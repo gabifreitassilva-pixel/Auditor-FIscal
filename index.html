@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MasterTax App - Inteligência Contábil</title>
-
+    
     <style>
         /* PALETA DE CORES MASTERTAX */
         :root {
@@ -40,9 +40,7 @@
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ========================================================================== */
-        /* ESTILOS DO DASHBOARD                                                       */
-        /* ========================================================================== */
+        /* DASHBOARD VISUAL */
         .dash-hero { text-align: center; margin-bottom: 50px; }
         .dash-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
         .dash-hero h1 span { color: var(--primary); }
@@ -107,9 +105,7 @@
         .btn-salvar-mini { background: var(--green); color: #fff; border: none; padding: 8px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; width: 100%; }
         .btn-add-mini { background: transparent; color: var(--cyan); border: 1px dashed var(--cyan); padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; width: 100%; margin-bottom: 5px; }
 
-        /* ========================================================================== */
-        /* VISUAL DO RAIO-X INDIVIDUAL                                                */
-        /* ========================================================================== */
+        /* VISUAL DO RAIO-X INDIVIDUAL */
         .result-grid { display: grid; grid-template-columns: 35% 65%; gap: 20px; display: none; }
         .card-header h3 { color: var(--primary); font-size: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; }
         .info-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 12px; font-size: 13px; }
@@ -122,15 +118,11 @@
         .cnae-code { font-size: 18px; font-weight: bold; color: var(--text-main); margin-top: 2px; }
         .badge-tipo { border: 1px solid var(--cyan); color: var(--cyan); background: transparent; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .cnae-desc { font-size: 13px; color: #ccc; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-light); }
-        
         .enquadramento-box { background-color: #111; border-left: 3px solid var(--primary); padding: 12px; border-radius: 0 4px 4px 0; margin-top: 5px; }
 
-        /* ========================================================================== */
-        /* VISUAL DO CRM / BANCO DE DADOS (CABEÇALHOS E LINHAS DE REGRAS)             */
-        /* ========================================================================== */
+        /* VISUAL DO CRM / BANCO DE DADOS (CABEÇALHOS E LINHAS DE REGRAS) */
         .crm-table th { background-color: #050505; border-bottom: 1px solid var(--border-light); color: var(--primary); padding: 15px; font-size: 12px; letter-spacing: 0.5px; }
         .crm-table td { background-color: #111; padding: 20px 15px; border-bottom: 4px solid #050505; vertical-align: top; }
-        
         .crm-cnpj { color: var(--primary); font-size: 16px; font-weight: bold; margin-bottom: 4px; display: block; }
         .crm-razao { color: #fff; font-size: 12px; text-transform: uppercase; display: block; }
         .crm-status { color: var(--green); font-weight: bold; font-size: 13px; }
@@ -140,13 +132,11 @@
         .crm-tipo { color: var(--primary); font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; display: block; }
         .crm-cnae-desc { color: #fff; font-size: 13px; margin-bottom: 8px; display: block; }
         
-        /* CABEÇALHOS DAS REGRAS NO CRM E NO RAIO-X */
         .crm-headers { display: flex; gap: 10px; padding: 5px 10px; margin-top: 10px; border-bottom: 1px solid #333; }
         .crm-col-cod { width: 120px; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
         .crm-col-anx { width: 130px; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
         .crm-col-obs { flex: 1; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
 
-        /* A TRINCA: CÓDIGO (CIANO) | ANEXO (VERDE) | HIPÓTESE (CINZA) */
         .crm-regra-row { display: flex; align-items: center; gap: 10px; background-color: #000; padding: 10px; border-radius: 4px; border: 1px solid #222; margin-top: 4px; }
         .crm-cod-servico { width: 120px; color: var(--cyan); font-weight: bold; font-size: 15px; font-family: monospace; }
         .crm-anexos-box { width: 130px; display: flex; gap: 4px; flex-wrap: wrap; }
@@ -169,7 +159,7 @@
             <div class="nav-item" onclick="switchTab('onboarding', this)">🏢 Raio-X Tributário</div>
             
             <div class="nav-item" id="menu-lote" onclick="switchTab('lote', this)" style="display: none; color: var(--danger);">📋 Cadastro em Lote DB</div>
-            <div class="nav-item" id="menu-db" onclick="switchTab('banco_dados', this)" style="display: none; color: var(--cyan); transition: all 0.3s;">🗄️ Base de Clientes (CRM)</div>
+            <div class="nav-item" id="menu-db" onclick="switchTab('banco_dados', this)" style="display: none; color: var(--cyan);">🗄️ Base de Clientes (CRM)</div>
             
             <div class="menu-category">Simuladores & Motores</div>
             <div class="nav-item" onclick="switchTab('servicos', this)">⚙️ Motor de Serviços</div>
@@ -193,12 +183,10 @@
     <div class="main-content">
         
         <div id="dashboard" class="tab-pane active">
-            
             <div class="dash-hero">
                 <h1>Inteligência <span>Tributária Estratégica</span></h1>
                 <p>Diagnóstico, enquadramento e economia fiscal com base na legislação atualizada.</p>
             </div>
-
             <div class="dash-grid-6">
                 <div class="dash-card" onclick="document.querySelector('.nav-item:nth-child(3)').click()">
                     <div class="dash-icon">🔍</div>
@@ -231,26 +219,12 @@
                     <p>Simulação Mensal</p>
                 </div>
             </div>
-
             <div class="dash-grid-4">
-                <div class="dash-kpi">
-                    <div class="dash-kpi-icon">💰</div>
-                    <div class="dash-kpi-text"><h4>Economic Potential</h4><span>Até 30%</span></div>
-                </div>
-                <div class="dash-kpi">
-                    <div class="dash-kpi-icon">🏢</div>
-                    <div class="dash-kpi-text"><h4>Empresas Analisadas</h4><span class="white">+500</span></div>
-                </div>
-                <div class="dash-kpi">
-                    <div class="dash-kpi-icon">🛡️</div>
-                    <div class="dash-kpi-text"><h4>Base Legal</h4><span>100%</span> <span class="white" style="font-size:12px;">Validada</span></div>
-                </div>
-                <div class="dash-kpi">
-                    <div class="dash-kpi-icon">⏱️</div>
-                    <div class="dash-kpi-text"><h4>Analise Rápida</h4><span class="white">Em Minutos</span></div>
-                </div>
+                <div class="dash-kpi"><div class="dash-kpi-icon">💰</div><div class="dash-kpi-text"><h4>Economic Potential</h4><span>Até 30%</span></div></div>
+                <div class="dash-kpi"><div class="dash-kpi-icon">🏢</div><div class="dash-kpi-text"><h4>Empresas Analisadas</h4><span class="white">+500</span></div></div>
+                <div class="dash-kpi"><div class="dash-kpi-icon">🛡️</div><div class="dash-kpi-text"><h4>Base Legal</h4><span>100%</span> <span class="white" style="font-size:12px;">Validada</span></div></div>
+                <div class="dash-kpi"><div class="dash-kpi-icon">⏱️</div><div class="dash-kpi-text"><h4>Analise Rápida</h4><span class="white">Em Minutos</span></div></div>
             </div>
-
             <div class="dash-section-title">Como Funciona</div>
             <div class="dash-steps">
                 <div class="dash-step"><div class="dash-step-circle">1</div><p>Inserir CNPJ</p></div>
@@ -263,19 +237,12 @@
                 <div class="dash-step-arrow">❱</div>
                 <div class="dash-step"><div class="dash-step-circle">5</div><p>Ação Estratégica</p></div>
             </div>
-
             <div style="display:flex; justify-content: center;">
                 <div class="dash-features">
                     <h3><span style="color:#fff;">Sistema Inteligente</span> que cruza automaticamente:</h3>
-                    <ul>
-                        <li>CNAE x LC 116 / 2003</li>
-                        <li>Anexos do Simples Nacional</li>
-                        <li>Regras Fiscais Atualizadas</li>
-                        <li>Oportunidades de Recuperação</li>
-                    </ul>
+                    <ul><li>CNAE x LC 116 / 2003</li><li>Anexos do Simples Nacional</li><li>Regras Fiscais Atualizadas</li><li>Oportunidades de Recuperação</li></ul>
                 </div>
             </div>
-
             <div class="dash-cta">
                 <p>Descubra agora se sua empresa está <strong>pagando imposto a mais.</strong></p>
                 <button class="btn-glow" onclick="document.querySelector('.nav-item:nth-child(3)').click()">ANALISAR EMPRESA AGORA</button>
@@ -319,8 +286,8 @@
             <h2 class="header-title" style="color: var(--danger);">Modo Desenvolvedor: Cadastro em Lote DB</h2>
             <p class="subtitle">Insira um ou vários CNPJs abaixo. O sistema verificará quais CNAEs ainda não estão no Banco de Dados.</p>
 
-            <div style="background: var(--bg-card); padding: 20px; border-radius: 6px; border: 1px solid var(--border-light); margin-bottom: 20px;">
-                <label style="color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: block;">COLE A LISTA DE CNPJS (UM POR LINHA)</label>
+            <div class="card" style="margin-bottom: 20px;">
+                <label style="color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">COLE A LISTA DE CNPJS (UM POR LINHA)</label>
                 <textarea id="cnpj-lista" placeholder="Ex: 18.747.083/0001-42..."></textarea>
                 
                 <div class="action-row">
@@ -345,9 +312,11 @@
 
         <div id="banco_dados" class="tab-pane">
             <h2 class="header-title" style="color: var(--cyan);">🗄️ Base de Clientes e Regras (CRM)</h2>
-            <p class="subtitle">As empresas que você analisou na aba de Lote aparecem aqui formatadas com suas matrizes tributárias.</p>
+            <p class="subtitle">Quando você salva uma regra no Lote, a empresa vem parar aqui. Exporte o código para atualizar o Gist!</p>
             
-            <table class="crm-table" style="width: 100%; border-collapse: collapse;">
+            <button class="btn btn-export" style="background-color: var(--primary); color: #fff;" onclick="exportarDB()">📋 GERAR BACKUP DE REGRAS (CÓDIGO)</button>
+
+            <table class="crm-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                 <thead>
                     <tr>
                         <th width="280">EMPRESA / CNPJ</th>
@@ -370,12 +339,38 @@
     </div>
 
     <script>
-        // ----------------------------------------------------
-        // BANCO DE DADOS 100% ZERADO (Inicia vazio a cada F5)
-        // ----------------------------------------------------
-        let dbEnquadramento = {}; // Sem nenhuma regra pré-salva
-        let dbEmpresas = {};      // Sem nenhum cliente pré-salvo
+        // ==========================================================================
+        // 🚨 COLOQUE O SEU LINK DO GITHUB GIST (RAW) AQUI 🚨
+        // ==========================================================================
+        const GIST_URL = ""; 
+        
+        // Inicializando os cofres 100% vazios para garantir testes limpos.
+        let dbEnquadramento = {}; 
+        let dbEmpresas = {};      
         let cacheLoteAtual = {};
+
+        // Carrega o banco da Nuvem (Gist) assim que o site abre
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (GIST_URL !== "") {
+                try {
+                    const response = await fetch(GIST_URL);
+                    const text = await response.text();
+                    
+                    // Extrai apenas o JSON que está dentro das chaves {} do arquivo JS
+                    let jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                    dbEnquadramento = JSON.parse(jsonStr);
+                    console.log("Banco de dados baixado da nuvem com sucesso!");
+                } catch (e) {
+                    console.error("Falha ao carregar o Gist. O sistema iniciará vazio.", e);
+                }
+            }
+
+            // O LocalStorage carrega apenas o que você fizer HOJE durante os testes, para não perder caso dê F5.
+            const bancoLocal = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
+            for(let key in bancoLocal) { dbEnquadramento[key] = bancoLocal[key]; }
+            
+            dbEmpresas = JSON.parse(localStorage.getItem('mastertax_db_empresas')) || {};
+        });
 
         // NAVEGAÇÃO
         function switchTab(tabId, element) {
@@ -398,7 +393,9 @@
             }
         }
 
+        // ==========================================
         // LÓGICA TELA 1: RAIO-X INDIVIDUAL
+        // ==========================================
         function maskCNPJ(input) {
             let v = input.value.replace(/\D/g, "");
             v = v.replace(/^(\d{2})(\d)/, "$1.$2"); v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
@@ -498,12 +495,13 @@
             });
         }
 
+        // ==========================================
         // LÓGICA TELA 2: MÁQUINA DE MAPEAMENTO LOTE (Aceita 1 ou Vários)
+        // ==========================================
         const delay = ms => new Promise(res => setTimeout(res, ms));
 
         async function iniciarProcessamentoLote() {
             const textArea = document.getElementById('cnpj-lista');
-            // Remove linhas vazias com filter para garantir que aceite apenas 1 CNPJ ou vários
             const linhas = textArea.value.split('\n').filter(linha => linha.trim() !== '');
             const cnpjsValidos = [];
 
@@ -546,12 +544,7 @@
             const cnpjLimpo = data.cnpj.replace(/\D/g, "");
             
             let statusHtml = `<strong style="color: ${data.descricao_situacao_cadastral === 'ATIVA' ? 'var(--green)' : 'var(--danger)'}">${data.descricao_situacao_cadastral}</strong><br><span style="font-size:10px; color:#888;">Abertura: ${data.data_inicio_atividade}</span>`;
-            if (data.descricao_situacao_cadastral === 'BAIXADA' && data.data_situacao_cadastral) {
-                let pB = data.data_situacao_cadastral.split('-');
-                let dataBaixa = pB.length === 3 ? `${pB[2]}/${pB[1]}/${pB[0]}` : data.data_situacao_cadastral;
-                statusHtml += `<br><span style="font-size:10px; color:var(--danger);">Baixa: ${dataBaixa}</span>`;
-            }
-
+            
             let cnpjFormatado = data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
 
             let todosCnaes = [];
@@ -628,7 +621,9 @@
             `);
         }
 
+        // ==========================================
         // LÓGICA TELA 3: SALVAR E ATUALIZAR CRM
+        // ==========================================
         function salvarNovoCNAE(rowId, codCnae, cnpjLimpo, btnElement) {
             const box = document.getElementById(`box_regras_${rowId}`);
             const linhas = box.querySelectorAll('.regra-linha');
@@ -640,15 +635,19 @@
                 const cd = linha.querySelector('.cd').value.trim();
                 
                 if(lc || ax || cd) {
-                    regrasCapturadas.push({ servico: lc, anexos: ax ? ax.split(',').map(a => a.trim().toUpperCase()) : [], regra: cd });
+                    regrasCapturadas.push({ servico: lc, anexos: ax ? ax.split(',').map(a => a.trim().toUpperCase()) : [], regra: cd || "-" });
                 }
             });
             
             if(regrasCapturadas.length === 0) return;
             
-            // Salva na memória apenas durante a sessão atual (Some no F5)
+            // Salva a Matriz na memória local (Rascunho)
             dbEnquadramento[codCnae] = regrasCapturadas;
+            let bancoLocalRegras = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
+            bancoLocalRegras[codCnae] = regrasCapturadas;
+            localStorage.setItem('mastertax_db_cnaes', JSON.stringify(bancoLocalRegras));
 
+            // Salva a Empresa na memória local (CRM)
             if (cacheLoteAtual[cnpjLimpo]) {
                 const dataEmpresa = cacheLoteAtual[cnpjLimpo];
                 if(!dbEmpresas[cnpjLimpo]) {
@@ -656,6 +655,7 @@
                     if(dataEmpresa.cnae_fiscal) dbEmpresas[cnpjLimpo].cnaes.push({ codigo: dataEmpresa.cnae_fiscal, desc: dataEmpresa.cnae_fiscal_descricao, tipo: 'PRINCIPAL' });
                     if(dataEmpresa.cnaes_secundarios) dataEmpresa.cnaes_secundarios.forEach(c => dbEmpresas[cnpjLimpo].cnaes.push({ codigo: c.codigo, desc: c.descricao, tipo: 'SECUNDÁRIO' }));
                 }
+                localStorage.setItem('mastertax_db_empresas', JSON.stringify(dbEmpresas));
             }
             
             const row = document.getElementById(rowId);
@@ -738,6 +738,22 @@
                     </tr>
                 `;
             });
+        }
+
+        // ==========================================
+        // GERA O BACKUP NO FORMATO EXATO PARA O GITHUB GIST
+        // ==========================================
+        function exportarDB() {
+            // Pega apenas as regras, exclui o CRM
+            let bancoLocalRegras = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
+            if(Object.keys(bancoLocalRegras).length === 0) {
+                alert("Você ainda não salvou nenhuma regra nova hoje para exportar.");
+                return;
+            }
+
+            const dbCode = "const dbEnquadramento = " + JSON.stringify(bancoLocalRegras, null, 4) + ";";
+            navigator.clipboard.writeText(dbCode);
+            alert("✅ CÓDIGO COPIADO COM SUCESSO!\n\nAgora vá lá no seu arquivo db_cnaes.js do GitHub Gist, clique em 'Edit', apague tudo que está lá e aperte CTRL+V para colar essa versão atualizada.");
         }
     </script>
 </body>
