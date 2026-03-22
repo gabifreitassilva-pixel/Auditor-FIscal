@@ -6,23 +6,25 @@
     <title>MasterTax App - Inteligência Contábil</title>
     
     <style>
-        /* PALETA DE CORES MASTERTAX */
+        /* ========================================================================== */
+        /* PALETA DE CORES E BASE GERAL */
+        /* ========================================================================== */
         :root {
             --bg-body: #050505; --bg-sidebar: #0a0a0a; --bg-card: #111111; --bg-input: #000000; --bg-item: #0d0d0d;
             --primary: #ff7300; --primary-hover: #ff8c00; --primary-glow: rgba(255, 115, 0, 0.4);
             --text-main: #ffffff; --text-muted: #aaaaaa;
             --border-light: #222222; --border-dark: #111111;
             --cyan: #00d4ff; --green: #28a745; --danger: #ff4444;
+            --slate-900: #0f172a; --slate-800: #1e293b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* SIDEBAR / MENU LATERAL */
+        /* SIDEBAR E MENUS */
         .sidebar { width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; }
         .logo { padding: 25px 20px; font-size: 18px; font-weight: 800; color: var(--primary); text-transform: uppercase; text-align: center; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .nav-menu { padding: 20px 0; overflow-y: auto; flex: 1; }
-        
         .menu-category { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 15px 20px 5px 20px; font-weight: bold; }
         .nav-item { padding: 12px 20px 12px 30px; color: var(--text-muted); cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-size: 13px; border-left: 4px solid transparent; }
         .nav-item:hover { background-color: var(--bg-card); color: var(--text-main); }
@@ -31,8 +33,7 @@
         .admin-zone { margin-top: auto; padding: 15px 20px; border-top: 1px solid var(--border-dark); background-color: #000; }
         .admin-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 12px; color: var(--danger); font-weight: bold; }
 
-        /* ÁREA PRINCIPAL E TABS */
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; scroll-behavior: smooth; background: radial-gradient(circle at top center, #111 0%, #050505 100%); }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; scroll-behavior: smooth; background: radial-gradient(circle at top center, #111 0%, #050505 100%); position: relative; }
         .header-title { font-size: 22px; color: var(--text-main); margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 8px; display: inline-block; }
         .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
 
@@ -40,184 +41,222 @@
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* DASHBOARD VISUAL */
+        /* MODAL DE SENHA E DETALHES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal-box { background-color: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 30px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-box h3 { color: var(--danger); margin-bottom: 10px; font-size: 18px; }
+        .modal-box p { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; }
+        .modal-box input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--border-light); background: #000; color: #fff; font-size: 16px; text-align: center; margin-bottom: 20px; letter-spacing: 5px; outline: none; }
+        .modal-box input:focus { border-color: var(--danger); }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.3s; }
+        .btn-cancel { background: #333; color: #fff; }
+        .btn-cancel:hover { background: #444; }
+        .btn-confirm { background: var(--green); color: #fff; }
+        .btn-confirm:hover { background: #218838; }
+
+        /* BOTÕES GERAIS E INPUTS */
+        .btn { background-color: var(--primary); color: #000; padding: 14px 25px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; transition: 0.3s; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: #555; cursor: not-allowed; color: #888; }
+        .btn-glow { background: linear-gradient(180deg, #ff8c00 0%, #cc5500 100%); color: #fff; padding: 15px 40px; border: 1px solid #ffa600; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; text-transform: uppercase; box-shadow: 0 0 20px rgba(255, 115, 0, 0.4); transition: 0.3s; }
+        .btn-glow:hover { box-shadow: 0 0 30px rgba(255, 115, 0, 0.6); transform: scale(1.02); }
+        .loading { display: none; color: var(--primary); font-weight: bold; margin-bottom: 20px; }
+        .card { background-color: var(--bg-card); padding: 20px; border-radius: 6px; border: 1px solid var(--border-light); }
+
+        /* ========================================================================== */
+        /* DASHBOARD RESTAURADO */
+        /* ========================================================================== */
         .dash-hero { text-align: center; margin-bottom: 50px; }
         .dash-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
         .dash-hero h1 span { color: var(--primary); }
         .dash-hero p { color: var(--text-muted); font-size: 15px; }
-
         .dash-grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
         .dash-card { background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%); border: 1px solid #333; border-top: 2px solid var(--primary); box-shadow: 0 -4px 20px rgba(255, 115, 0, 0.15); border-radius: 8px; padding: 25px 20px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .dash-card:hover { transform: translateY(-5px); box-shadow: 0 -6px 25px rgba(255, 115, 0, 0.3); border-color: var(--primary); }
         .dash-card h3 { color: var(--text-main); font-size: 16px; margin-bottom: 8px; font-weight: bold; }
         .dash-card p { color: var(--text-muted); font-size: 12px; }
         .dash-icon { font-size: 32px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255, 115, 0, 0.5); }
-
         .dash-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
         .dash-kpi { background: #111; border: 1px solid #222; border-radius: 8px; padding: 15px; display: flex; align-items: center; gap: 15px; }
         .dash-kpi-icon { font-size: 28px; }
         .dash-kpi-text h4 { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
         .dash-kpi-text span { font-size: 18px; font-weight: bold; color: var(--primary); }
         .dash-kpi-text span.white { color: #fff; }
-
         .dash-section-title { text-align: center; font-size: 18px; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .dash-section-title::before, .dash-section-title::after { content: ""; height: 1px; width: 50px; background: var(--primary); opacity: 0.5; }
-
         .dash-steps { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; background: #0a0a0a; padding: 20px; border-radius: 8px; border: 1px solid #222; position: relative; }
         .dash-step { text-align: center; z-index: 2; flex: 1; }
         .dash-step-circle { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, var(--primary) 0%, #a84d00 100%); color: #fff; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; box-shadow: 0 0 15px rgba(255,115,0,0.4); }
         .dash-step p { font-size: 12px; color: #ccc; font-weight: bold; }
         .dash-step-arrow { color: #444; font-size: 20px; margin-top: -25px; }
-
         .dash-features { background: linear-gradient(180deg, #151515 0%, #050505 100%); border: 1px solid #333; border-top: 2px solid var(--primary); border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 40px; box-shadow: 0 -4px 20px rgba(255, 115, 0, 0.1); }
         .dash-features h3 { color: var(--primary); margin-bottom: 20px; font-size: 16px; }
         .dash-features ul { list-style: none; display: inline-block; text-align: left; }
         .dash-features li { font-size: 14px; color: #ccc; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .dash-features li::before { content: "✔"; color: var(--primary); font-weight: bold; }
-
         .dash-cta { text-align: center; margin-top: 20px; }
-        .dash-cta p { font-size: 15px; margin-bottom: 20px; }
-        .btn-glow { background: linear-gradient(180deg, #ff8c00 0%, #cc5500 100%); color: #fff; padding: 15px 40px; border: 1px solid #ffa600; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; text-transform: uppercase; box-shadow: 0 0 20px rgba(255, 115, 0, 0.4); transition: 0.3s; }
-        .btn-glow:hover { box-shadow: 0 0 30px rgba(255, 115, 0, 0.6); transform: scale(1.02); }
 
-        /* ELEMENTOS GERAIS DE OUTRAS TELAS */
-        .btn { background-color: var(--primary); color: #000; padding: 14px 25px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
-        .btn:hover { background-color: var(--primary-hover); }
-        .btn:disabled { background-color: #555; cursor: not-allowed; color: #888; }
-        .loading { display: none; color: var(--primary); font-weight: bold; margin-bottom: 20px; }
+        /* ========================================================================== */
+        /* RAIO-X INDIVIDUAL */
+        /* ========================================================================== */
         .search-container { background-color: var(--bg-card); padding: 20px; border-radius: 6px; border: 1px solid var(--border-light); display: flex; gap: 15px; align-items: flex-end; margin-bottom: 30px; }
         .input-group { display: flex; flex-direction: column; flex: 1; }
         .input-group label { color: var(--primary); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
         .input-group input { padding: 14px; background-color: var(--bg-input); border: 1px solid var(--border-light); color: #fff; border-radius: 4px; font-size: 16px; outline: none; }
         .input-group input:focus { border-color: var(--primary); }
-
-        /* TABELAS DO MODO ADMIN / LOTE */
-        textarea { width: 100%; height: 120px; background-color: var(--bg-input); color: #fff; border: 1px solid var(--border-light); border-radius: 4px; padding: 15px; font-family: monospace; font-size: 14px; resize: vertical; margin-bottom: 15px; }
-        textarea:focus { border-color: var(--primary); outline: none; }
-        .action-row { display: flex; justify-content: space-between; align-items: center; }
-        .status-box { font-size: 14px; font-weight: bold; color: var(--cyan); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; background-color: var(--bg-card); border-radius: 6px; overflow: hidden; }
-        th { background-color: #000; color: var(--primary); padding: 15px; text-align: left; border-bottom: 2px solid var(--border-light); font-weight: bold; text-transform: uppercase; font-size: 11px; }
-        td { padding: 15px; border-bottom: 1px solid var(--border-light); color: #ddd; vertical-align: middle; }
-        
-        .mini-input { padding: 8px; background: #000; border: 1px solid var(--border-light); color: #fff; border-radius: 3px; width: 100%; font-size: 12px; }
-        .mini-input:focus { border-color: var(--primary); outline: none; }
-        .btn-salvar-mini { background: var(--green); color: #fff; border: none; padding: 8px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; width: 100%; }
-        .btn-add-mini { background: transparent; color: var(--cyan); border: 1px dashed var(--cyan); padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; width: 100%; margin-bottom: 5px; }
-
-        /* VISUAL DO RAIO-X INDIVIDUAL */
         .result-grid { display: grid; grid-template-columns: 35% 65%; gap: 20px; display: none; }
         .card-header h3 { color: var(--primary); font-size: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; }
         .info-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 12px; font-size: 13px; }
         .info-row strong { color: var(--text-muted); }
-        .status-ativa { color: var(--green) !important; font-weight: bold; }
         .cnae-list { list-style: none; overflow-y: auto; max-height: 600px; padding-right: 5px; }
         .cnae-item { background-color: var(--bg-item); border: 1px solid var(--border-light); border-radius: 6px; padding: 20px; margin-bottom: 15px; }
         .cnae-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .cnae-label { color: var(--primary); font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .cnae-code { font-size: 18px; font-weight: bold; color: var(--text-main); margin-top: 2px; }
-        .badge-tipo { border: 1px solid var(--cyan); color: var(--cyan); background: transparent; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .cnae-desc { font-size: 13px; color: #ccc; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-light); }
         .enquadramento-box { background-color: #111; border-left: 3px solid var(--primary); padding: 12px; border-radius: 0 4px 4px 0; margin-top: 5px; }
-
-        /* VISUAL DO CRM / BANCO DE DADOS (CABEÇALHOS E LINHAS DE REGRAS) */
-        .crm-table th { background-color: #050505; border-bottom: 1px solid var(--border-light); color: var(--primary); padding: 15px; font-size: 12px; letter-spacing: 0.5px; }
-        .crm-table td { background-color: #111; padding: 20px 15px; border-bottom: 4px solid #050505; vertical-align: top; }
-        .crm-cnpj { color: var(--primary); font-size: 16px; font-weight: bold; margin-bottom: 4px; display: block; }
-        .crm-razao { color: #fff; font-size: 12px; text-transform: uppercase; display: block; }
-        .crm-status { color: var(--green); font-weight: bold; font-size: 13px; }
-        
-        .crm-cnae-box { border-left: 2px solid var(--primary); padding-left: 15px; margin-bottom: 15px; }
-        .crm-cnae-box:last-child { margin-bottom: 0; }
-        .crm-tipo { color: var(--primary); font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; display: block; }
-        .crm-cnae-desc { color: #fff; font-size: 13px; margin-bottom: 8px; display: block; }
         
         .crm-headers { display: flex; gap: 10px; padding: 5px 10px; margin-top: 10px; border-bottom: 1px solid #333; }
         .crm-col-cod { width: 120px; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
         .crm-col-anx { width: 130px; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
         .crm-col-obs { flex: 1; font-size: 9px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
-
         .crm-regra-row { display: flex; align-items: center; gap: 10px; background-color: #000; padding: 10px; border-radius: 4px; border: 1px solid #222; margin-top: 4px; }
         .crm-cod-servico { width: 120px; color: var(--cyan); font-weight: bold; font-size: 15px; font-family: monospace; }
         .crm-anexos-box { width: 130px; display: flex; gap: 4px; flex-wrap: wrap; }
         .crm-anexo-badge { background-color: var(--green); color: #fff; font-weight: bold; font-size: 11px; padding: 4px 8px; border-radius: 3px; }
         .crm-hipotese { flex: 1; color: #bbb; font-size: 12px; font-style: italic; }
 
-        #tabela-resultados { display: none; }
+        /* ========================================================================== */
+        /* SIMULADOR GERAL E SIMPLES NACIONAL */
+        /* ========================================================================== */
+        .sim-header-row { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+        .sim-box { background-color: var(--bg-item); border: 1px solid var(--border-light); padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; }
+        .sim-box label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary); font-size: 12px; text-transform: uppercase; }
+        .sim-box select, .sim-box input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--border-light); background: var(--bg-input); color: var(--text-main); font-size: 14px; margin-bottom: 10px; outline: none; }
+        .sim-box select:focus, .sim-box input:focus { border-color: var(--primary); }
+        .anexos-selection { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .anexos-selection label { color: var(--text-main); font-weight: normal; font-size: 13px; text-transform: none; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .anexos-selection input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
+        .pgdas-import-zone { border: 2px dashed #444; background: #0f0a05; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .pgdas-import-zone:hover { border-color: var(--primary); background: #1a1005; }
+        .rbt12-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; }
+        .rbt12-item { display: flex; flex-direction: column; }
+        .rbt12-item label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+        .rbt12-item input { padding: 6px; font-size: 12px; text-align: right; font-family: monospace; transition: 0.3s; }
+        .table-container-sim { width: 100%; margin-top: 20px; border-radius: 8px; border: 1px solid var(--border-light); overflow-x: hidden; }
+        .sim-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 11px; table-layout: auto; }
+        .sim-table th, .sim-table td { padding: 8px 6px; border: 1px solid var(--border-light); vertical-align: top; }
+        .sim-table th { background-color: #1a1005; color: var(--primary); text-align: center; position: sticky; top: 0; font-size: 10px; text-transform: uppercase; }
+        .sim-table tbody tr:nth-child(even) { background-color: var(--bg-item); }
+        .sim-table tbody tr:hover { background-color: #1c1c1c; }
+        .sim-header-group { background-color: var(--primary); color: #000; font-weight: bold; }
+        .sim-destaque-total { background-color: #111 !important; font-weight: bold; color: var(--green); font-size: 12px; }
+        .sim-text-center { text-align: center; }
+        .sim-input-tabela { padding: 4px; border: 1px solid #333; border-radius: 4px; background-color: #000; color: var(--cyan); text-align: right; font-size: 12px; font-weight: bold; width: 100%; max-width: 90px; outline: none; font-family: monospace; transition: 0.3s; }
+        .tax-breakdown { display: none; margin-top: 6px; border-top: 1px dashed #444; padding-top: 4px; font-size: 9px; color: #aaa; text-align: right; line-height: 1.3; }
+        .tax-breakdown div { display: flex; justify-content: space-between; gap: 10px; }
+        .show-tax-details .tax-breakdown { display: block; animation: fadeIn 0.3s ease; }
+
+        /* ========================================================================== */
+        /* SIMULADOR LUCRO PRESUMIDO                                                  */
+        /* ========================================================================== */
+        .lp-container { overflow-x: auto; background: #000; border-radius: 8px; border: 1px solid var(--primary); box-shadow: 0 0 20px rgba(255, 115, 0, 0.1); margin-top: 20px; }
+        .lp-table { width: 100%; border-collapse: collapse; min-width: 1400px; font-family: monospace; font-size: 12px; }
+        .lp-table th, .lp-table td { padding: 10px; border: 1px solid var(--border-light); vertical-align: middle; text-align: right; }
+        .lp-table th { background-color: #0f172a; color: var(--primary); text-transform: uppercase; font-weight: bold; text-align: center; }
+        .lp-table .lp-header-fixed { position: sticky; left: 0; background-color: #0f172a; z-index: 10; text-align: left; width: 300px; border-right: 1px solid #333; }
+        .lp-table .lp-row-title { position: sticky; left: 0; background-color: #000; z-index: 10; font-weight: bold; color: #fff; border-right: 1px solid #333; display: flex; align-items: center; justify-content: space-between; text-align: left;}
+        .lp-table tbody tr:hover .lp-row-title { background-color: #111; }
+        .lp-table tbody tr:hover { background-color: rgba(255,255,255,0.02); }
+        .lp-section-title { background-color: #0f172a; color: var(--primary); font-weight: 900; letter-spacing: 1px; text-transform: uppercase; font-size: 10px; padding: 8px 10px !important; text-align: left !important;}
+        .lp-input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: right; font-weight: bold; outline: none; }
+        .lp-input:focus { background: #111; }
+        .lp-input-aliq { width: 40px; background: rgba(255, 115, 0, 0.1); border: 1px solid var(--primary); color: var(--primary); text-align: center; border-radius: 3px; font-size: 10px; margin-left: 10px; outline: none; }
+        .lp-result-cell { text-align: right; color: var(--text-muted); font-weight: bold; }
+        .lp-row-total { background-color: rgba(255, 115, 0, 0.1); }
+        .lp-row-total .lp-result-cell { color: var(--primary); }
+        .lp-row-geral { background-color: var(--primary); color: #000; }
+        .lp-row-geral .lp-row-title { background-color: var(--primary); color: #000; font-weight: 900; }
+        .lp-row-geral .lp-result-cell { color: #000; font-weight: 900; }
+
+        .btn-add-row { background: var(--primary); color: #000; border: none; padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-left: 10px; }
+        .btn-add-row:hover { background: var(--primary-hover); }
+        .btn-icon { background: transparent; border: none; color: #888; cursor: pointer; font-size: 12px; transition: 0.2s; padding: 0 4px; }
+        .btn-icon:hover { color: var(--primary); }
+        .btn-icon.danger:hover { color: var(--danger); }
+        .lp-row-actions { display: flex; align-items: center; gap: 4px; opacity: 0.3; transition: 0.3s; }
+        .lp-row-title:hover .lp-row-actions { opacity: 1; }
+
+        /* ========================================================================== */
+        /* TABELAS DO MODO ADMIN / LOTE E HISTÓRICO                                   */
+        /* ========================================================================== */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; background-color: var(--bg-card); border-radius: 6px; overflow: hidden; }
+        th { background-color: #000; color: var(--primary); padding: 15px; text-align: left; border-bottom: 2px solid var(--border-light); font-weight: bold; text-transform: uppercase; font-size: 11px; }
+        td { padding: 15px; border-bottom: 1px solid var(--border-light); color: #ddd; vertical-align: middle; }
+        textarea { width: 100%; height: 120px; background-color: var(--bg-input); color: #fff; border: 1px solid var(--border-light); border-radius: 4px; padding: 15px; font-family: monospace; font-size: 14px; resize: vertical; margin-bottom: 15px; }
+        .action-row { display: flex; justify-content: space-between; align-items: center; }
+        .status-box { font-size: 14px; font-weight: bold; color: var(--cyan); }
+        .mini-input { padding: 8px; background: #000; border: 1px solid var(--border-light); color: #fff; border-radius: 3px; width: 100%; font-size: 12px; }
+        .btn-salvar-mini { background: var(--green); color: #fff; border: none; padding: 8px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; width: 100%; }
+        .btn-add-mini { background: transparent; color: var(--cyan); border: 1px dashed var(--cyan); padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; width: 100%; margin-bottom: 5px; }
+        .crm-table th { background-color: #050505; border-bottom: 1px solid var(--border-light); color: var(--primary); padding: 15px; font-size: 12px; letter-spacing: 0.5px; text-align: left; }
+        .crm-table td { background-color: #111; padding: 20px 15px; border-bottom: 4px solid #050505; vertical-align: top; }
+        .crm-cnpj { color: var(--primary); font-size: 16px; font-weight: bold; margin-bottom: 4px; display: block; }
+        .crm-razao { color: #fff; font-size: 12px; text-transform: uppercase; display: block; }
+        .crm-status { color: var(--green); font-weight: bold; font-size: 13px; }
+        .crm-cnae-box { border-left: 2px solid var(--primary); padding-left: 15px; margin-bottom: 15px; }
+        .crm-cnae-box:last-child { margin-bottom: 0; }
+        .crm-tipo { color: var(--primary); font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; display: block; }
+        .crm-cnae-desc { color: #fff; font-size: 13px; margin-bottom: 8px; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo">
-            <span style="color: #fff;">🌐</span> MasterTax
+    <div id="modal-senha" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🛡️ Acesso Restrito</h3>
+            <p>O Módulo de Desenvolvedor altera a matriz de cálculo do sistema. Digite a senha para continuar.</p>
+            <input type="password" id="input-senha-admin" placeholder="•••••" onkeypress="if(event.key === 'Enter') verificarSenha()">
+            <div class="modal-btn-row">
+                <button class="modal-btn btn-cancel" onclick="cancelarSenha()">Cancelar</button>
+                <button class="modal-btn btn-confirm" onclick="verificarSenha()">Entrar</button>
+            </div>
         </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="logo"><span style="color: #fff;">🌐</span> MasterTax</div>
         <div class="nav-menu">
-            
             <div class="menu-category">Geral</div>
             <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 Dashboard Central</div>
-            <div class="nav-item" onclick="switchTab('onboarding', this)">🏢 Raio-X Tributário</div>
+            <div class="nav-item" id="menu-onboarding" onclick="switchTab('onboarding', this)">🏢 Raio-X Tributário</div>
+            <div class="nav-item" onclick="switchTab('historico', this)">🕒 Histórico de Consultas</div>
             
             <div class="nav-item" id="menu-lote" onclick="switchTab('lote', this)" style="display: none; color: var(--danger);">📋 Cadastro em Lote DB</div>
             <div class="nav-item" id="menu-db" onclick="switchTab('banco_dados', this)" style="display: none; color: var(--cyan);">🗄️ Base de Clientes (CRM)</div>
             
             <div class="menu-category">Simuladores & Motores</div>
+            <div class="nav-item" id="menu-simulador" onclick="switchTab('simulador', this)">📈 Simulador Financeiro</div>
             <div class="nav-item" onclick="switchTab('servicos', this)">⚙️ Motor de Serviços</div>
             <div class="nav-item" onclick="switchTab('comercio', this)">🛒 Motor de Comércio</div>
-            <div class="nav-item" onclick="switchTab('simulador', this)">📅 Projeção Financeira</div>
-            
-            <div class="menu-category">Auditoria & Recuperação</div>
-            <div class="nav-item" onclick="switchTab('recup_simples', this)">💰 Recuperação (Simples)</div>
-            <div class="nav-item" onclick="switchTab('recup_presumido', this)">🏢 Recuperação (Presumido)</div>
-            <div class="nav-item" onclick="switchTab('exclusao_icms', this)">⚖️ Exclusão ICMS da Base</div>
-            
         </div>
-
         <div class="admin-zone">
-            <label class="admin-toggle">
-                <input type="checkbox" id="chk-admin" onchange="toggleAdmin(this)"> Ativar Modo Desenvolvedor
-            </label>
+            <label class="admin-toggle"><input type="checkbox" id="chk-admin" onchange="abrirModalSenha(this)"> Ativar Modo Desenvolvedor</label>
         </div>
     </div>
 
     <div class="main-content">
         
         <div id="dashboard" class="tab-pane active">
-            <div class="dash-hero">
-                <h1>Inteligência <span>Tributária Estratégica</span></h1>
-                <p>Diagnóstico, enquadramento e economia fiscal com base na legislação atualizada.</p>
-            </div>
+            <div class="dash-hero"><h1>Inteligência <span>Tributária Estratégica</span></h1><p>Diagnóstico, enquadramento e economia fiscal com base na legislação atualizada.</p></div>
             <div class="dash-grid-6">
-                <div class="dash-card" onclick="document.querySelector('.nav-item:nth-child(3)').click()">
-                    <div class="dash-icon">🔍</div>
-                    <h3>Raio-X Tributário</h3>
-                    <p>Analise Completa de CNPJ</p>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-icon">⚖️</div>
-                    <h3>Enquadramento Inteligente</h3>
-                    <p>Simples Nacional Correto</p>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-icon">💰</div>
-                    <h3>Recuperação de Créditos</h3>
-                    <p>Recupere Tributos Pagos a Mais</p>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-icon">📈</div>
-                    <h3>Planejamento Tributário</h3>
-                    <p>Projeção de Impostos</p>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-icon">🛡️</div>
-                    <h3>Consultoria Fiscal</h3>
-                    <p>Segurança Jurídica</p>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-icon">⏱️</div>
-                    <h3>Projeção de Impostos</h3>
-                    <p>Simulação Mensal</p>
-                </div>
+                <div class="dash-card" onclick="document.getElementById('menu-onboarding').click()"><div class="dash-icon">🔍</div><h3>Raio-X Tributário</h3><p>Analise Completa de CNPJ</p></div>
+                <div class="dash-card" onclick="document.getElementById('menu-simulador').click()"><div class="dash-icon">⚖️</div><h3>Enquadramento Inteligente</h3><p>Simples Nacional Correto</p></div>
+                <div class="dash-card"><div class="dash-icon">💰</div><h3>Recuperação de Créditos</h3><p>Recupere Tributos Pagos a Mais</p></div>
+                <div class="dash-card" onclick="document.getElementById('menu-simulador').click()"><div class="dash-icon">📈</div><h3>Planejamento Tributário</h3><p>Projeção de Impostos</p></div>
+                <div class="dash-card"><div class="dash-icon">🛡️</div><h3>Consultoria Fiscal</h3><p>Segurança Jurídica</p></div>
+                <div class="dash-card" onclick="document.getElementById('menu-simulador').click()"><div class="dash-icon">⏱️</div><h3>Projeção de Impostos</h3><p>Simulação Mensal</p></div>
             </div>
             <div class="dash-grid-4">
                 <div class="dash-kpi"><div class="dash-kpi-icon">💰</div><div class="dash-kpi-text"><h4>Economic Potential</h4><span>Até 30%</span></div></div>
@@ -227,14 +266,10 @@
             </div>
             <div class="dash-section-title">Como Funciona</div>
             <div class="dash-steps">
-                <div class="dash-step"><div class="dash-step-circle">1</div><p>Inserir CNPJ</p></div>
-                <div class="dash-step-arrow">❱</div>
-                <div class="dash-step"><div class="dash-step-circle">2</div><p>Analise Automatica</p></div>
-                <div class="dash-step-arrow">❱</div>
-                <div class="dash-step"><div class="dash-step-circle">3</div><p>Cruzamento Tributário</p></div>
-                <div class="dash-step-arrow">❱</div>
-                <div class="dash-step"><div class="dash-step-circle">4</div><p>Diagnostico &<br>Oportunidades</p></div>
-                <div class="dash-step-arrow">❱</div>
+                <div class="dash-step"><div class="dash-step-circle">1</div><p>Inserir CNPJ</p></div><div class="dash-step-arrow">❱</div>
+                <div class="dash-step"><div class="dash-step-circle">2</div><p>Analise Automatica</p></div><div class="dash-step-arrow">❱</div>
+                <div class="dash-step"><div class="dash-step-circle">3</div><p>Cruzamento Tributário</p></div><div class="dash-step-arrow">❱</div>
+                <div class="dash-step"><div class="dash-step-circle">4</div><p>Diagnostico &<br>Oportunidades</p></div><div class="dash-step-arrow">❱</div>
                 <div class="dash-step"><div class="dash-step-circle">5</div><p>Ação Estratégica</p></div>
             </div>
             <div style="display:flex; justify-content: center;">
@@ -243,164 +278,239 @@
                     <ul><li>CNAE x LC 116 / 2003</li><li>Anexos do Simples Nacional</li><li>Regras Fiscais Atualizadas</li><li>Oportunidades de Recuperação</li></ul>
                 </div>
             </div>
-            <div class="dash-cta">
-                <p>Descubra agora se sua empresa está <strong>pagando imposto a mais.</strong></p>
-                <button class="btn-glow" onclick="document.querySelector('.nav-item:nth-child(3)').click()">ANALISAR EMPRESA AGORA</button>
-            </div>
+            <div class="dash-cta"><button class="btn-glow" onclick="document.getElementById('menu-onboarding').click()">ANALISAR EMPRESA AGORA</button></div>
         </div>
 
         <div id="onboarding" class="tab-pane">
             <h2 class="header-title">Onboarding: Raio-X Tributário</h2>
-            <p class="subtitle">Digite o CNPJ. O sistema cruza os CNAEs com a LC 116/2003 (Cód. Municipal) e os Anexos do Simples Nacional.</p>
-            
+            <p class="subtitle">Digite o CNPJ. O sistema cruza os CNAEs com a LC 116/2003 e os Anexos do Simples Nacional.</p>
             <div class="search-container">
-                <div class="input-group">
-                    <label>CNPJ DA EMPRESA</label>
-                    <input type="text" id="cnpj-input" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJ(this)" onkeypress="if(event.key === 'Enter') buscarCNPJ()">
-                </div>
+                <div class="input-group"><label>CNPJ DA EMPRESA</label><input type="text" id="cnpj-input" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJ(this)" onkeypress="if(event.key === 'Enter') buscarCNPJ()"></div>
                 <button class="btn" onclick="buscarCNPJ()">🔎 Analisar Empresa</button>
             </div>
-            
             <div id="loading-msg" class="loading">⏳ Consultando Receita Federal...</div>
-
             <div class="result-grid" id="result-container" style="display: none;">
-                <div class="card card-header">
-                    <h3>🏢 Dados Cadastrais</h3>
-                    <div class="info-row"><strong>Razão Social:</strong> <span id="res-nome">-</span></div>
-                    <div class="info-row"><strong>Fantasia:</strong> <span id="res-fantasia">-</span></div>
-                    <div class="info-row"><strong>Situação:</strong> <span id="res-situacao" class="status-ativa">-</span></div>
-                    <div class="info-row"><strong>Abertura:</strong> <span id="res-abertura">-</span></div>
-                    <div class="info-row"><strong>Natureza Jurídica:</strong> <span id="res-natureza">-</span></div>
-                    <div class="info-row"><strong>Capital Social:</strong> <span id="res-capital">-</span></div>
-                    <div class="info-row"><strong>Município/UF:</strong> <span id="res-local">-</span></div>
+                <div>
+                    <div class="card" style="height: fit-content;">
+                        <h3 style="color: var(--primary); font-size: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">🏢 Dados Cadastrais</h3>
+                        <div class="info-row"><strong>Razão Social:</strong> <span id="res-nome">-</span></div>
+                        <div class="info-row"><strong>Fantasia:</strong> <span id="res-fantasia">-</span></div>
+                        <div class="info-row"><strong>Situação:</strong> <span id="res-situacao" class="status-ativa">-</span></div>
+                        <div class="info-row"><strong>Abertura:</strong> <span id="res-abertura">-</span></div>
+                        <div class="info-row"><strong>Natureza Jurídica:</strong> <span id="res-natureza">-</span></div>
+                        <div class="info-row"><strong>Regime:</strong> <span id="res-regime">-</span></div>
+                        <div class="info-row"><strong>Município/UF:</strong> <span id="res-local">-</span></div>
+                    </div>
+                    
+                    <div id="box-action-simulador" style="display: none; background: #1a1005; border: 1px solid var(--primary); padding: 20px; border-radius: 6px; text-align: center; margin-top: 20px;">
+                        </div>
                 </div>
-
-                <div class="card card-header">
-                    <h3>📄 Mapeamento LC 116 e Simples Nacional</h3>
+                <div class="card">
+                    <h3 style="color: var(--primary); font-size: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">📄 Mapeamento LC 116 e Simples Nacional</h3>
                     <ul class="cnae-list" id="res-cnaes"></ul>
                 </div>
             </div>
         </div>
 
-        <div id="lote" class="tab-pane">
-            <h2 class="header-title" style="color: var(--danger);">Modo Desenvolvedor: Cadastro em Lote DB</h2>
-            <p class="subtitle">Insira um ou vários CNPJs abaixo. O sistema verificará quais CNAEs ainda não estão no Banco de Dados.</p>
+        <div id="simulador" class="tab-pane">
+            
+            <div id="simulador-simples" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <h2 class="header-title" style="margin: 0; border: none; padding: 0;">📈 Simulador Financeiro</h2>
+                    <span style="background: var(--green); color: #fff; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Simples Nacional</span>
+                </div>
+                <p class="subtitle" id="sim-subtitle">Projeção avançada de impostos e custos para empresas do Simples Nacional.</p>
 
-            <div class="card" style="margin-bottom: 20px;">
-                <label style="color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">COLE A LISTA DE CNPJS (UM POR LINHA)</label>
-                <textarea id="cnpj-lista" placeholder="Ex: 18.747.083/0001-42..."></textarea>
+                <div class="sim-header-row">
+                    <div class="sim-box">
+                        <label>Tipo de Empresa:</label>
+                        <select id="tipoEmpresa" onchange="toggleDatas(); iniciarSimulacao();">
+                            <option value="existente">Empresa Existente</option>
+                            <option value="nova">Empresa Nova</option>
+                        </select>
+                        <div id="dataAberturaDiv" style="display: none;"><label>Mês/Ano de Abertura:</label><div style="display: flex; gap: 10px;"><select id="mesAbertura" onchange="iniciarSimulacao();"></select><select id="anoAbertura" onchange="iniciarSimulacao();"></select></div></div>
+                        <div id="mesApuracaoDiv"><label>Mês/Ano de Apuração:</label><div style="display: flex; gap: 10px;"><select id="mesApuracao" onchange="toggleDatas(); iniciarSimulacao();"></select><select id="anoApuracao" onchange="toggleDatas(); iniciarSimulacao();"></select></div></div>
+                    </div>
+                    <div class="sim-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <label style="margin:0;">Anexos Identificados:</label>
+                            <button id="btn-toggle-taxes" class="btn" style="background: #222; color: var(--cyan); border: 1px solid var(--cyan); padding: 6px 12px; font-size: 10px;" onclick="toggleTaxes()">🔍 Mostrar Detalhes dos Impostos</button>
+                        </div>
+                        <div class="anexos-selection" onchange="iniciarSimulacao();">
+                            <label><input type="checkbox" name="anexo" value="anexoI" id="chk-anexoI"> Anexo I</label>
+                            <label><input type="checkbox" name="anexo" value="anexoII" id="chk-anexoII"> Anexo II</label>
+                            <label><input type="checkbox" name="anexo" value="anexoIII" id="chk-anexoIII"> Anexo III</label>
+                            <label><input type="checkbox" name="anexo" value="anexoIV" id="chk-anexoIV"> Anexo IV</label>
+                            <label><input type="checkbox" name="anexo" value="anexoV" id="chk-anexoV"> Anexo V</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-box" id="receitaMesesDiv" style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <div><label>Receita Bruta Acumulada (RBT12)</label><p style="font-size: 11px; color: #888;">Preencha manualmente ou importe o PGDAS.</p></div>
+                    </div>
+                    <div class="pgdas-import-zone" onclick="document.getElementById('file-pgdas').click()">
+                        <h4>📄 Importar Extrato PGDAS</h4><input type="file" id="file-pgdas" style="display:none" accept=".pdf" onchange="simularImportacaoPGDAS()">
+                    </div>
+                    <div class="rbt12-grid">
+                        <div class="rbt12-item"><label data-idx="1">Mês -1:</label><input type="text" class="receita-mes input-moeda" data-mes="-1" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="2">Mês -2:</label><input type="text" class="receita-mes input-moeda" data-mes="-2" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="3">Mês -3:</label><input type="text" class="receita-mes input-moeda" data-mes="-3" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="4">Mês -4:</label><input type="text" class="receita-mes input-moeda" data-mes="-4" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="5">Mês -5:</label><input type="text" class="receita-mes input-moeda" data-mes="-5" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="6">Mês -6:</label><input type="text" class="receita-mes input-moeda" data-mes="-6" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="7">Mês -7:</label><input type="text" class="receita-mes input-moeda" data-mes="-7" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="8">Mês -8:</label><input type="text" class="receita-mes input-moeda" data-mes="-8" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="9">Mês -9:</label><input type="text" class="receita-mes input-moeda" data-mes="-9" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="10">Mês -10:</label><input type="text" class="receita-mes input-moeda" data-mes="-10" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="11">Mês -11:</label><input type="text" class="receita-mes input-moeda" data-mes="-11" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                        <div class="rbt12-item"><label data-idx="12">Mês -12:</label><input type="text" class="receita-mes input-moeda" data-mes="-12" value="0,00" onblur="atualizarInputsFormatados(event)"></div>
+                    </div>
+                </div>
+                <div class="table-container-sim" id="resultadoSimulacao"></div>
+            </div>
+
+            <div id="simulador-presumido" style="display: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <h2 class="header-title" style="margin: 0; border: none; padding: 0;">📈 Provisão Fiscal Dinâmica</h2>
+                        <span style="background: var(--cyan); color: #000; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Lucro Presumido / Real</span>
+                    </div>
+                </div>
+                <p class="subtitle" id="presumido-subtitle">Cálculo de alíquotas base x débitos brutos para empresas não optantes.</p>
+
+                <div class="lp-container">
+                    <table class="lp-table" id="tabela-presumido">
+                        </table>
+                </div>
                 
-                <div class="action-row">
-                    <button id="btn-processar" class="btn" style="background: var(--danger); color: #fff;" onclick="iniciarProcessamentoLote()">🚀 Varrer Base e Descobrir CNAEs</button>
-                    <div id="status-texto" class="status-box" style="line-height: 40px;"></div>
+                <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 11px;">
+                    <span style="color: var(--primary);">⚠️</span> Nota: Informe a Base de Cálculo em cada mês. O sistema calcula IRPJ e CSLL instantaneamente.
                 </div>
             </div>
 
+        </div>
+
+        <div id="historico" class="tab-pane">
+            <h2 class="header-title">🕒 Histórico de Consultas</h2>
+            <p class="subtitle">Abaixo estão as últimas empresas que você pesquisou no Raio-X Tributário.</p>
+            <table>
+                <thead><tr><th width="150">Data da Consulta</th><th width="180">CNPJ</th><th>Razão Social</th><th width="120" style="text-align: center;">Ações</th></tr></thead>
+                <tbody id="corpo-tabela-historico"></tbody>
+            </table>
+        </div>
+
+        <div id="lote" class="tab-pane">
+            <h2 class="header-title" style="color: var(--danger);">Modo Desenvolvedor: Cadastro em Lote DB</h2>
+            <div class="card" style="margin-bottom: 20px;">
+                <label style="color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">COLE A LISTA DE CNPJS (UM POR LINHA)</label>
+                <textarea id="cnpj-lista" placeholder="Ex: 18.747.083/0001-42..."></textarea>
+                <div class="action-row"><button id="btn-processar" class="btn" style="background: var(--danger); color: #fff;" onclick="iniciarProcessamentoLote()">🚀 Varrer Base</button><div id="status-texto" class="status-box"></div></div>
+            </div>
             <table id="tabela-resultados" style="display: none; width: 100%;">
-                <thead>
-                    <tr>
-                        <th width="200">CNPJ / Empresa</th>
-                        <th width="120">Status & Datas</th>
-                        <th width="250">CNAE (Não Mapeado)</th>
-                        <th>Mapeamento Tributário (LC 116, Anexos e Hipóteses)</th>
-                        <th width="110" style="text-align: center;">Ações</th>
-                    </tr>
-                </thead>
+                <thead><tr><th width="200">CNPJ / Empresa</th><th width="120">Status</th><th width="250">CNAE (Não Mapeado)</th><th>Mapeamento (LC 116, Anexos)</th><th width="110">Ações</th></tr></thead>
                 <tbody id="corpo-tabela"></tbody>
             </table>
         </div>
 
         <div id="banco_dados" class="tab-pane">
-            <h2 class="header-title" style="color: var(--cyan);">🗄️ Base de Clientes e Regras (CRM)</h2>
-            <p class="subtitle">Quando você salva uma regra no Lote, a empresa vem parar aqui. Exporte o código para atualizar o Gist!</p>
-            
-            <button class="btn btn-export" style="background-color: var(--primary); color: #fff;" onclick="exportarDB()">📋 GERAR BACKUP DE REGRAS (CÓDIGO)</button>
-
+            <h2 class="header-title" style="color: var(--cyan);">🗄️ Base de Clientes (CRM)</h2>
+            <button class="btn btn-export" style="background-color: var(--primary); color: #fff;" onclick="exportarDB()">📋 GERAR BACKUP</button>
             <table class="crm-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                    <tr>
-                        <th width="280">EMPRESA / CNPJ</th>
-                        <th width="120">STATUS</th>
-                        <th>CNAES E REGRAS APLICADAS</th>
-                    </tr>
-                </thead>
-                <tbody id="corpo-tabela-crm">
-                    </tbody>
+                <thead><tr><th width="280">EMPRESA / CNPJ</th><th width="120">STATUS</th><th>CNAES E REGRAS APLICADAS</th></tr></thead>
+                <tbody id="corpo-tabela-crm"></tbody>
             </table>
         </div>
-
-        <div id="servicos" class="tab-pane"><h2 class="header-title">Motor de Serviços</h2></div>
-        <div id="comercio" class="tab-pane"><h2 class="header-title">Motor de Comércio (ST/NCM)</h2></div>
-        <div id="simulador" class="tab-pane"><h2 class="header-title">Projeção Financeira</h2></div>
-        <div id="recup_simples" class="tab-pane"><h2 class="header-title">Recuperação de Crédito (Simples)</h2></div>
-        <div id="recup_presumido" class="tab-pane"><h2 class="header-title">Recuperação de Crédito (Presumido)</h2></div>
-        <div id="exclusao_icms" class="tab-pane"><h2 class="header-title">Exclusão da Base de Cálculo (PIS/COFINS)</h2></div>
-
     </div>
 
     <script>
-        // ==========================================================================
-        // 🚨 COLOQUE O SEU LINK DO GITHUB GIST (RAW) AQUI 🚨
-        // ==========================================================================
         const GIST_URL = ""; 
-        
-        // Inicializando os cofres 100% vazios para garantir testes limpos.
         let dbEnquadramento = {}; 
         let dbEmpresas = {};      
         let cacheLoteAtual = {};
+        let chkAdminReferencia = null; 
+        
+        let empresaAtualAnexosDetectados = new Set();
+        let empresaAtualNome = "";
+        let empresaAtualOptanteSimples = false; 
+        let mostrarDetalhesImpostos = false; 
 
-        // Carrega o banco da Nuvem (Gist) assim que o site abre
+        // SIMPLES NACIONAL
+        let simulacaoData = []; 
+        const mesesOptions = [{ value: 1, nome: "01 - Janeiro" }, { value: 2, nome: "02 - Fevereiro" }, { value: 3, nome: "03 - Março" },{ value: 4, nome: "04 - Abril" }, { value: 5, nome: "05 - Maio" }, { value: 6, nome: "06 - Junho" },{ value: 7, nome: "07 - Julho" }, { value: 8, nome: "08 - Agosto" }, { value: 9, nome: "09 - Setembro" },{ value: 10, nome: "10 - Outubro" }, { value: 11, nome: "11 - Novembro" }, { value: 12, nome: "12 - Dezembro" }];
+        
+        // LUCRO PRESUMIDO 
+        const mesesLp = ['jan/25', 'fev/25', 'mar/25', 'abr/25', 'mai/25', 'jun/25', 'jul/25', 'ago/25', 'set/25', 'out/25', 'nov/25', 'dez/25'];
+        let lpCategorias = {
+            receitas: [
+                { id: 'lp_rec_venda', label: 'Vendas (Produtos)', tipo: 'venda' },
+                { id: 'lp_rec_servico', label: 'Prestação de Serviços', tipo: 'servico' }
+            ],
+            exclusoes: [
+                { id: 'lp_exc_icms', label: 'Exclusão ICMS base PIS/COFINS' }
+            ]
+        };
+        let lpValores = {}; 
+
         document.addEventListener('DOMContentLoaded', async () => {
             if (GIST_URL !== "") {
                 try {
                     const response = await fetch(GIST_URL);
                     const text = await response.text();
-                    
-                    // Extrai apenas o JSON que está dentro das chaves {} do arquivo JS
                     let jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
                     dbEnquadramento = JSON.parse(jsonStr);
-                    console.log("Banco de dados baixado da nuvem com sucesso!");
-                } catch (e) {
-                    console.error("Falha ao carregar o Gist. O sistema iniciará vazio.", e);
-                }
+                } catch (e) {}
             }
-
-            // O LocalStorage carrega apenas o que você fizer HOJE durante os testes, para não perder caso dê F5.
             const bancoLocal = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
             for(let key in bancoLocal) { dbEnquadramento[key] = bancoLocal[key]; }
-            
             dbEmpresas = JSON.parse(localStorage.getItem('mastertax_db_empresas')) || {};
+            atualizarTelaHistorico();
+            popularSelectsData(); 
+            
+            lpCategorias.receitas.forEach(r => lpValores[r.id] = Array(12).fill(0));
+            lpCategorias.exclusoes.forEach(e => lpValores[e.id] = Array(12).fill(0));
+            lpValores['lp_icms_base'] = Array(12).fill(0);
+            lpValores['lp_ipi_base'] = Array(12).fill(0);
+            iniciarPresumido(); 
         });
 
-        // NAVEGAÇÃO
         function switchTab(tabId, element) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             window.scrollTo(0,0); 
+            if(tabId === 'simulador' && empresaAtualOptanteSimples) iniciarSimulacao();
         }
 
-        function toggleAdmin(cb) {
+        // MODAL ADMIN
+        function abrirModalSenha(cb) {
+            chkAdminReferencia = cb;
             if (cb.checked) {
-                document.getElementById('menu-lote').style.display = 'flex';
-                document.getElementById('menu-db').style.display = 'flex';
-                atualizarTelaCRM(); 
+                document.getElementById('modal-senha').style.display = 'flex';
+                document.getElementById('input-senha-admin').value = '';
+                setTimeout(() => document.getElementById('input-senha-admin').focus(), 100);
             } else {
                 document.getElementById('menu-lote').style.display = 'none';
                 document.getElementById('menu-db').style.display = 'none';
-                document.querySelectorAll('.nav-item')[1].click(); 
+                document.getElementById('menu-onboarding').click(); 
+            }
+        }
+        function cancelarSenha() { document.getElementById('modal-senha').style.display = 'none'; if(chkAdminReferencia) chkAdminReferencia.checked = false; }
+        function verificarSenha() {
+            if (document.getElementById('input-senha-admin').value === "12345") {
+                document.getElementById('modal-senha').style.display = 'none';
+                document.getElementById('menu-lote').style.display = 'flex'; document.getElementById('menu-db').style.display = 'flex';
+            } else {
+                alert("❌ Senha incorreta."); document.getElementById('input-senha-admin').value = ''; document.getElementById('input-senha-admin').focus();
             }
         }
 
-        // ==========================================
-        // LÓGICA TELA 1: RAIO-X INDIVIDUAL
-        // ==========================================
+        // RAIO-X INDIVIDUAL & ROTEAMENTO
         function maskCNPJ(input) {
-            let v = input.value.replace(/\D/g, "");
-            v = v.replace(/^(\d{2})(\d)/, "$1.$2"); v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-            v = v.replace(/\.(\d{3})(\d)/, ".$1/$2"); v = v.replace(/(\d{4})(\d)/, "$1-$2");
-            input.value = v;
+            let v = input.value.replace(/\D/g, ""); v = v.replace(/^(\d{2})(\d)/, "$1.$2"); v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+            v = v.replace(/\.(\d{3})(\d)/, ".$1/$2"); v = v.replace(/(\d{4})(\d)/, "$1-$2"); input.value = v;
         }
 
         async function buscarCNPJ() {
@@ -410,16 +520,19 @@
 
             document.getElementById('loading-msg').style.display = 'block';
             document.getElementById('result-container').style.display = 'none';
+            document.getElementById('box-action-simulador').style.display = 'none';
+            empresaAtualAnexosDetectados.clear(); 
 
             try {
                 const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);
                 if(!response.ok) throw new Error("CNPJ não encontrado.");
                 const data = await response.json();
+                
+                empresaAtualNome = data.razao_social;
+                empresaAtualOptanteSimples = data.opcao_pelo_simples; 
                 preencherDadosIndividual(data);
-            } catch (error) {
-                alert("Erro: " + error.message);
-                document.getElementById('loading-msg').style.display = 'none';
-            }
+                salvarNoHistorico(data); 
+            } catch (error) { document.getElementById('loading-msg').style.display = 'none'; }
         }
 
         function preencherDadosIndividual(data) {
@@ -429,225 +542,535 @@
             document.getElementById('res-nome').innerText = data.razao_social;
             document.getElementById('res-fantasia').innerText = data.nome_fantasia || data.razao_social;
             document.getElementById('res-situacao').innerText = data.descricao_situacao_cadastral;
-            
-            let pA = data.data_inicio_atividade.split('-');
-            document.getElementById('res-abertura').innerText = pA.length === 3 ? `${pA[2]}/${pA[1]}/${pA[0]}` : data.data_inicio_atividade;
-            
+            document.getElementById('res-abertura').innerText = data.data_inicio_atividade;
             document.getElementById('res-natureza').innerText = data.natureza_juridica;
-            const capital = parseFloat(data.capital_social || 0);
-            document.getElementById('res-capital').innerText = capital.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
             document.getElementById('res-local').innerText = `${data.municipio} / ${data.uf}`;
+
+            let regimeText = '<span style="color: #ccc;">Não Optante (Presumido/Real)</span>';
+            if (data.opcao_pelo_mei) { regimeText = '<span style="color: var(--cyan); font-weight: bold;">Optante pelo MEI</span>'; } 
+            else if (data.opcao_pelo_simples) { regimeText = '<span style="color: var(--green); font-weight: bold;">Optante pelo Simples Nacional</span>'; }
+            document.getElementById('res-regime').innerHTML = regimeText;
 
             const listaCnaes = document.getElementById('res-cnaes');
             listaCnaes.innerHTML = ''; 
 
             let todosCnaes = [];
             if(data.cnae_fiscal) todosCnaes.push({ codigo: data.cnae_fiscal, descricao: data.cnae_fiscal_descricao, tipo: 'PRINCIPAL' });
-            if(data.cnaes_secundarios) {
-                data.cnaes_secundarios.forEach(c => todosCnaes.push({ codigo: c.codigo, descricao: c.descricao, tipo: 'SECUNDÁRIO' }));
-            }
+            if(data.cnaes_secundarios) data.cnaes_secundarios.forEach(c => todosCnaes.push({ codigo: c.codigo, descricao: c.descricao, tipo: 'SECUNDÁRIO' }));
 
             todosCnaes.forEach(cnae => {
                 const codStr = String(cnae.codigo);
                 let cnaeFormatado = codStr.length === 7 ? `${codStr.substring(0,2)}.${codStr.substring(2,4)}-${codStr.substring(4,5)}/${codStr.substring(5,7)}` : codStr;
 
                 let boxHtml = '';
-                
-                // MÁGICA: O Raio-X Individual agora puxa as regras usando o MESMO CABEÇALHO DO CRM
                 if (dbEnquadramento[codStr]) {
-                    let enqData = dbEnquadramento[codStr];
-                    let cenarios = Array.isArray(enqData) ? enqData : [enqData];
-
-                    boxHtml = `
-                        <div class="enquadramento-box" style="flex-direction: column; align-items: stretch; background: #0a0a0a; border: 1px solid #222; border-left: 3px solid var(--primary); padding: 15px; margin-top: 10px;">
-                            <div class="crm-headers" style="margin-top: 0; padding-top: 0;">
-                                <div class="crm-col-cod">Cód. Serviço</div>
-                                <div class="crm-col-anx">Anexo Simples Nac.</div>
-                                <div class="crm-col-obs">Observações (Hipóteses)</div>
-                            </div>
-                    `;
-                    
+                    let cenarios = Array.isArray(dbEnquadramento[codStr]) ? dbEnquadramento[codStr] : [dbEnquadramento[codStr]];
+                    boxHtml = `<div class="enquadramento-box" style="flex-direction: column; align-items: stretch; background: #0a0a0a; border: 1px solid #222; border-left: 3px solid var(--primary); padding: 15px; margin-top: 10px;"><div class="crm-headers" style="margin-top: 0; padding-top: 0;"><div class="crm-col-cod">Cód. Serviço</div><div class="crm-col-anx">Anexo Simples Nac.</div><div class="crm-col-obs">Observações</div></div>`;
                     cenarios.forEach(cenario => {
-                        let bAx = cenario.anexos ? cenario.anexos.map(a => `<span class="crm-anexo-badge">${a}</span>`).join(' ') : '';
-                        boxHtml += `
-                            <div class="crm-regra-row" style="width: 100%; border: none; padding: 5px 10px;">
-                                <span class="crm-cod-servico">${cenario.servico}</span>
-                                <div class="crm-anexos-box">${bAx}</div>
-                                <span class="crm-hipotese">${cenario.regra}</span>
-                            </div>
-                        `;
+                        let bAx = '';
+                        if(cenario.anexos) {
+                            cenario.anexos.forEach(a => { bAx += `<span class="crm-anexo-badge">${a}</span>`; empresaAtualAnexosDetectados.add(a); });
+                        }
+                        boxHtml += `<div class="crm-regra-row" style="width: 100%; border: none; padding: 5px 10px;"><span class="crm-cod-servico">${cenario.servico}</span><div class="crm-anexos-box">${bAx}</div><span class="crm-hipotese">${cenario.regra}</span></div>`;
                     });
-                    
                     boxHtml += `</div>`;
-                } else {
-                    boxHtml = `<div class="enquadramento-box" style="border-left-color: #444; margin-top:10px;"><div class="regras-box"><span class="regra-texto" style="color:var(--danger);">⚠️ CNAE não mapeado. Acesse o Modo Desenvolvedor para cadastrar.</span></div></div>`;
                 }
 
-                listaCnaes.innerHTML += `
-                    <li class="cnae-item">
-                        <div class="cnae-header">
-                            <div><div class="cnae-label">${cnae.tipo}</div><div class="cnae-code">${cnaeFormatado}</div></div>
-                            <div class="badge-tipo">SERVIÇO</div>
-                        </div>
-                        <div class="cnae-desc" style="border-bottom: none; padding-bottom: 0;">${cnae.descricao}</div>
-                        ${boxHtml}
-                    </li>`;
+                listaCnaes.innerHTML += `<li class="cnae-item"><div class="cnae-header"><div><div class="cnae-label">${cnae.tipo}</div><div class="cnae-code">${cnaeFormatado}</div></div><div class="badge-tipo">SERVIÇO</div></div><div class="cnae-desc" style="border-bottom: none; padding-bottom: 0;">${cnae.descricao}</div>${boxHtml}</li>`;
+            });
+
+            const boxAction = document.getElementById('box-action-simulador');
+            boxAction.style.display = 'block';
+            
+            if(empresaAtualOptanteSimples) {
+                boxAction.innerHTML = `
+                    <h4 style="color: var(--primary); margin-bottom: 10px; font-size: 14px;">Optante pelo Simples</h4>
+                    <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">Os anexos foram mapeados. Clique abaixo para projetar o Simples Nacional.</p>
+                    <button class="btn-glow" style="width: 100%; padding: 12px;" onclick="irParaSimulador()">📊 IR PARA PROJEÇÃO (SIMPLES NACIONAL)</button>
+                `;
+            } else {
+                boxAction.innerHTML = `
+                    <h4 style="color: var(--cyan); margin-bottom: 10px; font-size: 14px;">Não Optante (Presumido/Real)</h4>
+                    <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">A empresa não está no Simples. Clique abaixo para abrir a matriz de cálculo do Lucro Presumido.</p>
+                    <button class="btn-glow" style="width: 100%; padding: 12px; background: linear-gradient(180deg, #00b4d8 0%, #0077b6 100%); border-color: #00b4d8; box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);" onclick="irParaSimulador()">📊 IR PARA PROVISÃO FISCAL (PRESUMIDO)</button>
+                `;
+            }
+        }
+
+        function irParaSimulador() {
+            document.getElementById('menu-simulador').click();
+            
+            if (empresaAtualOptanteSimples) {
+                document.getElementById('simulador-simples').style.display = 'block';
+                document.getElementById('simulador-presumido').style.display = 'none';
+                document.getElementById('sim-subtitle').innerHTML = `Projetando impostos para <strong>${empresaAtualNome}</strong> baseados no seu Raio-X.`;
+                
+                document.querySelectorAll('input[name="anexo"]').forEach(cb => cb.checked = false);
+                empresaAtualAnexosDetectados.forEach(anx => {
+                    let anexoLimpo = anx.toUpperCase().replace('ANEXO', '').replace('-', '').trim();
+                    const cb = document.getElementById(`chk-anexo${anexoLimpo}`);
+                    if(cb) { cb.checked = true; }
+                });
+                document.getElementById('tipoEmpresa').value = "existente";
+                toggleDatas(); iniciarSimulacao();
+            } else {
+                document.getElementById('simulador-simples').style.display = 'none';
+                document.getElementById('simulador-presumido').style.display = 'block';
+                document.getElementById('presumido-subtitle').innerHTML = `Provisão de impostos em Lucro Presumido para <strong>${empresaAtualNome}</strong>.`;
+                iniciarPresumido();
+            }
+        }
+
+        // MÁSCARAS
+        function formatarMoedaBr(valor) {
+            if (isNaN(valor) || valor === null) return '0,00';
+            const valorArredondado = parseFloat(valor).toFixed(2);
+            let [parteInteira, parteDecimal] = valorArredondado.split('.');
+            parteInteira = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return `${parteInteira},${parteDecimal}`;
+        }
+        function limparFormatacaoBr(valorString) {
+            if (typeof valorString !== 'string') return parseFloat(valorString) || 0;
+            let limpa = valorString.replace(/\./g, ''); limpa = limpa.replace(',', '.'); return parseFloat(limpa) || 0; 
+        }
+        function maskCurrencyOnly(input) {
+            let valor = input.value.replace(/\D/g, ''); if (valor === "") { input.value = ""; return; }
+            valor = (parseInt(valor) / 100).toFixed(2) + ''; valor = valor.replace(".", ","); valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); input.value = valor;
+        }
+
+        // ==========================================================================
+        // SIMULADOR LUCRO PRESUMIDO (TEMPO REAL)
+        // ==========================================================================
+        function addLPRow(section) {
+            let nome = prompt(`Digite o nome da nova ${section === 'receitas' ? 'Receita' : 'Exclusão'}:`);
+            if(!nome) return;
+            let id = `lp_${section.substring(0,3)}_${Date.now()}`; let item = { id: id, label: nome };
+            if(section === 'receitas') {
+                let tipo = prompt("Qual a natureza dessa receita para cálculo da base?\n\nDigite 1 para VENDA DE PRODUTOS (IRPJ 8% / CSLL 12%)\nDigite 2 para SERVIÇOS (IRPJ 32% / CSLL 32%)");
+                item.tipo = (tipo === '2') ? 'servico' : 'venda';
+            }
+            lpCategorias[section].push(item); lpValores[id] = Array(12).fill(0); iniciarPresumido();
+        }
+        function editLPRow(section, id) {
+            let item = lpCategorias[section].find(x => x.id === id); let novoNome = prompt("Editar nome da linha:", item.label);
+            if(novoNome) { item.label = novoNome; iniciarPresumido(); }
+        }
+        function deleteLPRow(section, id) {
+            if(confirm("Tem certeza que deseja excluir esta linha?")) {
+                lpCategorias[section] = lpCategorias[section].filter(x => x.id !== id); delete lpValores[id]; iniciarPresumido();
+            }
+        }
+        function iniciarPresumido() {
+            const table = document.getElementById('tabela-presumido');
+            let html = `<thead><tr><th class="lp-header-fixed">ESTRUTURA DE APURAÇÃO</th>${mesesLp.map(m => `<th>${m}</th>`).join('')}</tr></thead><tbody>`;
+
+            html += `<tr><td colspan="13" class="lp-section-title" style="display:flex; justify-content:space-between; align-items:center;"><span>Receitas Operacionais</span><button class="btn-add-row" onclick="addLPRow('receitas')">➕ Incluir Receita</button></td></tr>`;
+            lpCategorias.receitas.forEach(r => { html += criarLinhaInputLPDinamica('receitas', r); });
+            html += criarLinhaResultLP('lp_rb_total', '(=) Receita Bruta Total', true);
+
+            html += `<tr><td colspan="13" class="lp-section-title" style="display:flex; justify-content:space-between; align-items:center;"><span>Exclusões</span><button class="btn-add-row" style="background:#555; color:#fff;" onclick="addLPRow('exclusoes')">➕ Incluir Exclusão</button></td></tr>`;
+            lpCategorias.exclusoes.forEach(e => { html += criarLinhaInputLPDinamica('exclusoes', e); });
+
+            html += `<tr><td colspan="13" class="lp-section-title">1. PIS e COFINS (Automático)</td></tr>`;
+            html += criarLinhaResultLP('lp_pis', 'PIS A PAGAR (0,65%)'); html += criarLinhaResultLP('lp_cofins', 'COFINS A PAGAR (3,00%)');
+
+            html += `<tr><td colspan="13" class="lp-section-title">2. ICMS - Débitos por Alíquota</td></tr>`;
+            html += criarLinhaInputAliqLP('lp_icms', 'ICMS Operação Própria', 18); html += criarLinhaResultLP('lp_icms_pagar', 'TOTAL ICMS A PAGAR');
+
+            html += `<tr><td colspan="13" class="lp-section-title">3. IPI - Débitos por Alíquota</td></tr>`;
+            html += criarLinhaInputAliqLP('lp_ipi', 'IPI Industrialização', 5); html += criarLinhaResultLP('lp_ipi_pagar', 'TOTAL IPI A PAGAR');
+
+            html += `<tr><td colspan="13" class="lp-section-title">4. IRPJ e CSLL (Lucro Presumido)</td></tr>`;
+            html += criarLinhaResultLP('lp_irpj', 'IRPJ A PAGAR (15% + Adic)'); html += criarLinhaResultLP('lp_csll', 'CSLL A PAGAR (9%)');
+
+            html += `<tr class="lp-row-geral"><td class="lp-row-title">TOTAL GERAL DE IMPOSTOS</td>`;
+            for(let i=0; i<12; i++) { html += `<td class="lp-result-cell" id="lp_total_${i}">0,00</td>`; }
+            html += `</tr></tbody>`;
+            
+            table.innerHTML = html; setTimeout(() => computarValoresLP(), 50); 
+        }
+
+        function onInputLP(inp) { maskCurrencyOnly(inp); computarValoresLP(); }
+        function onBlurLP(inp) { inp.value = formatarMoedaBr(limparFormatacaoBr(inp.value)); computarValoresLP(); }
+
+        function criarLinhaInputLPDinamica(section, item) {
+            let tipoBadge = section === 'receitas' ? `<span style="font-size:8px; color:var(--primary); border:1px solid var(--primary); padding:1px 4px; border-radius:2px;">${item.tipo === 'venda' ? 'VENDA' : 'SERVIÇO'}</span>` : '';
+            let html = `<tr><td class="lp-row-title"><div style="display:flex; align-items:center; gap:8px;"><div class="lp-row-actions"><button class="btn-icon" title="Editar" onclick="editLPRow('${section}', '${item.id}')">✏️</button><button class="btn-icon danger" title="Excluir" onclick="deleteLPRow('${section}', '${item.id}')">🗑️</button></div><span style="font-weight:normal; color:#bbb;">${item.label} ${tipoBadge}</span></div></td>`;
+            for(let i=0; i<12; i++) {
+                let valorAtual = lpValores[item.id] ? lpValores[item.id][i] : 0;
+                html += `<td><input type="text" class="lp-input lp-calc-trigger" id="${item.id}_${i}" value="${formatarMoedaBr(valorAtual)}" oninput="onInputLP(this)" onblur="onBlurLP(this)"></td>`;
+            }
+            return html + `</tr>`;
+        }
+
+        function criarLinhaInputAliqLP(idPrefix, label, aliqBase) {
+            let html = `<tr><td class="lp-row-title"><span style="font-weight:normal; color:#bbb;">${label}</span> <div><span style="font-size:9px;color:#888;">Aliq:</span><input type="number" class="lp-input-aliq lp-calc-trigger" id="${idPrefix}_aliq" value="${aliqBase}" oninput="computarValoresLP()"> %</div></td>`;
+            for(let i=0; i<12; i++) {
+                let val = lpValores[`${idPrefix}_base`] ? lpValores[`${idPrefix}_base`][i] : 0;
+                html += `<td><div style="font-size:8px; color:#555; text-align:right;">BASE:</div><input type="text" class="lp-input lp-calc-trigger" style="color:var(--cyan);" id="${idPrefix}_base_${i}" value="${formatarMoedaBr(val)}" oninput="onInputLP(this)" onblur="onBlurLP(this)"></td>`;
+            }
+            return html + `</tr>`;
+        }
+
+        function criarLinhaResultLP(idPrefix, label, isTotal = false) {
+            let trClass = isTotal ? 'lp-row-total' : ''; let html = `<tr class="${trClass}"><td class="lp-row-title">${label}</td>`;
+            for(let i=0; i<12; i++) html += `<td class="lp-result-cell" id="${idPrefix}_${i}">0,00</td>`;
+            return html + `</tr>`;
+        }
+
+        function computarValoresLP() {
+            document.querySelectorAll('.lp-calc-trigger[type="text"]').forEach(inp => {
+                if(inp.id.includes('_aliq')) return;
+                let val = limparFormatacaoBr(inp.value);
+                let parts = inp.id.split('_'); let m = parseInt(parts.pop()); let id = parts.join('_');
+                if(lpValores[id]) lpValores[id][m] = val;
+            });
+
+            const aliqIcms = parseFloat(document.getElementById('lp_icms_aliq')?.value) || 0;
+            const aliqIpi = parseFloat(document.getElementById('lp_ipi_aliq')?.value) || 0;
+
+            for(let m = 0; m < 12; m++) {
+                let totalVendas = 0; let totalServicos = 0;
+                lpCategorias.receitas.forEach(r => { let val = lpValores[r.id][m] || 0; if(r.tipo === 'venda') totalVendas += val; else totalServicos += val; });
+                let receitaBruta = totalVendas + totalServicos;
+
+                let exclusoes = 0;
+                lpCategorias.exclusoes.forEach(e => { exclusoes += (lpValores[e.id][m] || 0); });
+
+                let icmsBase = lpValores['lp_icms_base'] ? lpValores['lp_icms_base'][m] || 0 : 0;
+                let ipiBase = lpValores['lp_ipi_base'] ? lpValores['lp_ipi_base'][m] || 0 : 0;
+
+                let basePisCofins = Math.max(0, receitaBruta - exclusoes);
+                let pis = basePisCofins * 0.0065; let cofins = basePisCofins * 0.03;
+                let icms = icmsBase * (aliqIcms / 100); let ipi = ipiBase * (aliqIpi / 100);
+
+                let baseIrpj = (totalVendas * 0.08) + (totalServicos * 0.32); 
+                let irpj = (baseIrpj * 0.15) + (baseIrpj > 20000 ? (baseIrpj - 20000) * 0.10 : 0);
+                
+                let baseCsll = (totalVendas * 0.12) + (totalServicos * 0.32); 
+                let csll = baseCsll * 0.09;
+                
+                let totalMes = pis + cofins + icms + ipi + irpj + csll;
+
+                const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = formatarMoedaBr(val); };
+                setEl(`lp_rb_total_${m}`, receitaBruta); setEl(`lp_pis_${m}`, pis); setEl(`lp_cofins_${m}`, cofins); 
+                setEl(`lp_icms_pagar_${m}`, icms); setEl(`lp_ipi_pagar_${m}`, ipi); setEl(`lp_irpj_${m}`, irpj);
+                setEl(`lp_csll_${m}`, csll); setEl(`lp_total_${m}`, totalMes);
+            }
+        }
+
+        // ==========================================================================
+        // SIMULADOR SIMPLES NACIONAL (MANTIDO INTACTO)
+        // ==========================================================================
+        function toggleTaxes() {
+            const tableContainer = document.getElementById('resultadoSimulacao'); const btnToggle = document.getElementById('btn-toggle-taxes');
+            mostrarDetalhesImpostos = !mostrarDetalhesImpostos; 
+            if (mostrarDetalhesImpostos) {
+                tableContainer.classList.add('show-tax-details'); btnToggle.innerHTML = "➖ Ocultar Detalhes dos Impostos"; btnToggle.style.color = "var(--danger)"; btnToggle.style.borderColor = "var(--danger)";
+            } else {
+                tableContainer.classList.remove('show-tax-details'); btnToggle.innerHTML = "🔍 Mostrar Detalhes dos Impostos"; btnToggle.style.color = "var(--cyan)"; btnToggle.style.borderColor = "var(--cyan)";
+            }
+        }
+
+        function simularImportacaoPGDAS() {
+            const inputVal = document.getElementById('file-pgdas').value; if(!inputVal) return;
+            document.querySelectorAll('.receita-mes').forEach(input => { let mockValue = 40000 + (Math.random() * 20000); input.value = formatarMoedaBr(mockValue); input.classList.add('auto-filled'); setTimeout(() => input.classList.remove('auto-filled'), 2000); });
+            document.getElementById('file-pgdas').value = ""; iniciarSimulacao();
+        }
+
+        function atualizarInputsFormatados(event) { const input = event.target; input.value = formatarMoedaBr(limparFormatacaoBr(input.value)); iniciarSimulacao(); }
+        function atualizarInputsDaTabela(event) { const input = event.target; input.value = formatarMoedaBr(limparFormatacaoBr(input.value)); handleInputRecalc(); }
+
+        function popularSelectsData() {
+            const anoAtual = new Date().getFullYear();
+            const selectsMes = [document.getElementById('mesAbertura'), document.getElementById('mesApuracao')];
+            const selectsAno = [document.getElementById('anoAbertura'), document.getElementById('anoApuracao')];
+            selectsMes.forEach(select => {
+                if (!select) return; select.innerHTML = '<option value="">Mês</option>';
+                mesesOptions.forEach(mes => { const option = document.createElement('option'); option.value = mes.value; option.textContent = mes.nome; select.appendChild(option); });
+            });
+            selectsAno.forEach(select => {
+                if (!select) return; select.innerHTML = '<option value="">Ano</option>';
+                for (let ano = anoAtual - 4; ano <= anoAtual + 1; ano++) { const option = document.createElement('option'); option.value = ano; option.textContent = ano; if (ano === anoAtual) option.selected = true; select.appendChild(option); }
+            });
+            const mesAtual = new Date().getMonth() + 1;
+            if (document.getElementById('mesApuracao')) document.getElementById('mesApuracao').value = mesAtual;
+            if (document.getElementById('mesAbertura')) document.getElementById('mesAbertura').value = mesAtual;
+        }
+
+        function popularInputsReceitaMes(mesApuracao, anoApuracao) {
+            const mesAtual = parseInt(mesApuracao); const anoAtual = parseInt(anoApuracao);
+            if (isNaN(mesAtual) || isNaN(anoAtual)) return;
+            document.querySelectorAll('#receitaMesesDiv .rbt12-item').forEach(item => {
+                const input = item.querySelector('.receita-mes'); const label = item.querySelector('label'); const offset = Math.abs(parseInt(input.dataset.mes)); 
+                let dataReferencia = new Date(anoAtual, mesAtual - 1, 1); dataReferencia.setMonth(dataReferencia.getMonth() - offset);
+                const mesNome = mesesOptions.find(m => m.value === dataReferencia.getMonth() + 1)?.nome.substring(4) || '??'; label.textContent = `Mês -${offset} (${mesNome}/${dataReferencia.getFullYear()})`;
             });
         }
 
-        // ==========================================
-        // LÓGICA TELA 2: MÁQUINA DE MAPEAMENTO LOTE (Aceita 1 ou Vários)
-        // ==========================================
-        const delay = ms => new Promise(res => setTimeout(res, ms));
+        function toggleDatas() {
+            const tipoEmpresa = document.getElementById('tipoEmpresa').value;
+            const dataAberturaDiv = document.getElementById('dataAberturaDiv'); const mesApuracaoDiv = document.getElementById('mesApuracaoDiv'); const receitaMesesDiv = document.getElementById('receitaMesesDiv');
+            if (tipoEmpresa === 'nova' || tipoEmpresa === 'projecao') {
+                dataAberturaDiv.style.display = 'block'; mesApuracaoDiv.style.display = 'none'; receitaMesesDiv.style.display = 'none';
+            } else { 
+                dataAberturaDiv.style.display = 'none'; mesApuracaoDiv.style.display = 'block'; receitaMesesDiv.style.display = 'block'; popularInputsReceitaMes(document.getElementById('mesApuracao').value, document.getElementById('anoApuracao').value);
+            }
+            iniciarSimulacao();
+        }
 
-        async function iniciarProcessamentoLote() {
-            const textArea = document.getElementById('cnpj-lista');
-            const linhas = textArea.value.split('\n').filter(linha => linha.trim() !== '');
-            const cnpjsValidos = [];
+        function getReceitasRBT12() {
+            const receitasRBT12 = {}; document.querySelectorAll('.receita-mes').forEach(input => { receitasRBT12[parseInt(input.dataset.mes)] = limparFormatacaoBr(input.value); }); return receitasRBT12;
+        }
 
-            linhas.forEach(linha => {
-                const limpo = linha.replace(/\D/g, "");
-                if(limpo.length === 14) cnpjsValidos.push(limpo);
+        function gerarMesesSimulacao(tipoEmpresa, dataAberturaStr, mesApuracaoStr) {
+            const mesesSimulacao = []; let dataAtual;
+            if (tipoEmpresa === 'existente') { const [ano, mes] = mesApuracaoStr.split('-').map(Number); dataAtual = new Date(ano, mes - 1, 1); } 
+            else { const [ano, mes] = dataAberturaStr.split('-').map(Number); dataAtual = new Date(ano, mes - 1, 1); }
+            for (let i = 0; i < 12; i++) { const dataMes = new Date(dataAtual); dataMes.setMonth(dataMes.getMonth() + i); mesesSimulacao.push({ data: dataMes, numeroMes: i + 1, receitaMes: 0 }); }
+            return mesesSimulacao;
+        }
+
+        function iniciarSimulacao() {
+            if(!empresaAtualOptanteSimples) return; 
+            const tipoEmpresa = document.getElementById('tipoEmpresa').value;
+            const mesAbertura = document.getElementById('mesAbertura').value; const anoAbertura = document.getElementById('anoAbertura').value;
+            const mesApuracao = document.getElementById('mesApuracao').value; const anoApuracao = document.getElementById('anoApuracao').value;
+            
+            if (tipoEmpresa !== 'existente' && (!mesAbertura || !anoAbertura)) return;
+            if (tipoEmpresa === 'existente' && (!mesApuracao || !anoApuracao)) return;
+
+            const anexosSelecionados = Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.value);
+            if (anexosSelecionados.length === 0) { document.getElementById('resultadoSimulacao').innerHTML = ''; return; }
+
+            const mesesSimulacao = gerarMesesSimulacao(tipoEmpresa, `${anoAbertura}-${String(mesAbertura).padStart(2, '0')}`, `${anoApuracao}-${String(mesApuracao).padStart(2, '0')}`);
+            montarTabelaSimulacao(mesesSimulacao, anexosSelecionados, { salarioPadrao: 0, dependentes: 0, honorarios: 0 }, tipoEmpresa);
+            calcularTabelaCompleta(tipoEmpresa, getReceitasRBT12(), anexosSelecionados, { salarioPadrao: 0, dependentes: 0, honorarios: 0 });
+        }
+
+        function handleInputRecalc() {
+            const tipo = document.getElementById('tipoEmpresa').value;
+            calcularTabelaCompleta(tipo, tipo === 'existente' ? getReceitasRBT12() : {}, Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.value), {salarioPadrao: 0, dependentes: 0, honorarios: 0});
+        }
+        
+        function montarTabelaSimulacao(mesesSimulacao, anexosSelecionados, dadosBase, tipoEmpresa) {
+            const classeDetalhando = mostrarDetalhesImpostos ? 'show-tax-details' : '';
+            let htmlTabela = `<table class="sim-table ${classeDetalhando}"><thead>`;
+            const numAnexos = anexosSelecionados.length; const showTotalDAS = numAnexos >= 2;
+            let cabecalhoFaturamentoHTML = ''; anexosSelecionados.forEach(anexo => { cabecalhoFaturamentoHTML += `<th>${anexo.replace('anexo', 'Anexo ').toUpperCase()} (R$)</th>`; });
+
+            const showRBT12Folha = anexosSelecionados.includes('anexoV') && (tipoEmpresa !== 'projecao');
+            const showFolha = anexosSelecionados.includes('anexoV') || tipoEmpresa === 'projecao'; 
+            const showFatorR = anexosSelecionados.includes('anexoV'); const showCustos = tipoEmpresa === 'projecao';
+            
+            htmlTabela += `<tr><th rowspan="2">MÊS</th><th rowspan="2">RBT12 (R$)</th>`;
+            if (showRBT12Folha) htmlTabela += '<th rowspan="2">RBT12 FOLHA</th>';
+            htmlTabela += `<th colspan="${numAnexos}" class="sim-header-group">RECEITAS (R$)</th>`;
+            if (showFolha) htmlTabela += '<th rowspan="2">FOLHA PGTO</th>';
+            if (showFatorR) htmlTabela += '<th rowspan="2">FATOR R (%)</th>';
+            if (numAnexos * 2 + (showTotalDAS?1:0) > 0) htmlTabela += `<th colspan="${numAnexos * 2 + (showTotalDAS?1:0)}" class="sim-header-group">SIMPLES NACIONAL</th>`;
+            if (showCustos) htmlTabela += `<th colspan="3" class="sim-header-group">CUSTOS</th>`;
+            htmlTabela += `<th rowspan="2" class="sim-destaque-total">LÍQUIDO (R$)</th></tr><tr>`;
+            
+            htmlTabela += cabecalhoFaturamentoHTML;
+            anexosSelecionados.forEach(anexo => { htmlTabela += `<th>Efetiva ${anexo.replace('anexo', 'Anx ').toUpperCase()}</th><th>DAS ${anexo.replace('anexo', 'Anx ').toUpperCase()}</th>`; });
+            if (showTotalDAS) htmlTabela += `<th>TOTAL DAS</th>`;
+            if (showCustos) htmlTabela += `<th>INSS</th><th>IRRF</th><th>HONORÁRIOS</th>`;
+            htmlTabela += '</tr></thead><tbody>';
+            
+            simulacaoData = []; const inputRecalc = `atualizarInputsDaTabela(event)`; 
+            
+            mesesSimulacao.forEach((mesInfo, index) => {
+                const idLinha = `mes_${index}`; const faturamentosAnexo = {}; anexosSelecionados.forEach(a => faturamentosAnexo[a] = 0.00);
+                simulacaoData.push({ id: idLinha, data: mesInfo.data, mesFormatado: `${String(mesInfo.data.getMonth() + 1).padStart(2, '0')}/${mesInfo.data.getFullYear()}`, faturamentos: faturamentosAnexo, faturamentoTotal: 0, folha: 0, honorarios: 0, resultados: {} });
+                
+                htmlTabela += `<tr id="${idLinha}"><td class="sim-text-center">${String(mesInfo.data.getMonth() + 1).padStart(2, '0')}/${mesInfo.data.getFullYear()}</td><td class="rbt12-receita" style="color:var(--text-muted);">0,00</td>`;
+                if (showRBT12Folha) htmlTabela += `<td class="rbt12-folha" style="color:var(--text-muted);">0,00</td>`;
+                anexosSelecionados.forEach(anexo => { htmlTabela += `<td><input type="text" class="sim-input-tabela faturamento-input-anexo" data-index="${index}" data-anexo="${anexo}" value="0,00" onblur="${inputRecalc}" /></td>`; });
+                if (showFolha) htmlTabela += `<td><input type="text" class="sim-input-tabela folha-input" data-index="${index}" value="0,00" onblur="${inputRecalc}" /></td>`;
+                if (showFatorR) htmlTabela += `<td class="sim-text-center fatorr">-</td>`;
+                anexosSelecionados.forEach(anexo => { htmlTabela += `<td class="sim-text-center aliquota-${anexo}">-</td><td class="das-${anexo}" style="color:var(--danger); vertical-align: top;">0,00</td>`; });
+                if (showTotalDAS) htmlTabela += `<td class="sim-destaque-total total-das" style="color:var(--danger);">0,00</td>`;
+                if (showCustos) htmlTabela += `<td class="inss">0,00</td><td class="irrf">0,00</td><td><input type="text" class="sim-input-tabela sim-honorarios-input honorarios-input" data-index="${index}" value="0,00" onblur="${inputRecalc}" /></td>`;
+                htmlTabela += `<td class="sim-destaque-total valor-liquido">0,00</td></tr>`;
+            });
+            document.getElementById('resultadoSimulacao').innerHTML = htmlTabela + '</tbody></table>';
+        }
+
+        const tabelasSimples = {
+            anexoI: [{ limite: 180000, aliquota: 0.040, deducao: 0, reparticao: {irpj: 5.5, csll: 3.5, cofins: 12.74, pis: 2.76, cpp: 41.5, icms: 34.0} }, { limite: 360000, aliquota: 0.073, deducao: 5940, reparticao: {irpj: 5.5, csll: 3.5, cofins: 12.74, pis: 2.76, cpp: 41.5, icms: 34.0} }, { limite: 720000, aliquota: 0.095, deducao: 13860, reparticao: {irpj: 5.5, csll: 3.5, cofins: 12.74, pis: 2.76, cpp: 42.0, icms: 33.5} }, { limite: 1800000, aliquota: 0.107, deducao: 22500, reparticao: {irpj: 5.5, csll: 3.5, cofins: 12.74, pis: 2.76, cpp: 42.0, icms: 33.5} }, { limite: 3600000, aliquota: 0.143, deducao: 87300, reparticao: {irpj: 5.5, csll: 3.5, cofins: 12.74, pis: 2.76, cpp: 42.0, icms: 33.5} }, { limite: 4800000, aliquota: 0.190, deducao: 378000, reparticao: {irpj: 13.5, csll: 10.0, cofins: 28.27, pis: 6.13, cpp: 42.1, icms: 0.0} }],
+            anexoII: [{ limite: 180000, aliquota: 0.045, deducao: 0, reparticao: {irpj: 5.5, csll: 3.5, cofins: 11.51, pis: 2.49, cpp: 37.5, icms: 32.0, ipi: 7.5} }, { limite: 360000, aliquota: 0.078, deducao: 5940, reparticao: {irpj: 5.5, csll: 3.5, cofins: 11.51, pis: 2.49, cpp: 37.5, icms: 32.0, ipi: 7.5} }, { limite: 720000, aliquota: 0.100, deducao: 13860, reparticao: {irpj: 5.5, csll: 3.5, cofins: 11.51, pis: 2.49, cpp: 37.5, icms: 32.0, ipi: 7.5} }, { limite: 1800000, aliquota: 0.112, deducao: 22500, reparticao: {irpj: 5.5, csll: 3.5, cofins: 11.51, pis: 2.49, cpp: 37.5, icms: 32.0, ipi: 7.5} }, { limite: 3600000, aliquota: 0.147, deducao: 85500, reparticao: {irpj: 5.5, csll: 3.5, cofins: 11.51, pis: 2.49, cpp: 37.5, icms: 32.0, ipi: 7.5} }, { limite: 4800000, aliquota: 0.300, deducao: 720000, reparticao: {irpj: 8.5, csll: 7.5, cofins: 20.96, pis: 4.54, cpp: 23.5, icms: 0.0, ipi: 35.0} }],
+            anexoIII: [{ limite: 180000, aliquota: 0.060, deducao: 0, reparticao: {irpj: 4.0, csll: 3.5, cofins: 12.82, pis: 2.78, cpp: 43.4, iss: 33.5} }, { limite: 360000, aliquota: 0.112, deducao: 9360, reparticao: {irpj: 4.0, csll: 3.5, cofins: 12.82, pis: 2.78, cpp: 43.4, iss: 33.5} }, { limite: 720000, aliquota: 0.135, deducao: 17640, reparticao: {irpj: 4.0, csll: 3.5, cofins: 12.82, pis: 2.78, cpp: 43.4, iss: 33.5} }, { limite: 1800000, aliquota: 0.160, deducao: 35640, reparticao: {irpj: 4.0, csll: 3.5, cofins: 12.82, pis: 2.78, cpp: 43.4, iss: 33.5} }, { limite: 3600000, aliquota: 0.210, deducao: 125640, reparticao: {irpj: 4.0, csll: 3.5, cofins: 12.82, pis: 2.78, cpp: 43.4, iss: 33.5} }, { limite: 4800000, aliquota: 0.330, deducao: 648000, reparticao: {irpj: 35.0, csll: 15.0, cofins: 16.03, pis: 3.47, cpp: 30.5, iss: 0.0} }],
+            anexoIV: [{ limite: 180000, aliquota: 0.045, deducao: 0, reparticao: {irpj: 18.8, csll: 15.2, cofins: 17.67, pis: 3.83, iss: 44.5} }, { limite: 360000, aliquota: 0.090, deducao: 8100, reparticao: {irpj: 18.8, csll: 15.2, cofins: 17.67, pis: 3.83, iss: 44.5} }, { limite: 720000, aliquota: 0.102, deducao: 12420, reparticao: {irpj: 18.8, csll: 15.2, cofins: 17.67, pis: 3.83, iss: 44.5} }, { limite: 1800000, aliquota: 0.140, deducao: 39780, reparticao: {irpj: 18.8, csll: 15.2, cofins: 17.67, pis: 3.83, iss: 44.5} }, { limite: 3600000, aliquota: 0.220, deducao: 183780, reparticao: {irpj: 18.8, csll: 15.2, cofins: 17.67, pis: 3.83, iss: 44.5} }, { limite: 4800000, aliquota: 0.330, deducao: 828000, reparticao: {irpj: 53.5, csll: 21.5, cofins: 20.55, pis: 4.45, iss: 0.0} }],
+            anexoV: [{ limite: 180000, aliquota: 0.155, deducao: 0, reparticao: {irpj: 25.0, csll: 15.0, cofins: 14.10, pis: 3.05, cpp: 28.85, iss: 14.0} }, { limite: 360000, aliquota: 0.180, deducao: 4500, reparticao: {irpj: 25.0, csll: 15.0, cofins: 14.10, pis: 3.05, cpp: 28.85, iss: 14.0} }, { limite: 720000, aliquota: 0.195, deducao: 9900, reparticao: {irpj: 25.0, csll: 15.0, cofins: 14.10, pis: 3.05, cpp: 28.85, iss: 14.0} }, { limite: 1800000, aliquota: 0.205, deducao: 17100, reparticao: {irpj: 25.0, csll: 15.0, cofins: 14.10, pis: 3.05, cpp: 28.85, iss: 14.0} }, { limite: 3600000, aliquota: 0.230, deducao: 62100, reparticao: {irpj: 25.0, csll: 15.0, cofins: 14.10, pis: 3.05, cpp: 28.85, iss: 14.0} }, { limite: 4800000, aliquota: 0.305, deducao: 540000, reparticao: {irpj: 60.5, csll: 23.5, cofins: 16.64, pis: 3.60, cpp: 0.0, iss: 0.0} }]
+        };
+
+        function calcularAliquotaEfetivaParaDAS(rbt12, tabela, faturamentoAnexo, anexo, isFirstBillingMonth, fatorR) {
+            let faixa, aliquotaEfetiva, das;
+            if (anexo === 'anexoV') tabela = fatorR >= 28.00 ? tabelasSimples.anexoIII : tabelasSimples.anexoV;
+            if (rbt12 === 0 && faturamentoAnexo > 0) faixa = tabela[0]; else faixa = tabela.find(f => rbt12 <= f.limite) || tabela[tabela.length - 1];
+            if (rbt12 === 0 && faturamentoAnexo > 0) aliquotaEfetiva = faixa.aliquota; else aliquotaEfetiva = rbt12 > 0 ? ((rbt12 * faixa.aliquota) - faixa.deducao) / rbt12 : 0;
+            das = faturamentoAnexo * aliquotaEfetiva;
+            return { aliquota: aliquotaEfetiva * 100, das: das, reparticao: faixa.reparticao };
+        }
+        
+        function calcularINSS(baseSalarial) { const tetoINSS = 8157.41; const base = Math.min(baseSalarial, tetoINSS); if (base <= 0) return 0; return Math.floor((base * 0.11) * 100) / 100; }
+        
+        function calcularIRRF(baseIRRF, inssDescontado, numDependentes) {
+            const baseSalarial = parseFloat(baseIRRF); const descontoSimplificado = 607.20; const deducaoPorDependente = 189.59; 
+            function calc(baseDeCalculo) { if (baseDeCalculo <= 0) return 0; let impostoCalculado = 0; for (const faixa of tabelaIRRF) { if (baseDeCalculo <= faixa.limite || faixa.limite === Infinity) { impostoCalculado = (baseDeCalculo * faixa.aliquota) - faixa.deducao; break; } } return Math.max(0, impostoCalculado); }
+            const irrfLegal = calc(Math.max(0, baseSalarial - (inssDescontado + (numDependentes * deducaoPorDependente))));
+            const irrfSimplificado = calc(Math.max(0, baseSalarial - descontoSimplificado));
+            let irrfFinal = Math.floor(Math.min(irrfLegal, irrfSimplificado) * 100) / 100; return irrfFinal < 10 ? 0.00 : irrfFinal;
+        }
+
+        function calcularTabelaCompleta(tipoEmpresa, receitasRBT12Iniciais, anexosSelecionados, dadosBase) {
+            const showRBT12Folha = anexosSelecionados.includes('anexoV') && (tipoEmpresa !== 'projecao');
+            const showCustos = tipoEmpresa === 'projecao';
+            
+            document.querySelectorAll('.faturamento-input-anexo').forEach(input => {
+                if (simulacaoData[parseInt(input.dataset.index)]) simulacaoData[parseInt(input.dataset.index)].faturamentos[input.dataset.anexo] = limparFormatacaoBr(input.value);
+            });
+            simulacaoData.forEach(mes => { mes.faturamentoTotal = 0; for (const a in mes.faturamentos) mes.faturamentoTotal += mes.faturamentos[a]; });
+            if (anexosSelecionados.includes('anexoV') || showCustos) {
+                document.querySelectorAll('.folha-input').forEach(input => { if (simulacaoData[parseInt(input.dataset.index)]) simulacaoData[parseInt(input.dataset.index)].folha = limparFormatacaoBr(input.value); });
+            }
+            
+            let receitasAcumuladasSnapshot = [...(tipoEmpresa === 'existente' ? Object.values(receitasRBT12Iniciais) : [])];
+            let folhaAcumuladaSnapshot = [...(tipoEmpresa === 'existente' && showRBT12Folha ? Object.values(receitasRBT12Iniciais).map(() => 0) : [])];
+            
+            simulacaoData.forEach((mes, i) => {
+                let rbt12 = 0, rbt12Folha = 0;
+                const somaReceitas = receitasAcumuladasSnapshot.reduce((a, b) => a + b, 0);
+                const somaFolha = folhaAcumuladaSnapshot.reduce((a, b) => a + b, 0);
+                
+                if (tipoEmpresa === 'nova') {
+                    const mesesDesde = mes.data.getMonth() - (parseInt(document.getElementById('mesAbertura').value)-1) + (12 * (mes.data.getFullYear() - parseInt(document.getElementById('anoAbertura').value))) + 1;
+                    if (Math.max(0, mesesDesde - 1) > 0) {
+                        const d = Math.min(Math.max(0, mesesDesde - 1), 12);
+                        rbt12Folha = (somaFolha / d) * 12; rbt12 = (somaReceitas === 0 && mes.faturamentoTotal > 0) ? 0 : (somaReceitas / d) * 12;
+                    }
+                } else { rbt12 = somaReceitas + mes.faturamentoTotal; rbt12Folha = somaFolha + mes.folha; }
+
+                let fatorR = rbt12 > 0 ? (rbt12Folha / rbt12) * 100 : 0;
+                if (tipoEmpresa === 'nova' && somaReceitas === 0 && mes.faturamentoTotal > 0 && anexosSelecionados.includes('anexoV')) fatorR = 28.00;
+
+                const resultadosAnexos = {};
+                anexosSelecionados.forEach(anexo => {
+                    let t = tabelasSimples[anexo]; if (anexo === 'anexoV') t = fatorR >= 28 ? tabelasSimples.anexoIII : tabelasSimples.anexoV;
+                    let fx = (rbt12 === 0 && (mes.faturamentos[anexo]||0) > 0) ? t[0] : (t.find(f => rbt12 <= f.limite) || t[t.length - 1]);
+                    let al = (rbt12 === 0 && (mes.faturamentos[anexo]||0) > 0) ? fx.aliquota : (rbt12 > 0 ? ((rbt12 * fx.aliquota) - fx.deducao) / rbt12 : 0);
+                    resultadosAnexos[anexo] = { aliquota: al * 100, das: (mes.faturamentos[anexo]||0) * al, reparticao: fx.reparticao };
+                });
+                
+                simulacaoData[i].resultados = { rbt12, rbt12Folha, fatorR, anexos: resultadosAnexos };
+                receitasAcumuladasSnapshot.push(mes.faturamentoTotal); folhaAcumuladaSnapshot.push(mes.folha);
+                if (receitasAcumuladasSnapshot.length > 12) { receitasAcumuladasSnapshot.shift(); folhaAcumuladaSnapshot.shift(); }
             });
 
-            if(cnpjsValidos.length === 0) { alert("Nenhum CNPJ válido identificado."); return; }
+            simulacaoData.forEach((mes) => {
+                const linha = document.getElementById(mes.id);
+                if (!linha) return;
+                const r = mes.resultados;
+                linha.querySelector('.rbt12-receita').textContent = formatarMoedaBr(r.rbt12);
+                if (showRBT12Folha) linha.querySelector('.rbt12-folha').textContent = formatarMoedaBr(r.rbt12Folha);
+                if (linha.querySelector('.fatorr')) linha.querySelector('.fatorr').textContent = r.fatorR.toFixed(2).replace('.', ',');
 
-            document.getElementById('btn-processar').disabled = true;
-            document.getElementById('tabela-resultados').style.display = 'table';
-            const corpoTabela = document.getElementById('corpo-tabela');
-            const statusTexto = document.getElementById('status-texto');
-            corpoTabela.innerHTML = ''; 
-            cacheLoteAtual = {};
-
-            for(let i = 0; i < cnpjsValidos.length; i++) {
-                const cnpj = cnpjsValidos[i];
-                statusTexto.innerText = `Analisando ${i + 1} de ${cnpjsValidos.length}...`;
-                
-                try {
-                    const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
-                    if(response.ok) {
-                        const data = await response.json();
-                        cacheLoteAtual[cnpj] = data; 
-                        adicionarLinhasMapeamento(data);
+                let totalDASMes = 0;
+                anexosSelecionados.forEach(anexo => {
+                    const resAnexo = r.anexos[anexo];
+                    if (resAnexo) {
+                        linha.querySelector(`.aliquota-${anexo}`).textContent = resAnexo.aliquota.toFixed(2).replace('.', ',');
+                        let breakdownHtml = '';
+                        if (resAnexo.das > 0) {
+                            const rep = resAnexo.reparticao; const vDas = resAnexo.das; breakdownHtml += `<div class="tax-breakdown">`;
+                            if(rep.irpj > 0) breakdownHtml += `<div><span>IRPJ:</span><span>R$ ${formatarMoedaBr(vDas * rep.irpj/100)}</span></div>`;
+                            if(rep.csll > 0) breakdownHtml += `<div><span>CSLL:</span><span>R$ ${formatarMoedaBr(vDas * rep.csll/100)}</span></div>`;
+                            if(rep.cofins > 0) breakdownHtml += `<div><span>COFINS:</span><span>R$ ${formatarMoedaBr(vDas * rep.cofins/100)}</span></div>`;
+                            if(rep.pis > 0) breakdownHtml += `<div><span>PIS:</span><span>R$ ${formatarMoedaBr(vDas * rep.pis/100)}</span></div>`;
+                            if(rep.cpp > 0) breakdownHtml += `<div><span>CPP:</span><span>R$ ${formatarMoedaBr(vDas * rep.cpp/100)}</span></div>`;
+                            if(rep.icms > 0) breakdownHtml += `<div><span>ICMS:</span><span>R$ ${formatarMoedaBr(vDas * rep.icms/100)}</span></div>`;
+                            if(rep.ipi > 0) breakdownHtml += `<div><span>IPI:</span><span>R$ ${formatarMoedaBr(vDas * rep.ipi/100)}</span></div>`;
+                            if(rep.iss > 0) breakdownHtml += `<div><span>ISS:</span><span>R$ ${formatarMoedaBr(vDas * rep.iss/100)}</span></div>`;
+                            breakdownHtml += `</div>`;
+                        }
+                        linha.querySelector(`.das-${anexo}`).innerHTML = `<span>${formatarMoedaBr(resAnexo.das)}</span>` + breakdownHtml;
+                        totalDASMes += resAnexo.das;
                     }
-                } catch(error) {}
+                });
+                
+                if (linha.querySelector('.total-das')) linha.querySelector('.total-das').textContent = formatarMoedaBr(totalDASMes);
+                let inssRetido = 0, irrfRetido = 0;
+                if (showCustos) { inssRetido = calcularINSS(mes.folha); linha.querySelector('.inss').textContent = formatarMoedaBr(inssRetido); }
+                let valorLiquidoReceber = mes.faturamentoTotal - totalDASMes - (showCustos ? (mes.folha - inssRetido - irrfRetido) + mes.honorarios : mes.folha);
+                linha.querySelector('.valor-liquido').textContent = formatarMoedaBr(valorLiquidoReceber);
+            });
+        }
 
+        // ==========================================================================
+        // HISTÓRICO, ADMIN E GIST
+        // ==========================================================================
+        function salvarNoHistorico(data) {
+            let historico = JSON.parse(localStorage.getItem('mastertax_historico')) || [];
+            let dataHora = new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR').substring(0,5);
+            historico = historico.filter(item => item.cnpj !== data.cnpj);
+            historico.unshift({ cnpj: data.cnpj, razao_social: data.razao_social, data_hora: dataHora });
+            if(historico.length > 50) historico.pop();
+            localStorage.setItem('mastertax_historico', JSON.stringify(historico)); atualizarTelaHistorico();
+        }
+        function atualizarTelaHistorico() {
+            const tbody = document.getElementById('corpo-tabela-historico'); if(!tbody) return;
+            const historico = JSON.parse(localStorage.getItem('mastertax_historico')) || [];
+            if(historico.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888; padding: 30px;">Nenhuma consulta realizada ainda. Faça um Raio-X!</td></tr>`; return; }
+            tbody.innerHTML = historico.map(item => `<tr><td style="color: #aaa; font-size: 11px;">${item.data_hora}</td><td style="color: var(--primary); font-weight: bold; font-size: 14px;">${item.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")}</td><td style="color: #fff;">${item.razao_social}</td><td style="text-align: center;"><button onclick="reconsultarHistorico('${item.cnpj}')" class="btn-refazer">⟳ Refazer</button></td></tr>`).join('');
+        }
+        function reconsultarHistorico(cnpj) { document.getElementById('menu-onboarding').click(); document.getElementById('cnpj-input').value = cnpj; buscarCNPJ(); }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        async function iniciarProcessamentoLote() {
+            const textArea = document.getElementById('cnpj-lista'); const linhas = textArea.value.split('\n').filter(linha => linha.trim() !== ''); const cnpjsValidos = [];
+            linhas.forEach(linha => { const limpo = linha.replace(/\D/g, ""); if(limpo.length === 14) cnpjsValidos.push(limpo); });
+            if(cnpjsValidos.length === 0) { alert("Nenhum CNPJ válido."); return; }
+            document.getElementById('btn-processar').disabled = true; document.getElementById('tabela-resultados').style.display = 'table'; document.getElementById('corpo-tabela').innerHTML = ''; cacheLoteAtual = {};
+            for(let i = 0; i < cnpjsValidos.length; i++) {
+                const cnpj = cnpjsValidos[i]; document.getElementById('status-texto').innerText = `Analisando ${i + 1} de ${cnpjsValidos.length}...`;
+                try { const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`); if(response.ok) { const data = await response.json(); cacheLoteAtual[cnpj] = data; adicionarLinhasMapeamento(data); } } catch(error) {}
                 if (i < cnpjsValidos.length - 1) await delay(1200); 
             }
-
-            statusTexto.innerText = "✅ Varredura Concluída!";
-            document.getElementById('btn-processar').disabled = false;
+            document.getElementById('status-texto').innerText = "✅ Varredura Concluída!"; document.getElementById('btn-processar').disabled = false;
         }
 
         function adicionarLinhasMapeamento(data) {
-            const corpoTabela = document.getElementById('corpo-tabela');
-            const cnpjLimpo = data.cnpj.replace(/\D/g, "");
-            
+            const corpoTabela = document.getElementById('corpo-tabela'); const cnpjLimpo = data.cnpj.replace(/\D/g, "");
             let statusHtml = `<strong style="color: ${data.descricao_situacao_cadastral === 'ATIVA' ? 'var(--green)' : 'var(--danger)'}">${data.descricao_situacao_cadastral}</strong><br><span style="font-size:10px; color:#888;">Abertura: ${data.data_inicio_atividade}</span>`;
-            
             let cnpjFormatado = data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-
-            let todosCnaes = [];
-            if(data.cnae_fiscal) todosCnaes.push({ codigo: data.cnae_fiscal, descricao: data.cnae_fiscal_descricao, tipo: 'PRINCIPAL' });
+            let todosCnaes = []; if(data.cnae_fiscal) todosCnaes.push({ codigo: data.cnae_fiscal, descricao: data.cnae_fiscal_descricao, tipo: 'PRINCIPAL' });
             if(data.cnaes_secundarios) data.cnaes_secundarios.forEach(c => todosCnaes.push({ codigo: c.codigo, descricao: c.descricao, tipo: 'SECUNDÁRIO' }));
-
-            let cnaesParaMostrar = todosCnaes.filter(cnae => {
-                const codStr = String(cnae.codigo);
-                if(dbEnquadramento[codStr]) return false; 
-                cnae.codStr = codStr;
-                return true;
-            });
-
+            let cnaesParaMostrar = todosCnaes.filter(cnae => { const codStr = String(cnae.codigo); if(dbEnquadramento[codStr]) return false; cnae.codStr = codStr; return true; });
             if(cnaesParaMostrar.length === 0) return; 
-
             let html = '';
             cnaesParaMostrar.forEach((cnae, idx) => {
                 let cnaeFormatado = cnae.codStr.length === 7 ? `${cnae.codStr.substring(0,2)}.${cnae.codStr.substring(2,4)}-${cnae.codStr.substring(4,5)}/${cnae.codStr.substring(5,7)}` : cnae.codStr;
-                let rowId = `row_${cnae.codStr}_${cnpjLimpo}`;
-                let linhaClass = `linha-cnpj-${cnpjLimpo} unmapped`;
-
-                let tdRegras = `
-                    <td class="td-regras">
-                        <div id="box_regras_${rowId}" style="display:flex; flex-direction:column; gap:5px;">
-                            <div class="regra-linha" style="display: flex; gap: 5px;">
-                                <input type="text" class="mini-input lc" placeholder="Cód. LC 116" style="width: 90px;">
-                                <input type="text" class="mini-input ax" placeholder="Anexos (Ex: III)" style="width: 110px;">
-                                <input type="text" class="mini-input cd" placeholder="Hipótese ou Condição" style="flex: 1;">
-                            </div>
-                        </div>
-                    </td>
-                `;
-                let tdAcoes = `
-                    <td class="td-acoes" style="text-align: center;">
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button onclick="addLinhaRegra('${rowId}')" class="btn-add-mini">➕ Nova Situação</button>
-                            <button onclick="salvarNovoCNAE('${rowId}', '${cnae.codStr}', '${cnpjLimpo}', this)" class="btn-salvar-mini">✔ Salvar</button>
-                        </div>
-                    </td>
-                `;
-
-                if (idx === 0) {
-                    html += `
-                        <tr id="${rowId}" class="${linhaClass}">
-                            <td rowspan="${cnaesParaMostrar.length}" class="col-empresa" style="border-right: 1px solid var(--border-light);"><strong>${cnpjFormatado}</strong><br><span style="font-size:10px; color:#888;">${data.razao_social}</span></td>
-                            <td rowspan="${cnaesParaMostrar.length}" class="col-status" style="border-right: 1px solid var(--border-light);">${statusHtml}</td>
-                            <td><span style="color: var(--primary); font-size: 9px; font-weight: bold;">${cnae.tipo}</span><br><strong style="color: var(--text-main); font-size: 14px;">${cnaeFormatado}</strong><br><span style="font-size:11px; color:#ccc;">${cnae.descricao}</span></td>
-                            ${tdRegras}
-                            ${tdAcoes}
-                        </tr>
-                    `;
-                } else {
-                    html += `
-                        <tr id="${rowId}" class="${linhaClass}">
-                            <td><span style="color: var(--primary); font-size: 9px; font-weight: bold;">${cnae.tipo}</span><br><strong style="color: var(--text-main); font-size: 14px;">${cnaeFormatado}</strong><br><span style="font-size:11px; color:#ccc;">${cnae.descricao}</span></td>
-                            ${tdRegras}
-                            ${tdAcoes}
-                        </tr>
-                    `;
-                }
+                let rowId = `row_${cnae.codStr}_${cnpjLimpo}`; let linhaClass = `linha-cnpj-${cnpjLimpo} unmapped`;
+                let tdRegras = `<td class="td-regras"><div id="box_regras_${rowId}" style="display:flex; flex-direction:column; gap:5px;"><div class="regra-linha" style="display: flex; gap: 5px;"><input type="text" class="mini-input lc" placeholder="Cód. LC 116" style="width: 90px;"><input type="text" class="mini-input ax" placeholder="Anexos" style="width: 110px;"><input type="text" class="mini-input cd" placeholder="Hipótese ou Condição" style="flex: 1;"></div></div></td>`;
+                let tdAcoes = `<td class="td-acoes" style="text-align: center;"><div style="display: flex; flex-direction: column; gap: 6px;"><button onclick="addLinhaRegra('${rowId}')" class="btn-add-mini">➕ Nova Situação</button><button onclick="salvarNovoCNAE('${rowId}', '${cnae.codStr}', '${cnpjLimpo}', this)" class="btn-salvar-mini">✔ Salvar</button></div></td>`;
+                if (idx === 0) { html += `<tr id="${rowId}" class="${linhaClass}"><td rowspan="${cnaesParaMostrar.length}" class="col-empresa" style="border-right: 1px solid var(--border-light);"><strong>${cnpjFormatado}</strong><br><span style="font-size:10px; color:#888;">${data.razao_social}</span></td><td rowspan="${cnaesParaMostrar.length}" class="col-status" style="border-right: 1px solid var(--border-light);">${statusHtml}</td><td><span style="color: var(--primary); font-size: 9px; font-weight: bold;">${cnae.tipo}</span><br><strong style="color: var(--text-main); font-size: 14px;">${cnaeFormatado}</strong><br><span style="font-size:11px; color:#ccc;">${cnae.descricao}</span></td>${tdRegras}${tdAcoes}</tr>`; } 
+                else { html += `<tr id="${rowId}" class="${linhaClass}"><td><span style="color: var(--primary); font-size: 9px; font-weight: bold;">${cnae.tipo}</span><br><strong style="color: var(--text-main); font-size: 14px;">${cnaeFormatado}</strong><br><span style="font-size:11px; color:#ccc;">${cnae.descricao}</span></td>${tdRegras}${tdAcoes}</tr>`; }
             });
             corpoTabela.insertAdjacentHTML('beforeend', html);
         }
 
-        function addLinhaRegra(rowId) {
-            const box = document.getElementById(`box_regras_${rowId}`);
-            box.insertAdjacentHTML('beforeend', `
-                <div class="regra-linha" style="display: flex; gap: 5px; margin-top:5px;">
-                    <input type="text" class="mini-input lc" placeholder="Cód LC 116" style="width: 90px;">
-                    <input type="text" class="mini-input ax" placeholder="Anexos" style="width: 110px;">
-                    <input type="text" class="mini-input cd" placeholder="Hipótese ou Condição" style="flex: 1;">
-                    <button onclick="this.parentElement.remove()" style="background: var(--danger); color: white; border: none; border-radius: 3px; padding: 0 10px; cursor: pointer; font-weight: bold;">X</button>
-                </div>
-            `);
-        }
+        function addLinhaRegra(rowId) { document.getElementById(`box_regras_${rowId}`).insertAdjacentHTML('beforeend', `<div class="regra-linha" style="display: flex; gap: 5px; margin-top:5px;"><input type="text" class="mini-input lc" placeholder="Cód LC 116" style="width: 90px;"><input type="text" class="mini-input ax" placeholder="Anexos" style="width: 110px;"><input type="text" class="mini-input cd" placeholder="Hipótese ou Condição" style="flex: 1;"><button onclick="this.parentElement.remove()" style="background: var(--danger); color: white; border: none; border-radius: 3px; padding: 0 10px; cursor: pointer; font-weight: bold;">X</button></div>`); }
 
-        // ==========================================
-        // LÓGICA TELA 3: SALVAR E ATUALIZAR CRM
-        // ==========================================
         function salvarNovoCNAE(rowId, codCnae, cnpjLimpo, btnElement) {
-            const box = document.getElementById(`box_regras_${rowId}`);
-            const linhas = box.querySelectorAll('.regra-linha');
-            let regrasCapturadas = [];
-            
-            linhas.forEach(linha => {
-                const lc = linha.querySelector('.lc').value.trim();
-                const ax = linha.querySelector('.ax').value.trim();
-                const cd = linha.querySelector('.cd').value.trim();
-                
-                if(lc || ax || cd) {
-                    regrasCapturadas.push({ servico: lc, anexos: ax ? ax.split(',').map(a => a.trim().toUpperCase()) : [], regra: cd || "-" });
-                }
+            const box = document.getElementById(`box_regras_${rowId}`); let regrasCapturadas = [];
+            box.querySelectorAll('.regra-linha').forEach(linha => {
+                const lc = linha.querySelector('.lc').value.trim(); const ax = linha.querySelector('.ax').value.trim(); const cd = linha.querySelector('.cd').value.trim();
+                if(lc || ax || cd) regrasCapturadas.push({ servico: lc, anexos: ax ? ax.split(',').map(a => a.trim().toUpperCase()) : [], regra: cd || "-" });
             });
-            
             if(regrasCapturadas.length === 0) return;
-            
-            // Salva a Matriz na memória local (Rascunho)
             dbEnquadramento[codCnae] = regrasCapturadas;
-            let bancoLocalRegras = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
-            bancoLocalRegras[codCnae] = regrasCapturadas;
-            localStorage.setItem('mastertax_db_cnaes', JSON.stringify(bancoLocalRegras));
-
-            // Salva a Empresa na memória local (CRM)
+            let bancoLocalRegras = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {}; bancoLocalRegras[codCnae] = regrasCapturadas; localStorage.setItem('mastertax_db_cnaes', JSON.stringify(bancoLocalRegras));
             if (cacheLoteAtual[cnpjLimpo]) {
                 const dataEmpresa = cacheLoteAtual[cnpjLimpo];
                 if(!dbEmpresas[cnpjLimpo]) {
@@ -657,103 +1080,36 @@
                 }
                 localStorage.setItem('mastertax_db_empresas', JSON.stringify(dbEmpresas));
             }
-            
-            const row = document.getElementById(rowId);
-            row.classList.remove('unmapped');
-            const tdAcoes = btnElement.closest('.td-acoes');
-            const tdRegras = box.closest('.td-regras');
-            tdRegras.innerHTML = '<span style="color: var(--green); font-weight: bold; font-size: 13px; display: block; text-align: center;">✓ Salvo</span>';
-            tdAcoes.innerHTML = '';
-            
-            const faltam = document.querySelectorAll(`.linha-cnpj-${cnpjLimpo}.unmapped`).length;
-            if (faltam === 0) {
-                document.querySelectorAll(`.linha-cnpj-${cnpjLimpo}`).forEach(r => { r.style.display = "none"; });
-            }
-            
+            document.getElementById(rowId).classList.remove('unmapped'); btnElement.closest('.td-acoes').innerHTML = ''; box.closest('.td-regras').innerHTML = '<span style="color: var(--green); font-weight: bold; font-size: 13px; display: block; text-align: center;">✓ Salvo</span>';
+            if (document.querySelectorAll(`.linha-cnpj-${cnpjLimpo}.unmapped`).length === 0) { document.querySelectorAll(`.linha-cnpj-${cnpjLimpo}`).forEach(r => { r.style.display = "none"; }); }
             atualizarTelaCRM();
         }
 
         function atualizarTelaCRM() {
-            const corpoCRM = document.getElementById('corpo-tabela-crm');
-            if(!corpoCRM) return;
-            corpoCRM.innerHTML = '';
-
-            const chavesEmpresas = Object.keys(dbEmpresas);
-            if (chavesEmpresas.length === 0) {
-                corpoCRM.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888;">Nenhuma empresa mapeada no momento (Iniciamos em branco para o seu teste).</td></tr>`;
-                return;
-            }
-
+            const corpoCRM = document.getElementById('corpo-tabela-crm'); if(!corpoCRM) return; corpoCRM.innerHTML = '';
+            const chavesEmpresas = Object.keys(dbEmpresas); if (chavesEmpresas.length === 0) { corpoCRM.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888;">Nenhuma empresa mapeada nesta sessão.</td></tr>`; return; }
             chavesEmpresas.forEach(cnpj => {
-                const emp = dbEmpresas[cnpj];
-                let cnpjFormatado = emp.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-                
-                let htmlCnaes = '';
-                
+                const emp = dbEmpresas[cnpj]; let cnpjFormatado = emp.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5"); let htmlCnaes = '';
                 emp.cnaes.forEach(cnae => {
-                    const codStr = String(cnae.codigo);
-                    let cnaeFormatado = codStr.length === 7 ? `${codStr.substring(0,2)}.${codStr.substring(2,4)}-${codStr.substring(4,5)}/${codStr.substring(5,7)}` : codStr;
-                    
-                    let htmlRegras = '';
+                    const codStr = String(cnae.codigo); let cnaeFormatado = codStr.length === 7 ? `${codStr.substring(0,2)}.${codStr.substring(2,4)}-${codStr.substring(4,5)}/${codStr.substring(5,7)}` : codStr; let htmlRegras = '';
                     if (dbEnquadramento[codStr]) {
-                        let cenarios = dbEnquadramento[codStr]; 
-                        htmlRegras += `
-                            <div class="crm-headers">
-                                <div class="crm-col-cod">Cód. Serviço</div>
-                                <div class="crm-col-anx">Anexo Simples Nacional</div>
-                                <div class="crm-col-obs">Observações (Hipóteses)</div>
-                            </div>
-                        `;
-
-                        cenarios.forEach(cenario => {
+                        htmlRegras += `<div class="crm-headers"><div class="crm-col-cod">Cód. Serviço</div><div class="crm-col-anx">Anexo Simples Nac.</div><div class="crm-col-obs">Observações</div></div>`;
+                        dbEnquadramento[codStr].forEach(cenario => {
                             let bAx = cenario.anexos ? cenario.anexos.map(a => `<span class="crm-anexo-badge">${a}</span>`).join(' ') : '';
-                            htmlRegras += `
-                                <div class="crm-regra-row">
-                                    <span class="crm-cod-servico">${cenario.servico}</span>
-                                    <div class="crm-anexos-box">${bAx}</div>
-                                    <span class="crm-hipotese">${cenario.regra}</span>
-                                </div>
-                            `;
+                            htmlRegras += `<div class="crm-regra-row"><span class="crm-cod-servico">${cenario.servico}</span><div class="crm-anexos-box">${bAx}</div><span class="crm-hipotese">${cenario.regra}</span></div>`;
                         });
                     }
-
-                    if(htmlRegras !== '') {
-                        htmlCnaes += `
-                            <div class="crm-cnae-box">
-                                <span class="crm-tipo">${cnae.tipo}</span>
-                                <span class="crm-cnae-desc"><strong style="color:#fff;">${cnaeFormatado}</strong> ${cnae.desc}</span>
-                                ${htmlRegras}
-                            </div>
-                        `;
-                    }
+                    if(htmlRegras !== '') htmlCnaes += `<div class="crm-cnae-box"><span class="crm-tipo">${cnae.tipo}</span><span class="crm-cnae-desc"><strong style="color:#fff;">${cnaeFormatado}</strong> ${cnae.desc}</span>${htmlRegras}</div>`;
                 });
-
-                let statusClass = emp.status === 'ATIVA' ? 'crm-status' : 'crm-status'; 
-
-                corpoCRM.innerHTML += `
-                    <tr>
-                        <td><span class="crm-cnpj">${cnpjFormatado}</span><span class="crm-razao">${emp.razao_social}</span></td>
-                        <td><span class="${statusClass}" style="color: ${emp.status === 'ATIVA' ? 'var(--green)' : 'var(--danger)'};">${emp.status}</span></td>
-                        <td>${htmlCnaes}</td>
-                    </tr>
-                `;
+                corpoCRM.innerHTML += `<tr><td><span class="crm-cnpj">${cnpjFormatado}</span><span class="crm-razao">${emp.razao_social}</span></td><td><span class="crm-status" style="color: ${emp.status === 'ATIVA' ? 'var(--green)' : 'var(--danger)'};">${emp.status}</span></td><td>${htmlCnaes}</td></tr>`;
             });
         }
 
-        // ==========================================
-        // GERA O BACKUP NO FORMATO EXATO PARA O GITHUB GIST
-        // ==========================================
         function exportarDB() {
-            // Pega apenas as regras, exclui o CRM
             let bancoLocalRegras = JSON.parse(localStorage.getItem('mastertax_db_cnaes')) || {};
-            if(Object.keys(bancoLocalRegras).length === 0) {
-                alert("Você ainda não salvou nenhuma regra nova hoje para exportar.");
-                return;
-            }
-
-            const dbCode = "const dbEnquadramento = " + JSON.stringify(bancoLocalRegras, null, 4) + ";";
-            navigator.clipboard.writeText(dbCode);
-            alert("✅ CÓDIGO COPIADO COM SUCESSO!\n\nAgora vá lá no seu arquivo db_cnaes.js do GitHub Gist, clique em 'Edit', apague tudo que está lá e aperte CTRL+V para colar essa versão atualizada.");
+            if(Object.keys(bancoLocalRegras).length === 0) { alert("Nenhuma regra mapeada."); return; }
+            const dbCode = "{\n" + Object.keys(bancoLocalRegras).map(key => `    "${key}": ${JSON.stringify(bancoLocalRegras[key])}`).join(",\n") + "\n}";
+            navigator.clipboard.writeText(dbCode); alert("✅ CÓDIGO COPIADO COM SUCESSO!\nCole no seu GitHub Gist.");
         }
     </script>
 </body>
