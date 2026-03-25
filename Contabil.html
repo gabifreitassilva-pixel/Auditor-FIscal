@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo - Departamento Contábil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316; /* orange-500 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ea580c; /* orange-600 */
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        .step-number {
+            @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm;
+        }
+        .section-title {
+            @apply text-3xl font-bold text-white mb-2;
+        }
+        .section-subtitle {
+            @apply text-neutral-400;
+        }
+        .header-border {
+            @apply border-l-4 border-orange-500 pl-4 mb-8;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="text-orange-500"></i>
+                <span class="text-orange-500">Contábil</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Guia de Patrimônio, Custos e Balanço</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Início e Visão Geral
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">A Base Contábil</div>
+            
+            <a href="#" onclick="showSection('fundamentos')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="book-open" class="w-5 h-5"></i> Princípios e Regimes
+            </a>
+            <a href="#" onclick="showSection('plano-contas')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="scale" class="w-5 h-5"></i> Débito, Crédito e Contas
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">A Prática do Setor</div>
+
+            <a href="#" onclick="showSection('rotinas')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="check-square" class="w-5 h-5"></i> Conciliação e Provisões
+            </a>
+            <a href="#" onclick="showSection('custos')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="boxes" class="w-5 h-5"></i> Contabilidade de Custos
+            </a>
+            <a href="#" onclick="showSection('demonstracoes')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i> BP, DRE, DFC e DMPL
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Lucros e Obrigações</div>
+
+            <a href="#" onclick="showSection('lucros')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="banknote" class="w-5 h-5"></i> Distribuição e LALUR
+            </a>
+            <a href="#" onclick="showSection('sped')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="file-spreadsheet" class="w-5 h-5"></i> SPED: ECD e ECF
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Bem-vindo ao Departamento Contábil</h2>
+                    <p class="section-subtitle">O controle do Patrimônio, dos Lucros, dos Custos e da Saúde da Empresa.</p>
+                </div>
+                
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-8 shadow-2xl">
+                    <h3 class="text-2xl font-bold text-white mb-4">A verdadeira função da Contabilidade</h3>
+                    <p class="text-neutral-300 mb-6 text-sm leading-relaxed">
+                        Muitos empresários acham que a contabilidade serve apenas para "gerar guias de impostos". Isso é um erro terrível. A geração de guias é função do <strong>Departamento Fiscal</strong>. A verdadeira função do <strong>Departamento Contábil</strong> é registrar a história financeira e econômica da empresa, gerar relatórios para tomada de decisão (distribuição de lucros, atração de investidores, busca de crédito, valoração da empresa) e proteger o patrimônio segundo as normas internacionais (IFRS/CPC).
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-orange-500 flex flex-col items-center text-center">
+                            <i data-lucide="scale" class="text-orange-500 w-10 h-10 mb-3"></i>
+                            <h4 class="text-white font-bold mb-2">Patrimônio (Balanço)</h4>
+                            <p class="text-xs text-neutral-400">Uma "foto" exata de tudo o que a empresa tem (bens e direitos) e de tudo o que ela deve (obrigações) em uma determinada data.</p>
+                        </div>
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-blue-500 flex flex-col items-center text-center">
+                            <i data-lucide="trending-up" class="text-blue-500 w-10 h-10 mb-3"></i>
+                            <h4 class="text-white font-bold mb-2">Desempenho (DRE)</h4>
+                            <p class="text-xs text-neutral-400">Um "filme" que mostra se a operação da empresa, durante um período, gerou Lucro Líquido ou Prejuízo.</p>
+                        </div>
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-green-500 flex flex-col items-center text-center">
+                            <i data-lucide="check-square" class="text-green-500 w-10 h-10 mb-3"></i>
+                            <h4 class="text-white font-bold mb-2">Compliance e Conciliação</h4>
+                            <p class="text-xs text-neutral-400">O trabalho de cruzar cada centavo do extrato bancário com as notas fiscais, folhas de pagamento e movimentações de estoque.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl flex gap-4 items-center">
+                    <i data-lucide="git-merge" class="text-orange-500 w-8 h-8 flex-shrink-0"></i>
+                    <p class="text-sm text-orange-200">
+                        <strong>O epicentro da informação:</strong> O Contábil é o último setor na cadeia do escritório. Ele recebe as informações da Folha (do DP), as Notas Fiscais e Impostos (do Fiscal), as Movimentações de Estoque e os Extratos Bancários (do Cliente/Financeiro) para fechar o grande quebra-cabeça do balanço.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Fundamentos -->
+            <section id="fundamentos" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Princípios e Regimes</h2>
+                    <p class="section-subtitle">As leis universais e normas do CPC/IFRS que regem a contabilidade moderna.</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- Princípio da Entidade -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i data-lucide="shield-alert" class="text-red-500 w-6 h-6"></i>
+                            <h3 class="text-xl font-bold text-white">Princípio da Entidade (O Pecado Capital)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-2">
+                            <strong>O Patrimônio da empresa não se mistura com o patrimônio dos sócios.</strong>
+                        </p>
+                        <p class="text-sm text-neutral-400">
+                            A conta de luz da casa do dono paga com o dinheiro do caixa da empresa é o erro número 1 das pequenas e médias empresas (o famoso princípio da "Desorganização"). Para o contador, isso é um crime contábil que pode acarretar a desconsideração da personalidade jurídica. Se a empresa pagou algo do sócio, isso deve ser lançado como adiantamento de lucros, redução do pró-labore ou empréstimo ao sócio (Mútuo), mas jamais como "Despesa da Empresa".
+                        </p>
+                    </div>
+
+                    <!-- Caixa x Competência -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-6 text-center">A Guerra: Caixa x Competência</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-black p-5 rounded-lg border border-neutral-700">
+                                <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                                    <i data-lucide="wallet" class="text-blue-400"></i> Regime de Caixa
+                                </h4>
+                                <p class="text-sm text-neutral-300 mb-3">
+                                    Só registra o fato quando o dinheiro <strong>efetivamente entra ou sai</strong> da conta bancária. É a visão de liquidez imediata (extrato bancário).
+                                </p>
+                                <div class="bg-blue-900/20 p-3 rounded text-xs text-blue-200 border border-blue-800">
+                                    <em>Exemplo:</em> Comprei matéria-prima em Janeiro para pagar só em Março. No regime de caixa, essa despesa/desembolso só existe no relatório em Março.
+                                    <br><br><strong>Uso:</strong> Demonstração do Fluxo de Caixa (DFC), Gestão Financeira diária, Opção tributária para Simples Nacional ou Lucro Presumido (IR/CSLL).
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black p-5 rounded-lg border border-neutral-700">
+                                <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                                    <i data-lucide="calendar-check" class="text-orange-400"></i> Regime de Competência
+                                </h4>
+                                <p class="text-sm text-neutral-300 mb-3">
+                                    Registra o fato no momento em que ele <strong>ocorre (fato gerador / competência do mês)</strong>, não importando quando será pago ou recebido.
+                                </p>
+                                <div class="bg-orange-900/20 p-3 rounded text-xs text-orange-200 border border-orange-800">
+                                    <em>Exemplo:</em> Comprei mercadoria em Janeiro para pagar em Março. A contabilidade registra a compra/custo em Janeiro e cria uma dívida (Fornecedores a Pagar) no Passivo, que só será "baixada" em Março.
+                                    <br><br><strong>Uso:</strong> <strong>A contabilidade oficial SEMPRE usa este regime.</strong> Obrigatório para Balanço Patrimonial, DRE, LALUR e SPED.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Plano de Contas e Partidas -->
+            <section id="plano-contas" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Débito, Crédito e o Plano de Contas</h2>
+                    <p class="section-subtitle">O idioma secreto da contabilidade (Partidas Dobradas).</p>
+                </div>
+
+                <div class="bg-red-900/20 border border-red-500/50 p-5 rounded-xl mb-8">
+                    <h3 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="brain-circuit"></i> Esqueça o extrato do seu banco!
+                    </h3>
+                    <p class="text-sm text-neutral-300">
+                        Para o seu banco, "Crédito" é dinheiro entrando (positivo) e "Débito" é dinheiro saindo (negativo). <strong>Na contabilidade empresarial, a lógica é inversa.</strong> Para o banco, o seu dinheiro guardado lá é uma dívida deles para com você (um crédito a seu favor). Mas para a *sua* contabilidade, o dinheiro na sua conta é um Bem seu (um Ativo), portanto, tem natureza <strong>Devedora</strong>. Sempre que o seu Ativo aumenta, você <strong>debita</strong>.
+                    </p>
+                </div>
+
+                <!-- Partidas Dobradas -->
+                <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 mb-8">
+                    <h3 class="text-2xl font-bold text-orange-500 mb-4">Método das Partidas Dobradas</h3>
+                    <p class="text-sm text-neutral-300 mb-4">
+                        Criado/formalizado pelo frade Luca Pacioli no século XV. A regra máxima: <strong>Não há origem de recursos sem uma aplicação correspondente.</strong> Para todo Débito (ou soma de débitos), deve existir um Crédito (ou soma de créditos) de exato igual valor.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-black p-4 rounded border-t-4 border-t-blue-500">
+                            <strong class="text-blue-400 block text-lg mb-2">DÉBITO (D) = Destino / Aplicação</strong>
+                            <p class="text-neutral-400 mb-2">Para onde foi o dinheiro? Onde ele foi aplicado?</p>
+                            <ul class="list-disc list-inside text-neutral-300 space-y-1">
+                                <li>Aumenta as contas de <strong>Bens e Direitos (Ativo)</strong></li>
+                                <li>Aumenta as contas de <strong>Despesas e Custos</strong></li>
+                                <li><em>(Reduz Passivo e Patrimônio Líquido)</em></li>
+                            </ul>
+                        </div>
+                        <div class="bg-black p-4 rounded border-t-4 border-t-orange-500">
+                            <strong class="text-orange-400 block text-lg mb-2">CRÉDITO (C) = Origem da Fonte</strong>
+                            <p class="text-neutral-400 mb-2">De onde veio o dinheiro? Quem o originou?</p>
+                            <ul class="list-disc list-inside text-neutral-300 space-y-1">
+                                <li>Aumenta as contas de <strong>Dívidas (Passivo)</strong></li>
+                                <li>Aumenta as contas de <strong>Capital dos Sócios (PL)</strong></li>
+                                <li>Aumenta as contas de <strong>Receitas</strong></li>
+                                <li><em>(Reduz Ativos)</em></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-4 bg-neutral-800 rounded text-sm text-neutral-300 font-mono overflow-x-auto">
+                        <strong class="text-orange-400 mb-2 block">Exemplo Prático 1: Comprei um Carro de 50.000 financiados pelo Banco.</strong>
+                        DÉBITO: Veículos (Ativo) ..................... R$ 50.000,00 <em>(Destino: o bem que entrou)</em><br>
+                        CRÉDITO: Financiamentos a Pagar (Passivo) .... R$ 50.000,00 <em>(Origem: a dívida que financiou)</em>
+                        <br><br>
+                        <strong class="text-orange-400 mb-2 block">Exemplo Prático 2: Paguei uma conta de luz de R$ 1.000 com o dinheiro do caixa.</strong>
+                        DÉBITO: Despesa com Energia Elétrica (Resultado) ... R$ 1.000,00 <em>(Destino: o gasto consumido)</em><br>
+                        CRÉDITO: Caixa/Banco (Ativo) ....................... R$ 1.000,00 <em>(Origem: o dinheiro que saiu)</em>
+                    </div>
+                </div>
+
+                <!-- Plano de Contas -->
+                <h3 class="text-2xl font-bold text-white mb-4">A Estrutura do Plano de Contas (As 4 Grandes Famílias)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-neutral-900 border border-neutral-800 p-4 rounded">
+                        <h4 class="text-white font-bold mb-2 text-lg">1. ATIVO (Bens e Direitos)</h4>
+                        <p class="text-sm text-neutral-400">Tudo o que a empresa possui, tem sob seu controle ou tem a receber no futuro. <br><br>Ex: Caixa, Contas Bancárias, Aplicações Financeiras, Estoque de Mercadorias, Clientes (Duplicatas) a Receber, Máquinas, Imóveis, Marcas.</p>
+                        <span class="text-[11px] text-blue-400 uppercase font-bold mt-3 block bg-blue-900/20 inline-block px-2 py-1 rounded">Natureza Devedora</span>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-4 rounded">
+                        <h4 class="text-white font-bold mb-2 text-lg">2. PASSIVO (Obrigações)</h4>
+                        <p class="text-sm text-neutral-400">Tudo o que a empresa deve a terceiros (Capital de Terceiros).<br><br>Ex: Fornecedores a Pagar, Impostos a Recolher (ICMS, DAS, IRPJ), Salários e Encargos a Pagar, Empréstimos Bancários.</p>
+                        <span class="text-[11px] text-orange-400 uppercase font-bold mt-3 block bg-orange-900/20 inline-block px-2 py-1 rounded">Natureza Credora</span>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-4 rounded">
+                        <h4 class="text-white font-bold mb-2 text-lg">3. PATRIMÔNIO LÍQUIDO (Capital Próprio)</h4>
+                        <p class="text-sm text-neutral-400">O que a empresa "deve" aos seus próprios sócios/acionistas. É o valor residual dos ativos menos os passivos.<br><br>Ex: Capital Social Subscrito/Integralizado, Reservas de Lucro, Prejuízos Acumulados, Ajustes de Avaliação Patrimonial.</p>
+                        <span class="text-[11px] text-orange-400 uppercase font-bold mt-3 block bg-orange-900/20 inline-block px-2 py-1 rounded">Natureza Credora</span>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-4 rounded">
+                        <h4 class="text-white font-bold mb-2 text-lg">4. RESULTADO (Receitas, Custos e Despesas)</h4>
+                        <p class="text-sm text-neutral-400">Contas transitórias que zeram ao final do exercício. O que sobra delas (Lucro ou Prejuízo) é transferido para o Patrimônio Líquido.<br><br>Receitas = Natureza Credora (aumentam lucro).<br>Custos/Despesas = Natureza Devedora (reduzem lucro).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Rotinas -->
+            <section id="rotinas" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Rotina Contábil: Conciliação, Provisões e Ativo Fixo</h2>
+                    <p class="section-subtitle">O trabalho braçal, investigativo e técnico para que o balanço seja impecável.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Conciliação Bancária -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="check-square" class="text-orange-500"></i> Conciliação Bancária
+                        </h3>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            É o processo de cruzar os saldos e lançamentos do extrato do banco com os registros do sistema contábil. Se no dia 31/12 o extrato em PDF/OFX do banco Itaú marca R$ 15.000,00, o Razão Contábil da conta "Bancos - Itaú C/C" tem que fechar em exatos R$ 15.000,00. Nenhuma vírgula a menos.
+                        </p>
+                        <div class="bg-black p-4 rounded border border-neutral-700">
+                            <h4 class="text-orange-400 font-bold mb-2 text-sm">Desafios Mortais da Conciliação:</h4>
+                            <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                                <li><strong>Recebimentos em Cartão de Crédito/Maquininha:</strong> A empresa vende R$ 100, mas o banco deposita R$ 97 líquidos (por causa da taxa). O contador deve desmembrar: Baixa do direito a receber do cliente pelo valor total (Crédito de R$ 100), entrada no banco (Débito de R$ 97), e reconhecimento da despesa financeira da taxa (Débito de R$ 3).</li>
+                                <li><strong>Tarifas e Rendimentos Automáticos:</strong> IOF, tarifas de PIX, juros de cheque especial e rendimentos de CDB de liquidez diária precisam ser capturados e lançados.</li>
+                                <li><strong>O PIX do "João da Silva":</strong> Quando o cliente manda o extrato com um PIX recebido de R$ 500 sem identificação (sem nota fiscal emitida para esse CPF). Isso vai para uma conta de "Adiantamento de Clientes" ou "Valores a Identificar" e paralisa o fechamento limpo.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Provisões e Apropriações -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-blue-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="calendar-clock" class="text-blue-500"></i> Provisões e Apropriações (A Competência na Prática)
+                        </h3>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            A contabilidade não espera o pagamento acontecer para registrar a despesa. Ela tenta "suavizar" e reconhecer os impactos no mês exato a que pertencem.
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    Provisão de Férias e 13º Salário
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-xs text-neutral-400 leading-relaxed">
+                                    O 13º só é pago em Novembro/Dezembro, mas a empresa "consome" 1/12 avos do esforço do funcionário todo mês. O DP manda a planilha mensal, e o Contábil debita a Despesa (D) e credita um Passivo de "13º a Pagar" (C) todos os meses. Em dezembro, quando há o desembolso do dinheiro, apenas "mata-se" o passivo, sem causar um buraco irreal no lucro daquele último mês.
+                                </div>
+                            </details>
+
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    Seguros a Apropriar (Despesa Antecipada)
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-xs text-neutral-400 leading-relaxed">
+                                    A empresa paga R$ 12.000 à vista em Janeiro por 1 ano de seguro da frota. Lançar 12 mil de despesa em Janeiro está errado! O valor vai para o Ativo Circulante (Conta: Seguros a Apropriar). Todo mês, o contador faz um lançamento baixando R$ 1.000 desse ativo e jogando para "Despesa com Seguros" na DRE.
+                                </div>
+                            </details>
+
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    PECLD (Antiga PDD) - Calote Previsto
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-xs text-neutral-400 leading-relaxed">
+                                    <strong>Perdas Estimadas em Créditos de Liquidação Duvidosa.</strong> Se a empresa tem 1 milhão a receber de clientes no Ativo, mas a estatística histórica prova que 5% não pagam, o contador é obrigado a registrar uma provisão redutora de R$ 50.000. Isso impede que a empresa exiba um patrimônio ilusório e pague dividendos sobre um dinheiro que nunca vai entrar.
+                                </div>
+                            </details>
+                            
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    Provisões para Contingências (Processos)
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-xs text-neutral-400 leading-relaxed">
+                                    A empresa sofreu um processo trabalhista pesado. O advogado avalia a chance de perda como "Provável" num valor de R$ 200 mil. A contabilidade, por prudência, já deve reduzir o lucro do ano e criar um Passivo (Provisão para Contingências Trabalhistas) mesmo antes do juiz bater o martelo final. Se a chance for "Possível", apenas cita em Nota Explicativa. Se "Remota", nada é feito.
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+
+                    <!-- Ativo Fixo e Imobilizado -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-green-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="factory" class="text-green-500"></i> Gestão do Ativo Imobilizado e Intangível
+                        </h3>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Como contabilizar o desgaste das máquinas, prédios e o valor de patentes ao longo do tempo.
+                        </p>
+                        <div class="space-y-3">
+                            <div class="bg-black p-3 border border-neutral-700 rounded text-sm text-neutral-300">
+                                <strong class="text-green-400 block">Depreciação (Bens Tangíveis)</strong>
+                                <span class="text-xs text-neutral-400">Desgaste físico ou obsolescência de máquinas, veículos, computadores e imóveis (o terreno não deprecia!). Se um carro custa 100 mil e a Receita estipula vida útil de 5 anos (20% ao ano), o contador lança R$ 20.000 de despesa de depreciação todo ano.</span>
+                            </div>
+                            <div class="bg-black p-3 border border-neutral-700 rounded text-sm text-neutral-300">
+                                <strong class="text-green-400 block">Amortização (Bens Intangíveis)</strong>
+                                <span class="text-xs text-neutral-400">Direitos de prazo limitado. Exemplo: A empresa comprou o direito de uso de um software ERP caríssimo por 3 anos, ou pagou R$ 5 milhões por uma patente. Esse valor vai sendo amortizado e diluído no resultado durante esse período.</span>
+                            </div>
+                            <div class="bg-black p-3 border border-neutral-700 rounded text-sm text-neutral-300">
+                                <strong class="text-red-400 block">Teste de Impairment (Recuperabilidade)</strong>
+                                <span class="text-xs text-neutral-400">Regra exigida pelo CPC 01. Se uma máquina está no seu balanço valendo R$ 1 Milhão, mas a tecnologia dela ficou obsoleta de repente e ela só gerará R$ 400 mil de riqueza futura (e seu valor de venda caiu pra isso), você é <strong>obrigado</strong> a dar uma baixa reconhecendo essa perda (Impairment) imediatamente, para que o Balanço não seja mentiroso aos olhos dos investidores.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Contabilidade de Custos -->
+            <section id="custos" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Contabilidade de Custos</h2>
+                    <p class="section-subtitle">CMV, CPV e como apurar o verdadeiro custo para chegar à Margem Bruta.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-6 shadow-lg">
+                    <p class="text-sm text-neutral-300 mb-6 leading-relaxed">
+                        Custo é diferente de Despesa. O <strong>Custo</strong> é todo gasto diretamente ou indiretamente ligado à produção do bem ou serviço (Matéria-prima, Embalagem, Energia elétrica da fábrica, Salário do operário). A <strong>Despesa</strong> é o gasto para administrar e vender (Marketing, Comissão do vendedor, Salário do RH, Aluguel do escritório). Sem calcular o custo direito, a empresa vende com prejuízo e nem percebe.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Comércio (CMV) -->
+                        <div>
+                            <h3 class="text-xl font-bold text-orange-500 mb-3 flex items-center gap-2">
+                                <i data-lucide="shopping-cart"></i> O Comércio e o CMV
+                            </h3>
+                            <p class="text-sm text-neutral-400 mb-4">
+                                CMV significa <strong>Custo da Mercadoria Vendida</strong>. Nas distribuidoras e varejos, a apuração é feita pela famosa equação de controle de inventário:
+                            </p>
+                            <div class="bg-black border border-neutral-700 p-4 rounded-lg font-mono text-center text-lg text-white mb-4">
+                                CMV = EI + C - EF
+                            </div>
+                            <ul class="text-xs text-neutral-400 space-y-2">
+                                <li><strong>EI:</strong> Estoque Inicial (O que tinha na prateleira no dia 1)</li>
+                                <li><strong>C:</strong> Compras líquidas (Compras do mês + Fretes - Impostos recuperáveis como ICMS/PIS/COFINS)</li>
+                                <li><strong>EF:</strong> Estoque Final (Inventário no último dia do mês)</li>
+                            </ul>
+                            <p class="text-xs text-orange-300 mt-2 bg-orange-900/20 p-2 rounded">Dica: Impostos "recuperáveis" na compra não entram no custo do estoque. Eles vão direto para o Ativo (Impostos a Recuperar) para abater a guia do fiscal.</p>
+                        </div>
+
+                        <!-- Indústria (CPV) -->
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-500 mb-3 flex items-center gap-2">
+                                <i data-lucide="factory"></i> A Indústria e o CPV
+                            </h3>
+                            <p class="text-sm text-neutral-400 mb-4">
+                                CPV significa <strong>Custo dos Produtos Vendidos</strong>. Na indústria, a coisa é brutal. É necessário rastrear o gasto até que a matéria-prima vire um produto acabado. Ele é composto por 3 elementos clássicos:
+                            </p>
+                            <ul class="text-sm text-neutral-300 space-y-3 bg-black border border-neutral-700 p-4 rounded-lg">
+                                <li><strong class="text-blue-400">1. MP (Matéria Prima e Insumos):</strong> O que compõe fisicamente o produto.</li>
+                                <li><strong class="text-blue-400">2. MOD (Mão de Obra Direta):</strong> Salários + pesadíssimos encargos trabalhistas dos operadores das máquinas.</li>
+                                <li><strong class="text-blue-400">3. CIF (Custos Indiretos de Fabricação):</strong> O pesadelo do rateio. Depreciação das máquinas, energia, aluguel do galpão industrial, supervisor da fábrica.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-black border border-neutral-700 p-5 rounded-xl border-t-4 border-t-red-500">
+                        <h4 class="text-white font-bold mb-2">Custeio por Absorção (A Regra Oficial da Receita)</h4>
+                        <p class="text-sm text-neutral-400">
+                            Existem vários métodos gerenciais (Custeio Variável, ABC), mas a contabilidade oficial e o Fisco exigem o <strong>Custeio por Absorção</strong>. Nele, TUDO o que for custo (seja fixo ou variável) tem que ser rateado e "absorvido" pelo valor unitário do produto que vai para o estoque. Se a fábrica produziu muito e não vendeu, os custos ficam "presos" no Ativo (Estoque) e não vão para a DRE gerar prejuízo imediatamente.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Demonstrações -->
+            <section id="demonstracoes" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Demonstrações Contábeis (O Conjunto Completo)</h2>
+                    <p class="section-subtitle">O Raio-X, o Filme, o Rastreamento de Dinheiro e o Rastreamento de Lucros.</p>
+                </div>
+
+                <!-- Balanço Patrimonial -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="scale" class="text-orange-500"></i> Balanço Patrimonial (A Foto do Patrimônio)
+                    </h3>
+                    <p class="text-sm text-neutral-400 mb-4">Mostra a posição estática num determinado dia (ex: 31/12/2025). As contas são listadas por ordem de Liquidez (o que vira dinheiro mais rápido fica no topo) e Exigibilidade (o que vence mais rápido).</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 text-sm font-mono">
+                        <div class="bg-[#0f172a] p-4 rounded border border-blue-900/50">
+                            <h4 class="text-blue-400 font-bold mb-2 border-b border-blue-900/50 pb-1">ATIVO (Bens e Direitos) - Onde o dinheiro foi investido</h4>
+                            <ul class="text-neutral-300 space-y-1">
+                                <li class="text-white font-bold mt-2">Ativo Circulante (Até 12 meses)</li>
+                                <li class="pl-4">- Caixa, Bancos e Aplicações Liq. Imediata</li>
+                                <li class="pl-4">- Clientes (Duplicatas) a Receber</li>
+                                <li class="pl-4">- Estoques de Produtos/Insumos</li>
+                                <li class="pl-4">- Impostos a Recuperar</li>
+                                <li class="text-white font-bold mt-2 pt-2 border-t border-blue-900/30">Ativo Não Circulante (+12 meses)</li>
+                                <li class="pl-4">- Realizável a Longo Prazo</li>
+                                <li class="pl-4">- Investimentos (Participação em outras empresas)</li>
+                                <li class="pl-4">- Imobilizado (Máquinas, Veículos, Prédios)</li>
+                                <li class="pl-4">- Intangível (Softwares, Patentes, Marcas)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-[#431407] p-4 rounded border border-orange-900/50">
+                            <h4 class="text-orange-400 font-bold mb-2 border-b border-orange-900/50 pb-1">PASSIVO E P.L. - De onde o dinheiro veio</h4>
+                            <ul class="text-neutral-300 space-y-1">
+                                <li class="text-white font-bold mt-2">Passivo Circulante (Até 12 meses)</li>
+                                <li class="pl-4">- Fornecedores a Pagar</li>
+                                <li class="pl-4">- Obrigações Trabalhistas (Salários, Férias)</li>
+                                <li class="pl-4">- Obrigações Fiscais (ICMS, IRPJ a Pagar)</li>
+                                <li class="pl-4">- Empréstimos Curto Prazo</li>
+                                <li class="text-white font-bold mt-2 pt-2 border-t border-orange-900/30">Passivo Não Circulante (+12 meses)</li>
+                                <li class="pl-4">- Financiamentos Longo Prazo</li>
+                                <li class="pl-4">- Provisão para Contingências (Processos)</li>
+                                <li class="text-white font-bold mt-2 pt-2 border-t border-orange-500 pb-1 text-orange-300">Patrimônio Líquido (PL)</li>
+                                <li class="pl-4">- Capital Social (Investimento inicial/cotas)</li>
+                                <li class="pl-4">- Reservas de Lucro (Ex: Reserva Legal obrigatória)</li>
+                                <li class="pl-4">- (-) Prejuízos Acumulados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DRE -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="text-green-500"></i> DRE - Demonstração do Resultado do Exercício
+                    </h3>
+                    <p class="text-sm text-neutral-400 mb-4">A dinâmica das Vendas, Custos e Despesas (Regime de Competência) que explica se a operação foi lucrativa no ano.</p>
+                    
+                    <div class="bg-black p-4 rounded border border-neutral-700 font-mono text-sm shadow-inner">
+                        <div class="flex justify-between text-white border-b border-neutral-700 pb-1 mb-1">
+                            <span>(+) RECEITA BRUTA DE VENDAS (Faturamento)</span><span>R$ 1.000.000</span>
+                        </div>
+                        <div class="flex justify-between text-red-400 pl-4">
+                            <span>(-) Devoluções, Abatimentos e Impostos sobre Venda (ICMS/ISS/PIS/COFINS)</span><span>(R$ 180.000)</span>
+                        </div>
+                        <div class="flex justify-between text-green-400 border-b border-neutral-700 pb-1 mb-1 mt-1 font-bold bg-neutral-800 p-1">
+                            <span>(=) RECEITA LÍQUIDA</span><span>R$ 820.000</span>
+                        </div>
+                        <div class="flex justify-between text-red-400 pl-4">
+                            <span>(-) Custos (CMV / CPV / CSP)</span><span>(R$ 400.000)</span>
+                        </div>
+                        <div class="flex justify-between text-green-400 border-b border-neutral-700 pb-1 mb-1 mt-1 font-bold bg-neutral-800 p-1">
+                            <span>(=) LUCRO BRUTO (Margem Bruta)</span><span>R$ 420.000</span>
+                        </div>
+                        <div class="flex justify-between text-orange-300 pl-4">
+                            <span>(-) Despesas Operacionais (Vendas, Administrativas, DP, Diretoria)</span><span>(R$ 250.000)</span>
+                        </div>
+                        <div class="flex justify-between text-orange-300 pl-4">
+                            <span>(+/-) Resultado Financeiro (Despesas Bancárias, Juros pagos e recebidos)</span><span>(R$ 20.000)</span>
+                        </div>
+                        <div class="flex justify-between text-white font-bold mt-1 bg-neutral-800 p-1">
+                            <span>(=) LAIR (Lucro antes do IR e CSLL)</span><span>R$ 150.000</span>
+                        </div>
+                        <div class="flex justify-between text-red-400 pl-4 border-b border-neutral-700 pb-1 mb-1">
+                            <span>(-) Provisão IR e CSLL sobre o lucro</span><span>(R$ 50.000)</span>
+                        </div>
+                        <div class="flex justify-between text-green-500 font-bold mt-1 text-lg bg-neutral-800 p-2 border border-green-900">
+                            <span>(=) LUCRO LÍQUIDO DO EXERCÍCIO (A "Última Linha" / Bottom Line)</span><span>R$ 100.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DFC e DMPL -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-blue-400">
+                        <h4 class="text-white font-bold mb-3 text-lg flex items-center gap-2">
+                            <i data-lucide="arrow-right-left" class="text-blue-400"></i> DFC (Fluxo de Caixa)
+                        </h4>
+                        <p class="text-xs text-neutral-300 mb-3 leading-relaxed">
+                            Responde à pergunta clássica do dono: <em>"Se o DRE deu 100 mil de lucro, por que eu não tenho esse dinheiro no banco?"</em>. A DFC desfaz a competência e mostra apenas o que é <strong>Caixa</strong>, dividida em 3 partes:
+                        </p>
+                        <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                            <li><strong>Atividades Operacionais:</strong> Dinheiro de clientes - pagamentos a fornecedores/folha.</li>
+                            <li><strong>Atividades de Investimento:</strong> Dinheiro gasto comprando máquinas ou vendendo imóveis da empresa.</li>
+                            <li><strong>Atividades de Financiamento:</strong> Dinheiro que entrou de empréstimo do banco ou aportes de capital dos sócios (e dividendos pagos a eles).</li>
+                        </ul>
+                        <div class="mt-3 bg-black p-2 rounded text-[11px] text-blue-300">Existem 2 métodos para fazer a DFC: O <strong>Direto</strong> (classifica os recebimentos brutos) e o <strong>Indireto</strong> (Parte do Lucro Líquido do DRE e vem ajustando o que não afetou o caixa, como Depreciação).</div>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-purple-400">
+                        <h4 class="text-white font-bold mb-3 text-lg flex items-center gap-2">
+                            <i data-lucide="files" class="text-purple-400"></i> DMPL
+                        </h4>
+                        <p class="text-xs text-neutral-300 mb-3 leading-relaxed">
+                            <strong>Demonstração das Mutações do Patrimônio Líquido.</strong> O que aconteceu com a riqueza dos donos da empresa ao longo do ano? A DMPL pega o Lucro Líquido que saiu da DRE e mostra o seu destino.
+                        </p>
+                        <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                            <li>O lucro foi destinado para a <strong>Reserva Legal</strong> (retenção obrigatória em S/A's de 5%)?</li>
+                            <li>O lucro foi <strong>distribuído como Dividendos</strong> aos sócios?</li>
+                            <li>Houve aumento de Capital Social com entrada de novos sócios?</li>
+                            <li>Isso prova ao Fisco e aos auditores exatamente como o PL da empresa inflou ou desinflou.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Lucros e LALUR -->
+            <section id="lucros" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Distribuição de Lucros e LALUR</h2>
+                    <p class="section-subtitle">Como tirar dinheiro da empresa legalmente e a ponte para a tributação.</p>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Distribuição de Lucros -->
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 shadow-lg border-l-4 border-l-green-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="banknote" class="text-green-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Distribuição de Lucros (Isenção de IR)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Atualmente no Brasil, a distribuição de dividendos (lucros) aos sócios é <strong>isenta de Imposto de Renda Pessoa Física (IRPF)</strong> e não sofre retenção de INSS (ao contrário do Pró-labore). Porém, o Departamento Contábil precisa garantir requisitos fortíssimos para que o Fisco não autue o sócio alegando "tributação disfarçada".
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 text-sm">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-2">1. Tem que haver Lucro Contábil!</h4>
+                                <p class="text-xs text-neutral-400">Você não pode distribuir o que não tem. A contabilidade (Balanço/DRE) deve estar fechada e provar, por DRE ou balancete de suspensão/redução, que a empresa apurou Lucro Líquido no período ou que possui Reservas de Lucros Acumulados de anos anteriores suficientes.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-red-400 font-bold mb-2">2. A Trava dos Débitos Tributários</h4>
+                                <p class="text-xs text-neutral-400">É rigorosamente <strong>proibido (Lei 4.357/64)</strong> que uma empresa distribua lucros ou bonificações aos sócios se ela possuir débitos tributários federais não garantidos ou não parcelados em aberto. A multa para o sócio e para a empresa por descumprir isso é brutal (chega a 50% da quantia distribuída).</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-green-900/10 p-4 border border-green-900/50 rounded-lg">
+                            <strong class="text-green-400 text-sm">A "Presunção" para quem não tem Contabilidade (Cuidado!):</strong>
+                            <p class="text-xs text-neutral-300 mt-1">Se a empresa (Simples ou Presumido) for uma completa bagunça e não tiver contabilidade regular escriturada, ela só pode distribuir lucro isento aplicando os percentuais de presunção do IR (ex: 8% para comércio, 32% para serviços) sobre a receita bruta, e subtraindo os impostos pagos. Qualquer valor transferido ao sócio que exceda isso sem balanço será tributado na tabela do IR em até 27,5% (rendimento tributável). Daí a imensa importância do contador.</p>
+                        </div>
+                    </div>
+
+                    <!-- LALUR -->
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 shadow-lg border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="arrow-down-up" class="text-red-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">O LALUR (Lucro Real)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            <strong>Livro de Apuração do Lucro Real.</strong> A DRE mostra o <em>Lucro Contábil</em> (societário, feito pelas normas IFRS/CPC). Mas a Receita Federal não concorda com todas as despesas que os contadores lançam. O Fisco usa o LALUR para converter o Lucro Contábil no <strong>Lucro Fiscal Tributável (Base para IRPJ/CSLL)</strong>.
+                        </p>
+
+                        <div class="flex justify-center my-6">
+                            <div class="bg-black border border-neutral-700 p-5 rounded-lg text-center font-mono text-sm max-w-lg w-full">
+                                <span class="text-white">Lucro Contábil (Vindo da DRE)</span><br>
+                                <span class="text-red-400 font-bold">(+) ADIÇÕES</span><br>
+                                <span class="text-green-400 font-bold">(-) EXCLUSÕES</span><br>
+                                <span class="text-blue-400 font-bold">(-) COMPENSAÇÕES DE PREJUÍZOS (limite 30%)</span><br>
+                                <hr class="border-neutral-700 my-2">
+                                <span class="text-orange-500 font-bold text-lg">(=) LUCRO REAL (Base do Imposto)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 text-xs text-neutral-400">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-red-400 block mb-1">O que são ADIÇÕES?</strong>
+                                Despesas que a contabilidade lançou na DRE (reduzindo o lucro), mas que o Leão da Receita diz: <em>"Eu não aceito que você deduza isso do seu imposto, devolva esse valor para o lucro e pague sobre ele"</em>.
+                                <br><br><strong>Exemplos Clássicos:</strong> Multas de trânsito, Multas punitivas de atraso de impostos, Brindes superfaturados, Despesas com diretores não ligadas ao negócio (Alimentação em restaurantes de luxo sem cliente).
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-green-400 block mb-1">O que são EXCLUSÕES?</strong>
+                                Receitas que entraram na DRE (aumentando o lucro), mas que a Receita Federal dá o benefício de não pagar IRPJ/CSLL sobre elas, ou que já foram tributadas em outra etapa.
+                                <br><br><strong>Exemplos Clássicos:</strong> Recebimento de dividendos de participações em outras empresas controladas (já foram tributados na origem).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: SPED e Obrigações -->
+            <section id="sped" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Obrigações Acessórias e SPED</h2>
+                    <p class="section-subtitle">A digitalização e o monitoramento em tempo real do patrimônio pelo Fisco.</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-900/50 p-6 rounded-xl mb-8">
+                    <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle"></i> O Fim do Papel e o Big Data
+                    </h4>
+                    <p class="text-sm text-neutral-300">
+                        Antigamente, as empresas encadernavam livros físicos pesados (Livro Diário com termos de abertura e encerramento, e Livro Razão) e levavam à Junta Comercial para carimbar. Hoje, o <strong>SPED (Sistema Público de Escrituração Digital)</strong> acabou com isso. A contabilidade consolida tudo num super arquivo TXT. A Receita possui supercomputadores (T-Rex e Harpia) que cruzam a contabilidade (ECD) com o Fiscal (Notas Eletrônicas) e o eSocial (DP), gerando uma malha fina institucional de altíssima precisão.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-orange-500 hover:shadow-orange-900/20 shadow-lg transition-shadow">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="book-open-check" class="text-orange-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">ECD (Sped Contábil)</h3>
+                        </div>
+                        <p class="text-xs text-neutral-400 mb-3"><strong>Escrituração Contábil Digital.</strong> É a entrega oficial da contabilidade societária pura. Contém o Diário, Razão, Balancetes, Balanços, DRE e Notas Explicativas.</p>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside bg-black p-3 rounded border border-neutral-700">
+                            <li><strong>Prazo:</strong> Entregue anualmente, até o último dia útil de <strong class="text-orange-400">MAIO</strong> do ano seguinte.</li>
+                            <li><strong>Obrigatoriedade:</strong> Todas de Lucro Real. Empresas do Lucro Presumido (se distribuírem lucro acima do limite da presunção ou mantiverem livro caixa falho). Imunes/Isentas com grandes movimentações. Opcional (mas ótimo) para Simples Nacional.</li>
+                            <li><strong>Assinatura:</strong> Certificado Digital (e-CPF) do Contador e do Sócio/Representante legal.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-blue-500 hover:shadow-blue-900/20 shadow-lg transition-shadow">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="calculator" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">ECF (Sped Fiscal-Contábil)</h3>
+                        </div>
+                        <p class="text-xs text-neutral-400 mb-3"><strong>Escrituração Contábil Fiscal.</strong> Substituiu a antiga DIPJ. É a prestação de contas dos impostos diretos corporativos. A ECF obriga o sistema a buscar e <em>recuperar</em> o arquivo da ECD que já foi entregue.</p>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside bg-black p-3 rounded border border-neutral-700">
+                            <li><strong>Prazo:</strong> Entregue anualmente, até o último dia útil de <strong class="text-blue-400">JULHO</strong>.</li>
+                            <li><strong>Objetivo:</strong> É aqui que as empresas do Lucro Real transmitem eletronicamente o <strong>e-LALUR</strong> e o e-LACS (para CSLL), demonstrando ao fisco as adições e exclusões para chegar no imposto exato a pagar.</li>
+                            <li><strong>Cruzamento:</strong> A Receita usa a ECF para saber se o imposto que você pagou nas DARFs mensais confere com o cálculo anual final de fechamento do balanço.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Navegação de seções
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

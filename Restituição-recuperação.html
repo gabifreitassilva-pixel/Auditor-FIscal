@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Definitivo - Recuperação e Restituição Tributária</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ea580c; }
+        body { background-color: #0a0a0a; color: #ffffff; }
+        .step-number { @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm; }
+        .section-title { @apply text-3xl font-bold text-white mb-2; }
+        .section-subtitle { @apply text-neutral-400; }
+        .header-border { @apply border-l-4 border-orange-500 pl-4 mb-8; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="gem" class="text-orange-500"></i>
+                <span class="text-orange-500">Restituição</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">A Bíblia da Recuperação Tributária</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> A Mina de Ouro (Visão Geral)
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Mecanismos Legais</div>
+            
+            <a href="#" onclick="showSection('restituicao-dinheiro')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="banknote" class="w-5 h-5"></i> Restituição em Dinheiro (Prazos)
+            </a>
+            <a href="#" onclick="showSection('compensacao-perdcomp')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="arrow-right-left" class="w-5 h-5"></i> Compensação e PER/DCOMP
+            </a>
+            <a href="#" onclick="showSection('divida-ativa-parcelamento')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="landmark" class="w-5 h-5"></i> Dívida Ativa e Parcelamentos
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Mapa de Tributos</div>
+            
+            <a href="#" onclick="showSection('impostos-federais')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="building-2" class="w-5 h-5"></i> Federais (IR, CSLL, PIS, COF)
+            </a>
+            <a href="#" onclick="showSection('impostos-folha')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="users" class="w-5 h-5"></i> Folha / INSS (Indenizatórias)
+            </a>
+            <a href="#" onclick="showSection('impostos-estaduais')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="map" class="w-5 h-5"></i> Estaduais e Municipais (ICMS/ISS)
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">A Prática</div>
+
+            <a href="#" onclick="showSection('reavaliacao-passo-a-passo')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="search" class="w-5 h-5"></i> Reavaliação e Passo a Passo
+            </a>
+            <a href="#" onclick="showSection('riscos')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="shield-alert" class="w-5 h-5"></i> Riscos, Malha Fina e Cuidados
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Departamento de Recuperação Tributária</h2>
+                    <p class="section-subtitle">A engenharia reversa para devolver dinheiro ao caixa do cliente.</p>
+                </div>
+                
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-8 shadow-2xl">
+                    <h3 class="text-2xl font-bold text-white mb-4">A Regra dos 60 Meses (Prescrição Quinquenal)</h3>
+                    <p class="text-neutral-300 mb-4 text-sm leading-relaxed">
+                        A legislação brasileira (CTN - Código Tributário Nacional) permite que as empresas façam uma varredura para identificar valores pagos a maior e peçam o reembolso. O limite para olhar para o passado é estritamente de <strong>5 anos (60 meses)</strong> contados a partir da data em que o imposto indevido foi pago.
+                    </p>
+                    <p class="text-neutral-300 text-sm leading-relaxed">
+                        Existem duas formas principais de transformar esse crédito em benefício financeiro: **Restituição** (dinheiro vivo na conta) e **Compensação** (usar o crédito como "moeda" para pagar impostos atuais e futuros). Vamos descer aos detalhes absolutos de como, quando e por que utilizar cada um.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Restituição Dinheiro -->
+            <section id="restituicao-dinheiro" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Restituição em Dinheiro (Na Conta Bancária)</h2>
+                    <p class="section-subtitle">Como pedir, prazos reais e correção pela SELIC.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-green-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="hand-coins" class="text-green-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Como Funciona a Restituição?</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            A Restituição é o ato da Receita Federal depositar o dinheiro de volta na conta PJ da empresa. Ela é <strong>extremamente comum e ágil para empresas do Simples Nacional</strong> (especialmente em casos de produtos Monofásicos). Para empresas do Lucro Presumido/Real, a RFB resiste muito a devolver dinheiro vivo, preferindo "obrigar" a compensação via PER/DCOMP.
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-green-400 font-bold mb-2">Simples Nacional (O Portal PGDAS)</h4>
+                                <p class="text-xs text-neutral-400">Após retificar o PGDAS (ex: separando o que é monofásico), o crédito é apurado. O contador entra no menu <em>"Compensação a Pedido ou Restituição"</em> dentro do portal do Simples e insere os dados bancários. O CNPJ da conta bancária deve ser <strong>exatamente o mesmo</strong> da empresa solicitante.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-green-400 font-bold mb-2">A Correção Mágica (Taxa SELIC)</h4>
+                                <p class="text-xs text-neutral-400">O governo não devolve só o valor nominal. A lei manda corrigir todo o valor pago indevidamente pela <strong>Taxa SELIC acumulada</strong> desde o mês em que o imposto foi pago até o mês da devolução, mais 1% no mês do depósito. Se a empresa tem 50 mil de créditos de 4 anos atrás, ela pode acabar recebendo 65 mil devido à Selic acumulada.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border border-neutral-800 p-6 rounded-xl shadow-lg">
+                        <h4 class="text-white font-bold mb-4 text-lg">Prazos: Quanto tempo demora para cair o dinheiro?</h4>
+                        <ul class="text-sm text-neutral-300 space-y-4 list-none">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="clock-4" class="text-blue-400 mt-1"></i>
+                                <div><strong>O Cenário Ideal (Simples Nacional - Via Eletrônica Automática):</strong> <br>Se a retificação for limpa e a empresa não tiver pendências, o robô da Receita processa o pedido rapidamente. O dinheiro costuma cair na conta num prazo médio de <strong>45 a 90 dias úteis</strong> após o clique no pedido.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="search" class="text-yellow-400 mt-1"></i>
+                                <div><strong>Cenário de Análise (Malha de Restituição):</strong> <br>Se o valor for muito alto, ou os percentuais retificados forem discrepantes, o pedido vai para "Análise Manual". Neste caso, um auditor humano vai olhar. O prazo estica, podendo demorar de <strong>6 meses a 1 ano</strong>.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="scale" class="text-red-400 mt-1"></i>
+                                <div><strong>O Prazo Legal Limite (Lei 9.784/99):</strong> <br>A Lei determina que a Administração Pública tem o dever de decidir em até <strong>360 dias</strong>. Se a Receita demorar mais de 1 ano e não der resposta nem depositar, o escritório pode entrar com um Mandado de Segurança na Justiça para obrigar a Receita a liberar o dinheiro imediatamente.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: PER/DCOMP e Compensação -->
+            <section id="compensacao-perdcomp" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Compensação e PER/DCOMP</h2>
+                    <p class="section-subtitle">Usando o crédito como moeda de troca para abater impostos do mês.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="arrow-right-left" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Como Funciona a Compensação?</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Para empresas do Lucro Presumido e Lucro Real (e também cruzamentos com DP), a via principal é a <strong>Compensação</strong>. A empresa confessa: <em>"Governo, eu te devo R$ 10.000 de IRPJ neste mês, mas eu descobri que paguei R$ 100.000 a mais de PIS/COFINS em 2021. Quero usar 10 mil desse meu crédito para matar essa dívida de agora."</em>
+                        </p>
+                        
+                        <div class="bg-black p-5 rounded-lg border border-blue-900/50 mb-4">
+                            <h4 class="text-blue-400 font-bold mb-2">A Mágica da Condição Resolutória (Prazo Imediato)</h4>
+                            <p class="text-sm text-neutral-300">
+                                <strong>Quanto tempo demora para quitar o débito na compensação?</strong> A resposta é: <strong>IMEDIATAMENTE</strong>. <br>
+                                O envio da PER/DCOMP tem <em>"efeito de extinção do débito sob condição resolutória"</em>. No momento em que você transmite a DCOMP no e-CAC com sucesso, o débito do mês (ex: o DARF) <strong>é considerado pago e extinto</strong>. A empresa pode emitir CND (Certidão Negativa) no dia seguinte.
+                            </p>
+                            <p class="text-xs text-neutral-500 mt-2 bg-neutral-800 p-2 rounded">
+                                *O Risco da Condição Resolutória:* O débito some agora, mas a Receita tem até <strong>5 anos para auditar (Homologar)</strong> essa DCOMP. Se daqui a 4 anos o fiscal disser "Esse seu crédito era falso", a Receita recusa a DCOMP e aquela dívida que você achava que tinha pago "ressuscita", cobrando juros e multas de 4 anos atrás. Por isso a auditoria do crédito tem que ser perfeita.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                            <h4 class="text-orange-400 font-bold mb-3">Compensação Cruzada (A Revolução)</h4>
+                            <p class="text-sm text-neutral-300 mb-3">Antes de 2018, o Brasil era dividido: "Imposto da Receita (PIS/COFINS/IR)" não se misturava com "Imposto Previdenciário do INSS".</p>
+                            <p class="text-sm text-neutral-300">Com a Lei 13.670/2018 e a adoção plena do eSocial/DCTFWeb, <strong>agora você pode cruzar tudo (que for federal)</strong>. Se você descobriu um crédito de PIS/COFINS (Tese do Século), você pode fazer uma DCOMP Web para compensar a guia de INSS Patronal da folha de pagamento dos funcionários deste mês.</p>
+                        </div>
+
+                        <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                            <h4 class="text-orange-400 font-bold mb-3">O que NÃO PODE ser compensado via PER/DCOMP?</h4>
+                            <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                                <li>Tributos recolhidos no Simples Nacional (Simples só compensa Simples no portal próprio).</li>
+                                <li>ICMS (Imposto Estadual, requer processo na SEFAZ do estado).</li>
+                                <li>ISS (Imposto Municipal, requer processo na Prefeitura).</li>
+                                <li>Débitos que já foram inscritos em Dívida Ativa da União (PGFN).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Dívida Ativa e Parcelamento -->
+            <section id="divida-ativa-parcelamento" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Dívida Ativa e Parcelamentos</h2>
+                    <p class="section-subtitle">Dá para usar crédito para pagar parcelamento ou dívida ativa?</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Dívida Ativa -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="landmark" class="text-red-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Compensação em Dívida Ativa (DAU)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Quando o imposto atrasa muito, ele sai da Receita Federal e vai para a <strong>PGFN (Procuradoria Geral da Fazenda Nacional)</strong>. Vira um título de execução fiscal (Dívida Ativa).
+                        </p>
+                        <div class="bg-black p-4 rounded-lg border border-red-900/50">
+                            <h4 class="text-white font-bold mb-2">Pode fazer PER/DCOMP normal? NÃO.</h4>
+                            <p class="text-xs text-neutral-400 mb-2">A Instrução Normativa da RFB <strong>veda expressamente</strong> o uso da PER/DCOMP padrão (via e-CAC) para compensar débitos inscritos em Dívida Ativa.</p>
+                            <h4 class="text-green-400 font-bold mt-4 mb-2">A Solução: Transação Tributária (Acordo com a PGFN)</h4>
+                            <p class="text-xs text-neutral-400">Para a Dívida Ativa, o caminho é o portal <strong>REGULARIZE (da PGFN)</strong>. A PGFN permite que empresas utilizem Prejuízo Fiscal e Base de Cálculo Negativa de CSLL (ou créditos de ações judiciais transitadas em julgado) para amortizar até 70% do saldo devedor inscrito em dívida ativa, dentro de um programa de <em>Transação Tributária Excepcional</em>. É um processo mais jurídico/negocial do que puramente contábil.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parcelamentos -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-blue-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="copy" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Compensação de Parcelamentos (RFB)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            A empresa tem um parcelamento de 60 meses no e-CAC e descobriu um crédito gigante. Dá para usar o crédito para quitar as parcelas? <strong>Sim, mas existem regras estritas de amortização.</strong>
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700 text-sm">
+                                <strong class="text-blue-400 block mb-2">Regra da Amortização ("De Trás para Frente")</strong>
+                                <p class="text-xs text-neutral-400">Ao enviar uma DCOMP apontando para o número do processo de um parcelamento normal, a Receita não paga a parcela "deste mês" e nem deixa você parar de pagar. <strong>A compensação vai abater as ÚLTIMAS parcelas do acordo</strong> (da parcela 60, voltando para a 59, 58...).</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700 text-sm">
+                                <strong class="text-orange-400 block mb-2">Cuidado Operacional (A Parcela Atual)</strong>
+                                <p class="text-xs text-neutral-400">Mesmo que você faça uma PER/DCOMP gigante que abata quase todo o parcelamento, a empresa <strong>deve continuar gerando e pagando o DARF da prestação do mês vigente</strong>, até que a Receita processe e consolide o novo saldo devedor zerado, senão o parcelamento é cancelado por inadimplência da cota mensal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: O Mapa dos Tributos Federais -->
+            <section id="impostos-federais" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Mapa de Restituição: Tributos Federais</h2>
+                    <p class="section-subtitle">As teses e oportunidades para IRPJ, CSLL, PIS, COFINS e IPI.</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- PIS / COFINS -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none items-center text-lg">
+                            <span class="flex items-center gap-2"><i data-lucide="shopping-bag" class="text-blue-400"></i> PIS e COFINS</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-sm text-neutral-400 space-y-4">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">1. Exclusão do ICMS e ISS da Base (Tese do Século):</strong> O ICMS destacado na nota de venda (e em muitos casos, o ISS para prestadores de serviço) não é faturamento, devendo ser retirado da base do PIS/COFINS mensalmente. Gera créditos imensos dos últimos 60 meses.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">2. Crédito de Insumos (Lucro Real):</strong> O STJ ampliou o conceito de insumo para empresas do Lucro Real. Qualquer gasto que seja <em>essencial ou relevante</em> para a produção (ex: EPI de funcionário, taxa de maquininha de cartão, limpeza industrial) pode gerar crédito de 9,25% para abater impostos.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">3. Tributação Monofásica / Alíquota Zero:</strong> Autopeças, cosméticos, bebidas frias e remédios não pagam PIS/COFINS na ponta final (Lucro Presumido, Real ou Simples Nacional). Se pagou, pede restituição.
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- IRPJ / CSLL -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none items-center text-lg">
+                            <span class="flex items-center gap-2"><i data-lucide="building" class="text-green-400"></i> IRPJ e CSLL</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-sm text-neutral-400 space-y-4">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">1. Saldo Negativo (Lucro Real):</strong> Empresas que pagam IR/CSLL por estimativa mensal (fazem DARFs mensais). No final do ano, se fecharem o Balanço e descobrirem que o Lucro foi menor que a estimativa ou deu Prejuízo Fiscal, todo aquele dinheiro pago vira "Saldo Negativo", um crédito de ouro para compensar em PER/DCOMP no ano seguinte.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">2. Clínica Médica no Lucro Presumido:</strong> A base de presunção do IRPJ para serviços é de 32%. Mas clínicas médicas e laboratórios que se equiparam a hospitais (e seguem regras da ANVISA) têm o direito de reduzir a base do IRPJ para <strong>8%</strong> e CSLL para <strong>12%</strong>. Recuperação milionária para quem pagava 32%.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">3. Retenções Não Utilizadas:</strong> Sofreu retenção na fonte em serviços prestados, mas fechou no prejuízo e não teve como abater? Esse imposto retido vira crédito em DCOMP.
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- IPI -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none items-center text-lg">
+                            <span class="flex items-center gap-2"><i data-lucide="package-search" class="text-orange-400"></i> IPI (Imposto s/ Prod. Ind.)</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-sm text-neutral-400 space-y-4">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white">Crédito Presumido e Exportação:</strong> Indústrias que exportam (não pagam IPI na saída) acabam acumulando créditos de IPI nas matérias-primas que compraram no mercado interno. Esse crédito acumulado pode ser ressarcido via PER/DCOMP para abater outros impostos federais (ou pedir dinheiro).
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- SECTION: INSS Folha -->
+            <section id="impostos-folha" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Mapa de Restituição: Folha e INSS</h2>
+                    <p class="section-subtitle">Quando a empresa é tributada sobre indenizações que não são salário.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-6 shadow-lg">
+                    <p class="text-sm text-neutral-300 mb-6 leading-relaxed">
+                        A empresa paga pesados 20% de cota patronal de INSS sobre a folha de salários. A lei diz que isso deve incidir sobre verbas <strong>remuneratórias</strong> (que retribuem o trabalho). Porém, a Receita cobrou por anos sobre verbas <strong>indenizatórias</strong> (que apenas compensam o funcionário).
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-orange-500 mb-3 flex items-center gap-2">
+                                <i data-lucide="scissors"></i> O que já está pacificado (Não incide INSS)
+                            </h3>
+                            <ul class="text-sm text-neutral-300 space-y-3 bg-black border border-neutral-700 p-4 rounded-lg">
+                                <li><strong class="text-white">Aviso Prévio Indenizado:</strong> O funcionário foi demitido e foi para casa. O valor recebido indeniza a falta de aviso. Como não houve trabalho, o STJ pacificou que não pode incidir 20% de cota patronal.</li>
+                                <li><strong class="text-white">15 primeiros dias de Auxílio-Doença:</strong> A empresa paga os dias em que o funcionário está doente antes de ir para o INSS. Indenizatório = Crédito para a empresa.</li>
+                                <li><strong class="text-white">Salário Maternidade:</strong> Decisão do STF. Inconstitucional a cobrança de cota patronal.</li>
+                                <li><strong class="text-white">Terço (1/3) de Férias Gozadas.</strong></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-500 mb-3 flex items-center gap-2">
+                                <i data-lucide="calculator"></i> FAP / RAT / Retenção 11%
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="bg-black border border-neutral-700 p-4 rounded-lg text-sm text-neutral-300">
+                                    <strong class="text-white block mb-1">Revisão do FAP (Fator Acidentário):</strong> Multiplicador de 0,5 a 2,0. Muitos DPs repetem o FAP do ano passado (ex: 1,00). Se a empresa não teve acidentes, o FAP da Receita pode ter caído para 0,50. Se informou 1,00, a empresa pagou o DOBRO do imposto RAT de forma indevida por anos.
+                                </div>
+                                <div class="bg-black border border-neutral-700 p-4 rounded-lg text-sm text-neutral-300">
+                                    <strong class="text-white block mb-1">Retenção de 11% (Cessão de Mão de Obra):</strong> Empresas de limpeza e segurança sofrem retenção de 11% na nota. Muitas vezes a retenção é tão grande que zera a folha e sobra crédito acumulado de INSS. Isso pode ser restituído (Per/Dcomp).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Estaduais e Municipais -->
+            <section id="impostos-estaduais" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Mapa de Restituição: ICMS e ISS</h2>
+                    <p class="section-subtitle">Recuperação de impostos fora da esfera federal (Requer SEFAZ e Prefeitura).</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-900/50 p-6 rounded-xl mb-6">
+                    <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle"></i> Sem e-CAC, sem DCOMP
+                    </h4>
+                    <p class="text-sm text-neutral-300">
+                        Para recuperar ICMS (Estado) e ISS (Município), <strong>não se usa a PER/DCOMP da Receita Federal</strong>. É necessário montar um processo administrativo (ou judicial) próprio na Secretaria de Fazenda do Estado ou na Prefeitura, seguindo as regras específicas de cada local, o que costuma ser mais burocrático e lento.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-4 flex items-center gap-2">
+                            <i data-lucide="map"></i> ICMS (Estadual)
+                        </h3>
+                        <div class="space-y-4 text-sm text-neutral-400">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">Ressarcimento de ICMS-ST (Substituição Tributária):</strong><br>
+                                O Estado cobra ICMS antecipado assumindo que a loja venderia o produto por R$ 100. Mas a loja fez promoção e vendeu por R$ 80. O STF diz que a empresa tem direito à devolução do ICMS pago a maior sobre esses R$ 20 de diferença (Base de cálculo presumida x efetiva).
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">Transferência entre Matriz e Filial:</strong><br>
+                                O STF decidiu que não incide ICMS quando a empresa transfere mercadoria da sua matriz para sua própria filial em outro estado, pois não há "venda" (mudança de dono). Se a empresa pagou isso, cabe restituição (ADC 49).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-blue-500 mb-4 flex items-center gap-2">
+                            <i data-lucide="building"></i> ISS (Municipal)
+                        </h3>
+                        <div class="space-y-4 text-sm text-neutral-400">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">Locação de Bens Móveis:</strong><br>
+                                Súmula Vinculante 31 STF: É inconstitucional a cobrança de ISS sobre a locação de bens móveis (ex: locação de andaimes, máquinas, equipamentos sem operador). Muitas prefeituras forçam o pagamento, cabendo restituição.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">Exportação de Serviços:</strong><br>
+                                Desenvolvedores e designers que prestam serviço para empresas no exterior e o "resultado" do serviço se verifica lá fora, têm isenção de ISS, PIS e COFINS.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Passo a Passo (Reavaliação) -->
+            <section id="reavaliacao-passo-a-passo" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">O Passo a Passo Definitivo</h2>
+                    <p class="section-subtitle">Como fazer a reavaliação de débitos, retificações e os pedidos formais.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold text-white mb-6">A Engenharia Reversa (Como executar a compensação/restituição)</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start bg-black p-5 rounded-lg border border-neutral-700">
+                            <div class="step-number">1</div>
+                            <div>
+                                <strong class="text-orange-400 block mb-1 text-lg">Diagnóstico e Reavaliação dos Débitos Existentes</strong>
+                                <p class="text-sm text-neutral-300">Antes de pedir crédito, o contador deve entrar no <strong>e-CAC > Consulta Situação Fiscal</strong>. Emite-se o relatório de pendências. A regra de ouro é: A Receita cruza dados. Se você pedir 100 mil de restituição, mas o relatório apontar que você deve 20 mil de multa por SPED atrasado, a Receita fará uma <strong>Compensação de Ofício</strong> (desconta os 20 mil à força e só te devolve 80 mil). O escritório avalia se as dívidas no sistema são reais ou passíveis de prescrição.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start bg-black p-5 rounded-lg border border-neutral-700">
+                            <div class="step-number">2</div>
+                            <div>
+                                <strong class="text-orange-400 block mb-1 text-lg">Download de Dados e Malha Fina Própria</strong>
+                                <p class="text-sm text-neutral-300">Descarrega-se XMLs (vendas), Folhas de Pagamento (.txt) ou EFD-Contribuições originais via Receitanet. O escritório roda isso em softwares de auditoria cruzando NCMs (produtos), CFOPs e rubricas de folha com as tabelas legais vigentes. Nasce a "Planilha de Apuração do Crédito".</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start bg-black p-5 rounded-lg border border-red-900/50">
+                            <div class="step-number bg-red-500 text-white">3</div>
+                            <div>
+                                <strong class="text-red-400 block mb-1 text-lg">A Fase Crítica: Retificação das Obrigações</strong>
+                                <p class="text-sm text-neutral-300">Você não pode simplesmente pedir dinheiro. O histórico da empresa (SPED/PGDAS/eSocial) tem que provar.
+                                <br>- <strong>Para Simples:</strong> Entra no PGDAS mês a mês (até 60) e altera o faturamento de "Receita Bruta" para "Isenta/Monofásica".
+                                <br>- <strong>Para Lucro Real/Presumido (Pis/Cofins):</strong> Reabre os arquivos EFD-Contribuições mês a mês, retira o ICMS da base, recalcula, assina digitalmente e transmite por cima das antigas. Faz o mesmo com a DCTF.
+                                <br>- <strong>Para INSS:</strong> Reabre eventos S-1200 e S-1299 no eSocial, tirando a incidência de INSS cota patronal da rubrica "Aviso Prévio Indenizado", e transmite DCTFWeb retificadora.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start bg-black p-5 rounded-lg border border-green-900/50">
+                            <div class="step-number bg-green-500 text-white">4</div>
+                            <div>
+                                <strong class="text-green-400 block mb-1 text-lg">O Ato do Pedido (Portal ou PER/DCOMP)</strong>
+                                <p class="text-sm text-neutral-300">
+                                - <strong>Para dinheiro vivo (Simples Nacional):</strong> Vai em "Compensação a Pedido ou Restituição" no PGDAS. Escolhe Restituição, informa o banco da PJ. O valor apurado pelas retificações anteriores vai aparecer ali. Clica em enviar. Aguarda de 45 a 90 dias (ou até 360 legais).<br>
+                                - <strong>Para abater impostos (Presumido/Real):</strong> Entra no e-CAC > Restituição e Compensação > PER/DCOMP Web. Primeiro você cria o "Documento de Crédito" (Diz que pagou a mais em 2021). Depois, você cria a "Declaração de Compensação" (Puxa o crédito de 2021 e aponta para o DARF do mês atual de 2024 que você não quer pagar). Assina e envia. O DARF atual é quitado instantaneamente pela <em>Condição Resolutória</em>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Riscos -->
+            <section id="riscos" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Riscos, Malha Fina e Precauções</h2>
+                    <p class="section-subtitle">A linha tênue entre a economia fiscal de sucesso e a fraude.</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-900/50 p-6 rounded-xl mb-8">
+                    <h4 class="text-red-400 font-bold mb-3 flex items-center gap-2 text-xl">
+                        <i data-lucide="skull"></i> Os "Milagreiros" da Tributação
+                    </h4>
+                    <p class="text-sm text-neutral-300 mb-4 leading-relaxed">
+                        Existem muitas empresas "aventureiras" de recuperação tributária no mercado. Elas entram no sistema do cliente, reduzem arbitrariamente o faturamento no SPED ou jogam tudo na classificação "monofásica" (mesmo papel higiénico que não é monofásico) só para gerar um crédito falso rápido.
+                    </p>
+                    <p class="text-sm text-neutral-300 leading-relaxed font-bold">
+                        A Receita Federal homologa a PER/DCOMP na hora, mas tem um prazo estrito de 5 anos para auditar fundo esse pedido. Quando a malha fina (T-Rex) apanha essa fraude, a PER/DCOMP é cancelada. O empresário é obrigado a pagar os impostos que achou que tinha compensado, acrescidos de juros SELIC e multas que variam de 75% a 150% do valor (por fraude/dolo). Enquanto isso, a empresa "milagreira" já cobrou os seus 30% de honorários e desapareceu do mapa.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-orange-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="shield-check" class="text-orange-500"></i> A Proteção: Dossiê de Evidências
+                        </h3>
+                        <p class="text-sm text-neutral-400 mb-3">O escritório sério, ao concluir uma recuperação, entrega ao cliente um <strong>Dossiê Técnico</strong> blindado:</p>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside bg-black p-4 rounded-lg border border-neutral-700">
+                            <li>Listagem linha a linha de todos os NCMs/EANs cruzados com a fundamentação legal (ex: Lei 10.147/00 para cosméticos).</li>
+                            <li>Demonstrativo comparando o valor Original vs Valor Retificado mês a mês.</li>
+                            <li>Recibos criptografados de todas as retificações.</li>
+                            <li>Se um fiscal bater na porta dali a 4 anos, basta entregar-lhe o Dossiê e o processo de auditoria encerra favoravelmente.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-blue-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="scale" class="text-blue-500"></i> Acompanhamento do Despacho Decisório
+                        </h3>
+                        <p class="text-sm text-neutral-400 mb-3">O trabalho não acaba ao clicar em enviar.</p>
+                        <p class="text-sm text-neutral-300 bg-black p-4 rounded-lg border border-neutral-700">
+                            A Receita emitirá, eventualmente, um <strong>Despacho Decisório</strong>. Se a DCOMP for <em>homologada</em>, sucesso absoluto, processo encerrado. Se a DCOMP for <em>não homologada</em> (total ou parcial), o débito compensado volta a ser exigível. Neste caso, o escritório tem um prazo exíguo (geralmente 30 dias) para apresentar <strong>Manifestação de Inconformidade</strong>, um processo de defesa administrativa juntando o Dossiê para provar que a Receita se enganou e o crédito é real.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

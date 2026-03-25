@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Obrigações Acessórias</title>
+    <style>
+        :root {
+            --primary: #ff6600; /* Laranja */
+            --bg: #000000;      /* Preto */
+            --card-bg: #111111; /* Cinza Escuro */
+            --border: #333333;
+            --text-main: #ffffff;
+            --text-dim: #aaaaaa;
+            --success: #00ff00;
+            --warning: #ffcc00;
+            --danger: #ff3333;
+            --info: #33ccff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- MENU LATERAL (SIMPLIFICADO) --- */
+        #sidebar {
+            width: 250px;
+            background: #080808;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .sidebar-branding {
+            padding: 30px 20px;
+            background: #111;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sidebar-branding .logo-title {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin: 0 0 5px 0;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .sidebar-branding .subtitle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* --- ÁREA PRINCIPAL --- */
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .container-center {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            color: var(--text-main);
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- ABAS DE NAVEGAÇÃO --- */
+        .sub-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .sub-tab-btn {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid transparent;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .sub-tab-btn:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .sub-tab-btn.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .obrigacao-aba {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .obrigacao-aba.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- TABELAS --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 16px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: #080808;
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-table tr:hover {
+            background: #1a1a1a;
+        }
+
+        .data-table td {
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+
+        .tipo-destaque {
+            color: var(--info);
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+
+        /* Controles do Painel */
+        .panel-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #222;
+        }
+
+        .dark-select {
+            background: #111;
+            color: #fff;
+            border: 1px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            min-width: 250px;
+            font-weight: bold;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+        }
+
+        /* Botões de Ação na Tabela */
+        .btn-small {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-small:hover { background: #333; }
+        .btn-small.view { color: #fff; border-color: #666; }
+        .btn-small.view:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+        .btn-small.edit { color: var(--warning); border-color: var(--warning); }
+        .btn-small.edit:hover { background: rgba(255, 204, 0, 0.1); }
+        .btn-small.delete { color: var(--danger); border-color: var(--danger); }
+        .btn-small.delete:hover { background: rgba(255, 51, 51, 0.1); }
+
+        /* --- MODAL DE EDIÇÃO --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: #111;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            width: 600px;
+            max-width: 95%;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(255, 102, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel:hover { background: #222; }
+
+        .btn-save {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-save:hover { background: #e65c00; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+            background: #0c0c0c;
+            border-radius: 8px;
+            border: 1px dashed #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- BARRA LATERAL -->
+    <aside id="sidebar">
+        <div class="sidebar-branding">
+            <h1 class="logo-title">FISCAL</h1>
+            <p class="subtitle">Gestão de Obrigações</p>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-btn">
+                📅 Obrigações Acessórias
+            </div>
+        </nav>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+        <div class="container-center">
+            <div class="section-title">
+                <span>Calendário de Obrigações Acessórias</span>
+            </div>
+
+            <!-- SUB-NAVEGAÇÃO (Âmbitos) -->
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" onclick="mudarAba('trabalhista', this)">Trabalhista/Previdenciário</button>
+                <button class="sub-tab-btn" onclick="mudarAba('federal', this)">Âmbito Federal</button>
+                <button class="sub-tab-btn" onclick="mudarAba('estadual', this)">Âmbito Estadual</button>
+                <button class="sub-tab-btn" onclick="mudarAba('municipal', this)">Âmbito Municipal</button>
+            </div>
+
+            <!-- ABA 1: TRABALHISTA -->
+            <div id="aba-trabalhista" class="obrigacao-aba active">
+                <div class="panel-controls" style="justify-content: flex-end;">
+                    <button class="btn-add" onclick="abrirModal('trabalhista')">+ Adicionar Obrigação</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo da Obrigação</th>
+                            <th>Obrigatoriedade</th>
+                            <th>Periodicidade</th>
+                            <th>Prazo de Entrega</th>
+                            <th style="text-align: right; width: 180px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-trabalhista">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ABA 2: FEDERAL -->
+            <div id="aba-federal" class="obrigacao-aba">
+                <div class="panel-controls" style="justify-content: flex-end;">
+                    <button class="btn-add" onclick="abrirModal('federal')">+ Adicionar Obrigação</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo da Obrigação</th>
+                            <th>Obrigatoriedade</th>
+                            <th>Periodicidade</th>
+                            <th>Prazo de Entrega</th>
+                            <th style="text-align: right; width: 180px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-federal">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ABA 3: ESTADUAL -->
+            <div id="aba-estadual" class="obrigacao-aba">
+                <div class="panel-controls">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label style="color: var(--text-dim); font-weight: bold; text-transform: uppercase;">Estado (UF):</label>
+                        <select id="select-estado" class="dark-select" onchange="renderizarTabelaEstadual()">
+                            <!-- Preenchido dinamicamente via JS -->
+                        </select>
+                    </div>
+                    <button class="btn-add" onclick="abrirModal('estadual')">+ Adicionar Obrigação / Novo Estado</button>
+                </div>
+
+                <table class="data-table" id="table-estadual">
+                    <thead>
+                        <tr>
+                            <th>Tipo da Obrigação</th>
+                            <th>Obrigatoriedade</th>
+                            <th>Periodicidade</th>
+                            <th>Prazo de Entrega</th>
+                            <th style="text-align: right; width: 180px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-estadual">
+                        <!-- Preenchido via JS baseado no Estado selecionado -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ABA 4: MUNICIPAL -->
+            <div id="aba-municipal" class="obrigacao-aba">
+                <div class="panel-controls" style="justify-content: flex-end;">
+                    <button class="btn-add" onclick="abrirModal('municipal')">+ Adicionar Obrigação Municipal</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo da Obrigação</th>
+                            <th>Obrigatoriedade</th>
+                            <th>Periodicidade</th>
+                            <th>Prazo de Entrega</th>
+                            <th style="text-align: right; width: 180px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-municipal">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL INCLUIR/EDITAR -->
+    <div class="modal-overlay" id="modalObrigacao">
+        <div class="modal-content">
+            <h2 id="modal-titulo">Adicionar Obrigação</h2>
+            
+            <input type="hidden" id="modId">
+            <input type="hidden" id="modAmbito">
+            <input type="hidden" id="modEstadoOriginal">
+
+            <div class="form-group" id="fg-estado" style="display: none;">
+                <label>Estado (Sigla UF - Ex: SP, MG, RJ)</label>
+                <input type="text" id="modEstado" placeholder="Ex: SP" maxlength="2" style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo (Ex: DCTFWeb, DEFIS, GIA)</label>
+                <input type="text" id="modTipo" placeholder="Nome da obrigação acessória">
+            </div>
+            
+            <div class="form-group">
+                <label>Obrigatoriedade (Regime da Empresa)</label>
+                <input type="text" id="modObrigatoriedade" placeholder="Ex: Simples Nacional, Lucro Presumido, Lucro Real, MEI...">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Periodicidade</label>
+                    <input type="text" id="modPeriodicidade" placeholder="Ex: Mensal, Anual...">
+                </div>
+                <div class="form-group">
+                    <label>Prazo de Entrega</label>
+                    <input type="text" id="modPrazo" placeholder="Ex: Dia 20, Último dia útil...">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-save" onclick="salvarObrigacao()">Salvar Obrigação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO RÁPIDA (OLHO) -->
+    <div class="modal-overlay" id="modalVisualizacaoObrigacao">
+        <div class="modal-content" style="max-width: 500px; background: #080808;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #fff; display: flex; align-items: center; gap: 10px;">👁️ Detalhes da Obrigação</h2>
+                <button onclick="fecharModalVisualizacaoObrigacao()" style="background: transparent; color: #aaa; border: none; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            
+            <div id="visualizacao-obrigacao-content">
+                <!-- Injetado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GERENCIAMENTO DE BANCO DE DADOS (LOCALSTORAGE) ---
+
+        // Estrutura inicial padrão (AGORA COM TODOS OS ESTADOS MAPEADOS)
+        const dbPadrao = {
+            trabalhista: [
+                { id: 1, tipo: 'DCTFWeb', obrigatoriedade: 'Empresas/Equiparadas', periodicidade: 'Mensal', prazo: 'Último dia útil' },
+                { id: 2, tipo: 'Dirbi', obrigatoriedade: 'Empresas/Equiparadas', periodicidade: 'Mensal', prazo: 'Dia 20 (2º mês)' },
+                { id: 3, tipo: 'EFD - Reinf', obrigatoriedade: 'Empresas/Equiparadas', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                { id: 4, tipo: 'eSocial', obrigatoriedade: 'Empresas/Equiparadas', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                { id: 5, tipo: 'FGTS Digital', obrigatoriedade: 'Empresas/Equiparadas', periodicidade: 'Mensal', prazo: 'Dia 20' }
+            ],
+            federal: [
+                { id: 1, tipo: 'DEFIS', obrigatoriedade: 'Simples Nacional', periodicidade: 'Anual', prazo: 'Último dia de março' },
+                { id: 2, tipo: 'DIRF', obrigatoriedade: 'Pessoas jurídicas em geral', periodicidade: 'Anual', prazo: 'Último dia útil de fevereiro' },
+                { id: 3, tipo: 'DME', obrigatoriedade: 'Residentes ou domiciliados no Brasil', periodicidade: 'Mensal', prazo: 'Último dia útil' },
+                { id: 4, tipo: 'ECD', obrigatoriedade: 'Lucro Real, Presumido, Imunes e Isentas', periodicidade: 'Anual', prazo: 'Último dia útil de junho' },
+                { id: 5, tipo: 'ECF', obrigatoriedade: 'Pessoas jurídicas em geral', periodicidade: 'Anual', prazo: 'Último dia útil de julho' },
+                { id: 6, tipo: 'EFD-CONTRIBUIÇÕES', obrigatoriedade: 'Lucro Real, Presumido e Arbitrado', periodicidade: 'Mensal', prazo: '10º dia útil' }
+            ],
+            municipal: [],
+            estadual: {
+                "AC": [
+                    { id: 101, tipo: 'DAM', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10 ou 20' },
+                    { id: 102, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 103, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 104, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 105, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 106, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 107, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' }
+                ],
+                "AL": [
+                    { id: 201, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 202, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 203, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 204, tipo: 'REDF', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Até dias 10 a 19 do mês subsequente (ou 4 dias da NF)' },
+                    { id: 205, tipo: 'REDF', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Até dias 10 a 19 do mês subsequente (ou 4 dias da NF)' },
+                    { id: 206, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 25' },
+                    { id: 207, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 25' }
+                ],
+                "AM": [
+                    { id: 301, tipo: 'GI/ICMS', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Até 31 de março' },
+                    { id: 302, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 303, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 12 / Último dia útil / 5º dia útil' },
+                    { id: 304, tipo: 'DAM', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia útil (para prestador de serviço aéreo/telecom...)' },
+                    { id: 305, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 306, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15 ou 30' },
+                    { id: 307, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 308, tipo: 'DIA', obrigatoriedade: 'Contribuintes incentivados', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 309, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "AP": [
+                    { id: 401, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 402, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal/Trimestral', prazo: 'Dia 15' },
+                    { id: 403, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 404, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 405, tipo: 'DIAP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: '5º dia útil' },
+                    { id: 406, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' }
+                ],
+                "BA": [
+                    { id: 501, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 25' },
+                    { id: 502, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 503, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 504, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "CE": [
+                    { id: 601, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 602, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 603, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 604, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 605, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime recolhimento especial/produtor rural', periodicidade: 'Trimestral', prazo: 'Dia 30' }
+                ],
+                "DF": [
+                    { id: 701, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 702, tipo: 'SINTEGRA', obrigatoriedade: 'Regime Normal', periodicidade: 'Trimestral', prazo: 'Dia 15' },
+                    { id: 703, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Trimestral', prazo: 'Dia 15' },
+                    { id: 704, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 705, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 706, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 707, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' }
+                ],
+                "ES": [
+                    { id: 801, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 802, tipo: 'DOT', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Dia 30 de abril' },
+                    { id: 803, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 804, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "GO": [
+                    { id: 901, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 902, tipo: 'GIA-ST', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 903, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 904, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 905, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' }
+                ],
+                "MA": [
+                    { id: 1001, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1002, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1003, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1004, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1005, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1006, tipo: 'DIEF', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1007, tipo: 'DIEF', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1008, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "MG": [
+                    { id: 1101, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1102, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1103, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1104, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1105, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1106, tipo: 'DAPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dias 04, 08, 09, 10, 15 e 20' },
+                    { id: 1107, tipo: 'SINTEGRA', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1108, tipo: 'DAMEF-VAF', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: '31 de maio' }
+                ],
+                "MS": [
+                    { id: 1201, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1202, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1203, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1204, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1205, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1206, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "MT": [
+                    { id: 1301, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1302, tipo: 'DEVEC', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 14 do mês subsequente' },
+                    { id: 1303, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Até dia 15 ou Último dia do mês' },
+                    { id: 1304, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1305, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "PA": [
+                    { id: 1401, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1402, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1403, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1404, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1405, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15' }
+                ],
+                "PB": [
+                    { id: 1501, tipo: 'GIVA', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Dia 31 de março' },
+                    { id: 1502, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1503, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1504, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1505, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1506, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' }
+                ],
+                "PE": [
+                    { id: 1601, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1602, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1603, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1604, tipo: 'GIA', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Dia 30 de abril' },
+                    { id: 1605, tipo: 'SEF', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 1606, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1607, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "PI": [
+                    { id: 1701, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1702, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1703, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1704, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' }
+                ],
+                "PR": [
+                    { id: 1801, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1802, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1803, tipo: 'DEVEC', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 14 do mês subsequente' },
+                    { id: 1804, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1805, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1806, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 15' }
+                ],
+                "RJ": [
+                    { id: 1901, tipo: 'DEVEC', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 14 do mês subsequente' },
+                    { id: 1902, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 1903, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 1904, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1905, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 1906, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 1907, tipo: 'DECLAN-IPM', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Ato da SUCIEF' }
+                ],
+                "RN": [
+                    { id: 2001, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2002, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15 ou Dia 8 (PROADI)' },
+                    { id: 2003, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 2004, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 2005, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2006, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' }
+                ],
+                "RO": [
+                    { id: 2101, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 2102, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 2103, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2104, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 14' },
+                    { id: 2105, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' }
+                ],
+                "RR": [
+                    { id: 2201, tipo: 'GIM', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15 ou 20' },
+                    { id: 2202, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2203, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 2204, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2205, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' }
+                ],
+                "RS": [
+                    { id: 2301, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 2302, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2303, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2304, tipo: 'GIA-ICMS', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dias 10, 12, 15, 25, último dia e dia 4...' },
+                    { id: 2305, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 2306, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' }
+                ],
+                "SC": [
+                    { id: 2401, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 2402, tipo: 'DDE', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Após o dia 31 de março' },
+                    { id: 2403, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2404, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 2405, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2406, tipo: 'DCIP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do terceiro mês' },
+                    { id: 2407, tipo: 'SINTEGRA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 14, 15 ou 25' },
+                    { id: 2408, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 2409, tipo: 'DEVEC', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 14' },
+                    { id: 2410, tipo: 'DIME', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' }
+                ],
+                "SE": [
+                    { id: 2501, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2502, tipo: 'REDF', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Até o dia 05 do mês subsequente' },
+                    { id: 2503, tipo: 'REDF', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Até o dia 05 do mês subsequente' },
+                    { id: 2504, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Até o 15º dia do mês subsequente' },
+                    { id: 2505, tipo: 'DIA', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'A partir do dia 02 até vencimento...' },
+                    { id: 2506, tipo: 'DIA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'A partir do dia 02 até vencimento...' },
+                    { id: 2507, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2508, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' }
+                ],
+                "SP": [
+                    { id: 2601, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 2602, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2603, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2604, tipo: 'GIA-ICMS', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 20' },
+                    { id: 2605, tipo: 'DeSTDA', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 28' },
+                    { id: 2606, tipo: 'DIPAM-A', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Dia 31 de março' },
+                    { id: 2607, tipo: 'DIPAM-A', obrigatoriedade: 'Simples Nacional', periodicidade: 'Anual', prazo: 'Dia 31 de março' },
+                    { id: 2608, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' }
+                ],
+                "TO": [
+                    { id: 2701, tipo: 'DIMP', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2702, tipo: 'GIAM', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 09' },
+                    { id: 2703, tipo: 'GIAM', obrigatoriedade: 'Simples Nacional', periodicidade: 'Mensal', prazo: 'Dia 09' },
+                    { id: 2704, tipo: 'EFD ICMS/IPI', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 15' },
+                    { id: 2705, tipo: 'GIA-ST', obrigatoriedade: 'Regime Normal', periodicidade: 'Mensal', prazo: 'Dia 10' },
+                    { id: 2706, tipo: 'ARQUIVO MAGNÉTICO', obrigatoriedade: 'Regime Normal e Simples Nacional', periodicidade: 'Mensal', prazo: 'Último dia do mês' },
+                    { id: 2707, tipo: 'DIF', obrigatoriedade: 'Regime Normal', periodicidade: 'Anual', prazo: 'Dia 28 de fevereiro' }
+                ]
+            }
+        };
+
+        // Inicializa o BD e mescla novos estados se não existirem
+        function initDB() {
+            let currentDB = localStorage.getItem('obrigacoes_db');
+            if (!currentDB) {
+                localStorage.setItem('obrigacoes_db', JSON.stringify(dbPadrao));
+            } else {
+                let parsedDB = JSON.parse(currentDB);
+                let mudou = false;
+                
+                if (!parsedDB.municipal) {
+                    parsedDB.municipal = [];
+                    mudou = true;
+                }
+
+                // Mescla/Injeta de forma inteligente os estados que você não tinha no cache
+                if (!parsedDB.estadual) parsedDB.estadual = {};
+                for (const uf in dbPadrao.estadual) {
+                    if (!parsedDB.estadual[uf]) {
+                        parsedDB.estadual[uf] = dbPadrao.estadual[uf];
+                        mudou = true;
+                    }
+                }
+                
+                if (mudou) {
+                    localStorage.setItem('obrigacoes_db', JSON.stringify(parsedDB));
+                }
+            }
+        }
+
+        function getDB() {
+            return JSON.parse(localStorage.getItem('obrigacoes_db'));
+        }
+
+        function saveDB(db) {
+            localStorage.setItem('obrigacoes_db', JSON.stringify(db));
+        }
+
+        // --- NAVEGAÇÃO DE ABAS ---
+        function mudarAba(abaNome, elementoBotao) {
+            document.querySelectorAll('.obrigacao-aba').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('aba-' + abaNome).classList.add('active');
+            elementoBotao.classList.add('active');
+        }
+
+        // --- RENDERIZAÇÃO DAS TABELAS ---
+        function renderizarLinhas(arrayObrigacoes, ambito, estadoStr = '') {
+            if (!arrayObrigacoes || arrayObrigacoes.length === 0) {
+                return `<tr><td colspan="5"><div class="empty-state">Nenhuma obrigação cadastrada nesta categoria. Clique no botão acima para adicionar.</div></td></tr>`;
+            }
+
+            return arrayObrigacoes.map(ob => `
+                <tr>
+                    <td class="tipo-destaque">${ob.tipo}</td>
+                    <td>${ob.obrigatoriedade}</td>
+                    <td>${ob.periodicidade}</td>
+                    <td>${ob.prazo}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button class="btn-small view" onclick="visualizarObrigacao('${ambito}', ${ob.id}, '${estadoStr}')" title="Visualizar Detalhes">👁️</button>
+                        <button class="btn-small edit" onclick="abrirModal('${ambito}', ${ob.id}, '${estadoStr}')">Editar</button>
+                        <button class="btn-small delete" onclick="excluirObrigacao('${ambito}', ${ob.id}, '${estadoStr}')">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function atualizarSelectEstados(ufFoco = null) {
+            const db = getDB();
+            const select = document.getElementById('select-estado');
+            const ufs = Object.keys(db.estadual || {}).sort();
+            
+            select.innerHTML = '';
+            
+            if (ufs.length === 0) {
+                select.innerHTML = '<option value="">Nenhum Estado</option>';
+                return;
+            }
+
+            ufs.forEach(uf => {
+                const option = document.createElement('option');
+                option.value = uf;
+                option.textContent = uf;
+                select.appendChild(option);
+            });
+
+            if (ufFoco && ufs.includes(ufFoco)) {
+                select.value = ufFoco;
+            } else if (ufs.includes('SP')) {
+                select.value = 'SP';
+            } else {
+                select.value = ufs[0];
+            }
+        }
+
+        function renderizarTabelas(ufFoco = null) {
+            const db = getDB();
+            
+            document.getElementById('tbody-trabalhista').innerHTML = renderizarLinhas(db.trabalhista, 'trabalhista');
+            document.getElementById('tbody-federal').innerHTML = renderizarLinhas(db.federal, 'federal');
+            document.getElementById('tbody-municipal').innerHTML = renderizarLinhas(db.municipal, 'municipal');
+            
+            atualizarSelectEstados(ufFoco || document.getElementById('select-estado').value);
+            renderizarTabelaEstadual();
+        }
+
+        function renderizarTabelaEstadual() {
+            const db = getDB();
+            const uf = document.getElementById('select-estado').value;
+            
+            if (!uf) {
+                document.getElementById('tbody-estadual').innerHTML = `<tr><td colspan="5"><div class="empty-state">Nenhum Estado cadastrado. Clique no botão acima para adicionar uma obrigação.</div></td></tr>`;
+                return;
+            }
+
+            const arrayEstado = db.estadual[uf] || [];
+            document.getElementById('tbody-estadual').innerHTML = renderizarLinhas(arrayEstado, 'estadual', uf);
+        }
+
+        // --- FUNÇÕES CRUD (CREATE, UPDATE, DELETE) ---
+        
+        // Gerador de ID Simples
+        function gerarId() {
+            return new Date().getTime(); 
+        }
+
+        function abrirModal(ambito, id = null, uf = '') {
+            const db = getDB();
+            
+            // Setar valores ocultos
+            document.getElementById('modAmbito').value = ambito;
+            document.getElementById('modId').value = id || '';
+            
+            let estadoAlvo = uf;
+            if (ambito === 'estadual' && !estadoAlvo) {
+                estadoAlvo = document.getElementById('select-estado').value;
+            }
+            document.getElementById('modEstadoOriginal').value = estadoAlvo;
+
+            // Mudar Título
+            document.getElementById('modal-titulo').innerText = id ? 'Editar Obrigação' : 'Adicionar Nova Obrigação';
+
+            if (ambito === 'estadual') {
+                document.getElementById('fg-estado').style.display = 'block';
+                document.getElementById('modEstado').value = estadoAlvo || '';
+            } else {
+                document.getElementById('fg-estado').style.display = 'none';
+                document.getElementById('modEstado').value = '';
+            }
+
+            // Limpar/Preencher Form
+            if (id) {
+                let lista = ambito === 'estadual' ? db.estadual[estadoAlvo] : db[ambito];
+                let item = lista.find(ob => ob.id === id);
+                if (item) {
+                    document.getElementById('modTipo').value = item.tipo;
+                    document.getElementById('modObrigatoriedade').value = item.obrigatoriedade;
+                    document.getElementById('modPeriodicidade').value = item.periodicidade;
+                    document.getElementById('modPrazo').value = item.prazo;
+                }
+            } else {
+                document.getElementById('modTipo').value = '';
+                document.getElementById('modObrigatoriedade').value = '';
+                document.getElementById('modPeriodicidade').value = '';
+                document.getElementById('modPrazo').value = '';
+            }
+
+            document.getElementById('modalObrigacao').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modalObrigacao').style.display = 'none';
+        }
+
+        function salvarObrigacao() {
+            const ambito = document.getElementById('modAmbito').value;
+            const id = document.getElementById('modId').value;
+            const ufNovo = document.getElementById('modEstado').value.toUpperCase();
+            const ufOriginal = document.getElementById('modEstadoOriginal').value;
+
+            if (ambito === 'estadual' && (!ufNovo || ufNovo.length !== 2)) {
+                alert("Por favor, preencha a sigla do Estado corretamente (Ex: SP, MG).");
+                return;
+            }
+
+            const novaObrigacao = {
+                id: id ? parseInt(id) : gerarId(),
+                tipo: document.getElementById('modTipo').value.trim(),
+                obrigatoriedade: document.getElementById('modObrigatoriedade').value.trim(),
+                periodicidade: document.getElementById('modPeriodicidade').value.trim(),
+                prazo: document.getElementById('modPrazo').value.trim()
+            };
+
+            if (!novaObrigacao.tipo || !novaObrigacao.prazo) {
+                alert("Preencha ao menos o Tipo e o Prazo.");
+                return;
+            }
+
+            const db = getDB();
+
+            if (ambito === 'estadual') {
+                if (!db.estadual) db.estadual = {};
+
+                // Se mudou de estado na edição, remove do estado original
+                if (id && ufOriginal && ufOriginal !== ufNovo) {
+                    db.estadual[ufOriginal] = db.estadual[ufOriginal].filter(ob => ob.id !== parseInt(id));
+                    if (db.estadual[ufOriginal].length === 0) {
+                        delete db.estadual[ufOriginal];
+                    }
+                }
+
+                if (!db.estadual[ufNovo]) db.estadual[ufNovo] = [];
+                
+                if (id && ufOriginal === ufNovo) {
+                    let index = db.estadual[ufNovo].findIndex(ob => ob.id === parseInt(id));
+                    if(index !== -1) db.estadual[ufNovo][index] = novaObrigacao;
+                } else {
+                    db.estadual[ufNovo].push(novaObrigacao);
+                }
+            } else {
+                if (id) {
+                    let index = db[ambito].findIndex(ob => ob.id === parseInt(id));
+                    if(index !== -1) db[ambito][index] = novaObrigacao;
+                } else {
+                    db[ambito].push(novaObrigacao);
+                }
+            }
+
+            saveDB(db);
+            fecharModal();
+            renderizarTabelas(ambito === 'estadual' ? ufNovo : null);
+        }
+
+        function excluirObrigacao(ambito, id, uf = '') {
+            if(confirm("Tem certeza que deseja excluir esta obrigação permanentemente?")) {
+                const db = getDB();
+                
+                if (ambito === 'estadual') {
+                    db.estadual[uf] = db.estadual[uf].filter(ob => ob.id !== id);
+                    // Apaga a chave do estado se não houver mais obrigações nele
+                    if(db.estadual[uf].length === 0) {
+                        delete db.estadual[uf];
+                    }
+                } else {
+                    db[ambito] = db[ambito].filter(ob => ob.id !== id);
+                }
+
+                saveDB(db);
+                renderizarTabelas(uf);
+            }
+        }
+
+        // --- FUNÇÃO DE VISUALIZAÇÃO (OLHO) ---
+        function visualizarObrigacao(ambito, id, uf = '') {
+            const db = getDB();
+            let lista = ambito === 'estadual' ? db.estadual[uf] : db[ambito];
+            let item = lista.find(ob => ob.id === id);
+            
+            if (item) {
+                let ambitoTexto = ambito.charAt(0).toUpperCase() + ambito.slice(1);
+                if (ambito === 'estadual') ambitoTexto += ` (${uf})`;
+
+                const html = `
+                    <div style="background: #151515; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">Tipo da Obrigação</span>
+                            <div style="color: #fff; font-size: 1.2rem; font-weight: bold;">${item.tipo}</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">Âmbito</span>
+                            <div style="color: #ddd; font-size: 1rem;">${ambitoTexto}</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">Regime / Obrigatoriedade</span>
+                            <div style="color: var(--info); font-size: 1rem; font-weight: bold;">${item.obrigatoriedade}</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">Periodicidade</span>
+                            <div style="color: #ddd; font-size: 1rem;">${item.periodicidade}</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">Prazo de Entrega</span>
+                            <div style="color: var(--success); font-size: 1.1rem; font-weight: bold;">${item.prazo}</div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('visualizacao-obrigacao-content').innerHTML = html;
+                document.getElementById('modalVisualizacaoObrigacao').style.display = 'flex';
+            }
+        }
+
+        function fecharModalVisualizacaoObrigacao() {
+            document.getElementById('modalVisualizacaoObrigacao').style.display = 'none';
+        }
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = function() {
+            initDB();
+            renderizarTabelas();
+        };
+
+    </script>
+</body>
+</html>

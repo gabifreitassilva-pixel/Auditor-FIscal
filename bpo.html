@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo - BPO Financeiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316; /* orange-500 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ea580c; /* orange-600 */
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        .step-number {
+            @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm;
+        }
+        .section-title {
+            @apply text-3xl font-bold text-white mb-2;
+        }
+        .section-subtitle {
+            @apply text-neutral-400;
+        }
+        .header-border {
+            @apply border-l-4 border-orange-500 pl-4 mb-8;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="dollar-sign" class="text-orange-500"></i>
+                <span class="text-orange-500">BPO</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Guia de Terceirização Financeira</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Início e Visão Geral
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">A Operação Diária</div>
+            
+            <a href="#" onclick="showSection('contas-pagar')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="arrow-down-right" class="w-5 h-5"></i> Contas a Pagar (AP)
+            </a>
+            <a href="#" onclick="showSection('contas-receber')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="arrow-up-right" class="w-5 h-5"></i> Contas a Receber (AR)
+            </a>
+            <a href="#" onclick="showSection('conciliacao')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="check-square" class="w-5 h-5"></i> Conciliação Diária
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Inteligência Financeira</div>
+
+            <a href="#" onclick="showSection('relatorios')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i> Fluxo de Caixa e DRE
+            </a>
+            <a href="#" onclick="showSection('sistemas')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="laptop" class="w-5 h-5"></i> Sistemas e Integrações
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">O que é o BPO Financeiro?</h2>
+                    <p class="section-subtitle">Business Process Outsourcing: A terceirização inteligente do coração da empresa.</p>
+                </div>
+                
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-8 shadow-2xl">
+                    <h3 class="text-2xl font-bold text-white mb-4">Mais do que Contabilidade, a Operação Real</h3>
+                    <p class="text-neutral-300 mb-6 text-sm leading-relaxed">
+                        A Contabilidade tradicional olha para o <strong>passado</strong>: o cliente envia os extratos do mês anterior para o contador fechar os impostos e o balanço. O <strong>BPO Financeiro</strong> atua no <strong>presente e no futuro</strong>. O analista de BPO entra no sistema do cliente todos os dias, agenda os pagamentos, emite as faturas (notas fiscais) de venda, cobra os clientes inadimplentes e diz ao empresário exatamente quanto dinheiro ele terá na próxima sexta-feira.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-orange-500">
+                            <h4 class="text-orange-400 font-bold mb-3 flex items-center gap-2">
+                                <i data-lucide="shield-check"></i> O que o BPO FAZ
+                            </h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                                <li>Emissão de Faturas (Notas Fiscais) e Boletos.</li>
+                                <li>Agendamento de contas a pagar no banco (sem autorizar).</li>
+                                <li>Conciliação bancária <strong>diária</strong>.</li>
+                                <li>Envio de lembretes de cobrança (Régua de Cobrança).</li>
+                                <li>Elaboração de relatórios de Fluxo de Caixa.</li>
+                                <li>Organização digital de todos os recibos e comprovativos.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-red-500">
+                            <h4 class="text-red-400 font-bold mb-3 flex items-center gap-2">
+                                <i data-lucide="x-octagon"></i> O que o BPO NÃO FAZ
+                            </h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                                <li><strong>Aprovação final de pagamentos:</strong> O BPO agenda, mas só o dono da empresa tem a senha/token para autorizar a saída do dinheiro.</li>
+                                <li><strong>Decisões estratégicas de compra:</strong> O BPO não negocia descontos com fornecedores nem decide o que comprar.</li>
+                                <li><strong>Auditoria Contábil profunda:</strong> O BPO organiza a base para a contabilidade, mas não assina o Balanço (isso é função do Departamento Contábil).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl flex gap-4 items-center">
+                    <i data-lucide="zap" class="text-orange-500 w-8 h-8 flex-shrink-0"></i>
+                    <p class="text-sm text-orange-200">
+                        <strong>O Valor para o Cliente:</strong> O empresário poupa horas de trabalho administrativo por dia, deixa de pagar multas por esquecimento de faturas e ganha previsibilidade. É um serviço altamente rentável e percebido como "premium" no mercado contábil.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Contas a Pagar -->
+            <section id="contas-pagar" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Contas a Pagar (Accounts Payable - AP)</h2>
+                    <p class="section-subtitle">O controlo rigoroso das saídas de caixa e organização de fornecedores.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-white mb-4">O Fluxo Perfeito do "A Pagar"</h3>
+                        <p class="text-sm text-neutral-300 mb-6">
+                            O maior caos nas pequenas empresas é perder faturas ou pagar impostos com atraso. O BPO assume o controlo dessa receção e preparação.
+                        </p>
+
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                            <div class="flex gap-4 items-start">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <strong class="text-orange-400 block mb-1">Captação (O DDA e o E-mail)</strong>
+                                    O BPO configura um e-mail exclusivo (ex: financeiro@empresa.com) para receber faturas. Em paralelo, utiliza o <strong>DDA (Débito Direto Autorizado)</strong> no banco para que todos os boletos emitidos contra o NIF/CNPJ do cliente apareçam automaticamente no sistema.
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <strong class="text-orange-400 block mb-1">Classificação no ERP</strong>
+                                    Cada conta que entra é registada no sistema de gestão (ERP). O analista classifica o <strong>Plano de Contas Financeiro</strong> (Ex: Categoria: "Energia Elétrica", Centro de Custo: "Escritório Lisboa"). Isso é vital para os relatórios futuros.
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <strong class="text-orange-400 block mb-1">Agendamento Bancário (API ou OFX/Remessa)</strong>
+                                    O BPO entra no portal do banco do cliente (com perfil de "Operador/Digitador") e introduz o pagamento para a data de vencimento. Sistemas modernos usam integração direta (Open Banking API) para enviar as ordens sem precisar digitar.
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="step-number">4</div>
+                                <div>
+                                    <strong class="text-orange-400 block mb-1">Autorização (Ação do Cliente)</strong>
+                                    O BPO avisa o empresário: <em>"Os pagamentos de amanhã estão agendados no banco, perfazem o total de 5.000€. Por favor, aprove com o seu token."</em> O cliente apenas abre a app do banco e clica em "Autorizar Tudo".
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="step-number">5</div>
+                                <div>
+                                    <strong class="text-orange-400 block mb-1">Recolha de Comprovativos</strong>
+                                    No dia seguinte, o BPO descarrega os comprovativos de pagamento e anexa-os à respetiva despesa no sistema ERP. Tudo fica pronto para o Departamento Contábil auditar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-xl">
+                        <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                            <i data-lucide="shield-alert"></i> Regra de Segurança do BPO
+                        </h4>
+                        <p class="text-sm text-neutral-300">
+                            <strong>NUNCA, sob nenhuma circunstância, o BPO deve ter o token de autorização master do banco do cliente.</strong> O BPO deve ter apenas o perfil de "Consulta e Preparação" (Operador). Se o BPO puder autorizar transferências livremente, existe um risco gravíssimo de fraude, desvios e responsabilização criminal do escritório de contabilidade.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Contas a Receber -->
+            <section id="contas-receber" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Contas a Receber (Accounts Receivable - AR)</h2>
+                    <p class="section-subtitle">Garantir que a empresa efetivamente recebe o dinheiro do que vendeu.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-green-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="file-text" class="text-green-500"></i> Faturação
+                        </h3>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            O BPO assume a emissão dos documentos fiscais e de cobrança. Quando a equipa de vendas fecha um negócio, envia os dados para o BPO.
+                        </p>
+                        <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                            <li><strong>Emissão de NF-e / NFS-e:</strong> Geração da nota fiscal no sistema com os dados e impostos corretos (alinhado com as orientações do Departamento Fiscal).</li>
+                            <li><strong>Emissão de Cobrança:</strong> Geração do Boleto Registado, QR Code Pix ou link de pagamento no cartão de crédito.</li>
+                            <li><strong>Envio Automático:</strong> Disparo do e-mail para o cliente final contendo a Nota Fiscal, a Fatura/Boleto e a data de vencimento.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-yellow-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="bell-ring" class="text-yellow-500"></i> Régua de Cobrança
+                        </h3>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            O combate à inadimplência. É um processo automatizado ou semi-automatizado para garantir que os clientes não se "esqueçam" de pagar.
+                        </p>
+                        <div class="bg-black p-3 rounded border border-neutral-700 text-xs text-neutral-300 font-mono space-y-2">
+                            <p class="text-green-400">» 3 dias ANTES: Lembrete cordial por e-mail ou WhatsApp.</p>
+                            <p class="text-yellow-400">» DIA DO VENCIMENTO: Aviso de "A sua fatura vence hoje".</p>
+                            <p class="text-orange-400">» 2 dias DEPOIS: Aviso de atraso, envio de 2ª via com juros e multas atualizados.</p>
+                            <p class="text-red-400">» 10 dias DEPOIS: Chamada telefónica de cobrança ativa (ou bloqueio do serviço/produto).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                    <h4 class="text-orange-400 font-bold mb-2">Desconto de Recebíveis (Antecipação)</h4>
+                    <p class="text-sm text-neutral-300">
+                        Se a empresa vendeu a prazo (ex: cartão de crédito em 10x ou boletos para daqui a 60 dias) e precisa de dinheiro hoje para pagar a folha de pagamento, o BPO pode gerir a operação de antecipação junto ao banco ou a uma *Factoring*. O BPO avalia as taxas de juros cobradas para garantir que a empresa não perca toda a margem de lucro só para antecipar o dinheiro.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Conciliação -->
+            <section id="conciliacao" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Conciliação Bancária Diária</h2>
+                    <p class="section-subtitle">Onde a magia acontece: A busca pelo "Pendente Zero".</p>
+                </div>
+
+                <div class="bg-blue-900/10 border border-blue-500/30 p-6 rounded-xl mb-6">
+                    <h3 class="text-xl font-bold text-white mb-3">O coração do BPO</h3>
+                    <p class="text-sm text-neutral-300">
+                        Na contabilidade tradicional, a conciliação é feita meses depois. No BPO Financeiro, ela é feita <strong>todos os dias, geralmente na primeira hora da manhã</strong>. O analista olha para o extrato do banco (do dia anterior) e diz ao sistema ERP o que foi cada cêntimo que entrou ou saiu.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-orange-400 font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="search" class="text-orange-500"></i> A Rotina de Conciliação
+                        </h4>
+                        <ul class="text-sm text-neutral-300 space-y-3 list-none">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check-circle" class="text-green-500 w-5 h-5 mt-0.5"></i>
+                                <div><strong>Importação:</strong> O ERP lê o banco automaticamente. Ele tenta "casar" os valores pelo montante e pela data (se saiu 100€ do banco e havia uma conta de luz de 100€ agendada, ele sugere a conciliação).</div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check-circle" class="text-green-500 w-5 h-5 mt-0.5"></i>
+                                <div><strong>Baixa de Recebimentos:</strong> Verificar quem pagou os boletos. Ao "baixar" o recebimento no ERP, a fatura do cliente muda de "Pendente" para "Paga", parando a régua de cobrança.</div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check-circle" class="text-green-500 w-5 h-5 mt-0.5"></i>
+                                <div><strong>Tratamento de Taxas:</strong> Lançar o IOF, a taxa de manutenção de conta e a comissão da plataforma de cartão de crédito.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-red-400 font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="target" class="text-red-500"></i> O Problema dos "Não Identificados"
+                        </h4>
+                        <p class="text-sm text-neutral-300 mb-3">
+                            A maior dor de cabeça do BPO é quando aparece uma saída no banco que não estava no sistema, ou um PIX de entrada sem identificação.
+                        </p>
+                        <div class="bg-black p-4 rounded border border-neutral-700 text-xs text-neutral-400">
+                            <strong>Procedimento:</strong> O BPO nunca deve "inventar" uma categoria. Esses valores são classificados provisoriamente numa conta de trânsito (ex: "Valores a Identificar"). O BPO envia um relatório diário ou semanal ao cliente perguntando: <em>"O que foi este Pix de 250€ transferido ontem à noite?"</em>. O cliente justifica, e o BPO reclassifica corretamente.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Relatórios -->
+            <section id="relatorios" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Inteligência Financeira (Relatórios)</h2>
+                    <p class="section-subtitle">O produto final que o empresário valoriza e compreende.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-6 shadow-lg">
+                    <p class="text-sm text-neutral-300 mb-6 leading-relaxed">
+                        A maioria dos empresários não sabe interpretar um Balanço Patrimonial feito com base nas normas IFRS. Eles entendem o dinheiro no bolso. Por isso, a entrega de valor do BPO baseia-se em Dashboards e relatórios gerenciais fáceis de ler.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Fluxo de Caixa -->
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-400 mb-3 flex items-center gap-2">
+                                <i data-lucide="waves"></i> Fluxo de Caixa (Realizado x Previsto)
+                            </h3>
+                            <p class="text-sm text-neutral-400 mb-4">
+                                Mostra o saldo inicial do banco, todas as entradas de dinheiro, todas as saídas e o saldo final diário/semanal.
+                            </p>
+                            <div class="bg-black border border-neutral-700 p-4 rounded-lg font-mono text-xs text-neutral-300 space-y-1">
+                                <div class="text-blue-300">Saldo Hoje: 10.000€</div>
+                                <div>(+) Recebimentos Previstos da Semana: 5.000€</div>
+                                <div>(-) Pagamentos Agendados da Semana: 18.000€</div>
+                                <div class="text-red-400 font-bold border-t border-neutral-700 pt-1 mt-1">(=) Previsão Sexta-feira: -3.000€ (Falta de Caixa!)</div>
+                            </div>
+                            <p class="text-xs text-neutral-500 mt-2">Graças a esta previsão, o BPO alerta o dono na segunda-feira para antecipar vendas ou captar recursos, evitando que a conta fique a descoberto na sexta-feira.</p>
+                        </div>
+
+                        <!-- DRE Gerencial -->
+                        <div>
+                            <h3 class="text-xl font-bold text-green-400 mb-3 flex items-center gap-2">
+                                <i data-lucide="bar-chart"></i> DRE Gerencial
+                            </h3>
+                            <p class="text-sm text-neutral-400 mb-4">
+                                Diferente da DRE Contábil Oficial (que tem regras rígidas do Fisco), a DRE Gerencial do BPO é desenhada para a gestão. Ela mostra a <strong>Margem de Contribuição</strong> e o <strong>Ponto de Equilíbrio (Break-even Point)</strong>.
+                            </p>
+                            <div class="bg-black border border-neutral-700 p-4 rounded-lg text-xs text-neutral-300 space-y-2">
+                                <p><strong>Receitas de Vendas</strong></p>
+                                <p class="text-red-300">(-) Custos Variáveis (Impostos, Matéria-prima, Comissões)</p>
+                                <p class="text-green-300 font-bold border-b border-neutral-700 pb-1">(=) Margem de Contribuição (O que sobra para pagar a estrutura)</p>
+                                <p class="text-orange-300">(-) Despesas Fixas (Rendas, Salários, Sistemas)</p>
+                                <p class="text-white font-bold border-t border-neutral-700 pt-1">(=) Lucro ou Prejuízo Operacional</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-black border border-neutral-700 p-5 rounded-xl border-l-4 border-l-purple-500">
+                        <h4 class="text-purple-400 font-bold mb-2">Métricas Avançadas (KPIs Financeiros)</h4>
+                        <ul class="text-sm text-neutral-400 space-y-2 list-disc list-inside">
+                            <li><strong>Burn Rate:</strong> A velocidade com que a empresa "queima" o seu dinheiro de reserva mensalmente.</li>
+                            <li><strong>Runway:</strong> Quantos meses a empresa sobrevive com o saldo atual no banco, se a receita for a zero (muito comum em Startups).</li>
+                            <li><strong>Taxa de Inadimplência:</strong> Percentagem do faturado que não foi recebido na data acordada.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Sistemas e Integrações -->
+            <section id="sistemas" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Sistemas e Ferramentas do BPO</h2>
+                    <p class="section-subtitle">O BPO Financeiro é impossível de escalar sem a tecnologia adequada.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:shadow-orange-900/20 shadow-lg transition-shadow">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="laptop" class="text-orange-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">ERPs de Gestão Financeira</h3>
+                        </div>
+                        <p class="text-sm text-neutral-400 mb-3">O BPO não trabalha no Excel. A operação acontece dentro de softwares de gestão em nuvem (SaaS), que o escritório fornece ou que o cliente já possui.</p>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside bg-black p-3 rounded border border-neutral-700">
+                            <li><strong>Conta Azul, Omie, Nibo, Tiny, Bling:</strong> Sistemas voltados para pequenas e médias empresas. Permitem emissão fácil de notas, leitura de DDA e possuem APIs abertas.</li>
+                            <li><strong>Automação de Tarefas:</strong> Bons ERPs conciliam automaticamente valores idênticos e sugerem categorias com base no histórico ou na inteligência artificial.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:shadow-blue-900/20 shadow-lg transition-shadow">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="network" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Integração Bancária e Open Finance</h3>
+                        </div>
+                        <p class="text-sm text-neutral-400 mb-3">A comunicação entre o sistema ERP e o banco do cliente deve ser o mais fluída possível para evitar trabalho manual redundante.</p>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside bg-black p-3 rounded border border-neutral-700">
+                            <li><strong>O antigo OFX:</strong> Ficheiro que o cliente descarrega do banco e envia para o BPO importar no ERP. É manual e sujeito a esquecimentos.</li>
+                            <li><strong>Open Banking / Integração Automática:</strong> O ERP conecta-se diretamente ao banco. O saldo, as entradas e as saídas aparecem no ecrã do BPO em tempo real. Bancos digitais e tradicionais já fornecem APIs para automatizar 100% o extrato e o agendamento.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-green-900/10 border border-green-900/50 p-6 rounded-xl mt-6">
+                    <h4 class="text-green-400 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="folder-sync"></i> A Ponte perfeita com a Contabilidade Oficial
+                    </h4>
+                    <p class="text-sm text-neutral-300">
+                        O maior ganho de ter o BPO Financeiro dentro de um escritório contábil é que o Departamento Contábil não precisa de implorar por documentos ao cliente no final do mês. Como o BPO já organizou todas as contas a pagar, recebimentos, faturas e comprovativos diários, os dados são <strong>exportados eletronicamente</strong> (via integração de sistemas) do ERP do BPO diretamente para o sistema Contábil (Domínio, Alterdata, etc.). A contabilidade fecha o balanço numa fração do tempo habitual e sem erros de digitação.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Navegação de seções
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

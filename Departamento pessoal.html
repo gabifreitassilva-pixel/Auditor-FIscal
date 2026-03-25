@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo - Departamento Pessoal e RH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316; /* orange-500 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ea580c; /* orange-600 */
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        .step-number {
+            @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm;
+        }
+        .section-title {
+            @apply text-3xl font-bold text-white mb-2;
+        }
+        .section-subtitle {
+            @apply text-neutral-400;
+        }
+        .header-border {
+            @apply border-l-4 border-orange-500 pl-4 mb-8;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="users-2" class="text-orange-500"></i>
+                <span class="text-orange-500">DP & RH</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Guia Trabalhista e eSocial</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Início (DP vs RH)
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ciclo do Colaborador</div>
+            
+            <a href="#" onclick="showSection('admissao')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="user-plus" class="w-5 h-5"></i> Admissão e Contratos
+            </a>
+            <a href="#" onclick="showSection('jornada')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="clock" class="w-5 h-5"></i> Jornada e Adicionais
+            </a>
+            <a href="#" onclick="showSection('folha')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="wallet" class="w-5 h-5"></i> Folha de Pagamento
+            </a>
+            <a href="#" onclick="showSection('ferias')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="sun" class="w-5 h-5"></i> Férias e 13º Salário
+            </a>
+            <a href="#" onclick="showSection('rescisao')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="user-minus" class="w-5 h-5"></i> Rescisão (Desligamento)
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Gestão e Contratos</div>
+
+            <a href="#" onclick="showSection('beneficios')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="heart" class="w-5 h-5"></i> Gestão de Benefícios
+            </a>
+            <a href="#" onclick="showSection('outras-contratacoes')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="briefcase" class="w-5 h-5"></i> PJ, Autônomos e Pró-labore
+            </a>
+            <a href="#" onclick="showSection('domestico')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Empregado Doméstico
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Obrigações e Sistemas</div>
+
+            <a href="#" onclick="showSection('esocial')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="monitor-dot" class="w-5 h-5"></i> eSocial e Encargos
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Bem-vindo ao DP & RH</h2>
+                    <p class="section-subtitle">O núcleo de gestão, legislação trabalhista (CLT) e conformidade previdenciária.</p>
+                </div>
+                
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-8">
+                    <h3 class="text-2xl font-bold text-white mb-6">Qual a diferença entre DP e RH?</h3>
+                    <p class="text-neutral-300 mb-6 text-sm">
+                        É muito comum confundir as duas áreas, pois ambas lidam com os funcionários da empresa. Porém, as atuações são completamente diferentes. O <strong>Recursos Humanos (RH)</strong> cuida das pessoas e do comportamento. O <strong>Departamento Pessoal (DP)</strong> cuida da burocracia, do dinheiro e das leis.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-blue-500">
+                            <h4 class="text-blue-400 font-bold mb-3 flex items-center gap-2">
+                                <i data-lucide="heart-handshake"></i> Recursos Humanos (RH)
+                            </h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                                <li><strong>Foco:</strong> Gestão de Pessoas, Cultura e Clima.</li>
+                                <li><strong>Recrutamento e Seleção:</strong> Atrair, entrevistar e contratar talentos.</li>
+                                <li><strong>Integração (Onboarding):</strong> Apresentar a empresa ao novo funcionário.</li>
+                                <li><strong>Treinamento e Desenvolvimento:</strong> Capacitar a equipe.</li>
+                                <li><strong>Avaliação de Desempenho:</strong> Feedback e plano de carreira.</li>
+                                <li><strong>Prevenção de Conflitos:</strong> Manter a harmonia no ambiente de trabalho.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-black border border-neutral-700 p-6 rounded-lg border-t-4 border-t-orange-500">
+                            <h4 class="text-orange-400 font-bold mb-3 flex items-center gap-2">
+                                <i data-lucide="file-signature"></i> Departamento Pessoal (DP)
+                            </h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                                <li><strong>Foco:</strong> Burocracia, Leis (CLT), Cálculos e Prazos.</li>
+                                <li><strong>Admissão Legal:</strong> Contratos, registro na carteira (CTPS Digital) e eSocial.</li>
+                                <li><strong>Folha de Pagamento:</strong> Calcular salário, horas extras, descontos (INSS/IR).</li>
+                                <li><strong>Benefícios e PJs:</strong> Gestão de VTs, Planos de Saúde, controle de Pró-labore e terceiros.</li>
+                                <li><strong>Férias e 13º:</strong> Controle de vencimentos e pagamentos corretos.</li>
+                                <li><strong>Desligamento:</strong> Cálculo de rescisão, guias de FGTS e Seguro-Desemprego.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl">
+                    <p class="text-sm text-orange-200">
+                        <strong>Neste Guia:</strong> Vamos mergulhar profundamente nas <strong>rotinas de Departamento Pessoal</strong>, pois são as que geram passivos trabalhistas, multas altíssimas e exigem conhecimento técnico apurado das leis trabalhistas brasileiras.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Admissão -->
+            <section id="admissao" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Admissão e Contratos de Trabalho</h2>
+                    <p class="section-subtitle">O início do vínculo empregatício. O menor erro aqui custa caro.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-white mb-4">A Regra de Ouro da Admissão</h3>
+                        <div class="bg-red-900/20 border border-red-500/50 p-4 rounded text-sm text-red-200 mb-4">
+                            <strong>Atenção ao eSocial (Evento S-2200):</strong> O funcionário <strong>NÃO PODE</strong> começar a trabalhar sem estar registrado. A informação da admissão deve ser enviada ao eSocial <strong>até o dia imediatamente anterior</strong> ao início da prestação do serviço. Começar a trabalhar "em teste" sem registro é ilegal e gera multa grave.
+                        </div>
+
+                        <h4 class="text-orange-400 font-bold mb-3">Passo a Passo da Admissão:</h4>
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-4 rounded-lg border border-neutral-700">
+                            <div class="flex gap-3 items-start"><div class="step-number">1</div><p><strong>Exame Admissional (ASO):</strong> O candidato vai à clínica de medicina do trabalho para atestar que está apto para a função (Evento S-2220).</p></div>
+                            <div class="flex gap-3 items-start"><div class="step-number">2</div><p><strong>Coleta de Documentos:</strong> RG, CPF, Título de Eleitor, Comprovante de Residência, Certidão de Casamento/Nascimento, Documentos dos dependentes (para salário-família e IRRF).</p></div>
+                            <div class="flex gap-3 items-start"><div class="step-number">3</div><p><strong>Cadastro no Sistema de Folha:</strong> Inclusão de dados, definição de CBO (Código Brasileiro de Ocupações), salário e jornada.</p></div>
+                            <div class="flex gap-3 items-start"><div class="step-number">4</div><p><strong>Transmissão ao eSocial:</strong> Envio do evento S-2200. Após o processamento, o vínculo já aparece na Carteira de Trabalho Digital do funcionário.</p></div>
+                            <div class="flex gap-3 items-start"><div class="step-number">5</div><p><strong>Assinatura de Documentos:</strong> Contrato de Trabalho, Acordo de Compensação de Horas, Termo de Vale-Transporte e Políticas Internas.</p></div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-neutral-900 p-4 rounded-xl border-t-4 border-t-orange-500">
+                            <h4 class="text-white font-bold mb-2">Contrato de Experiência</h4>
+                            <p class="text-xs text-neutral-400">É um contrato por prazo determinado. Pode durar no <strong>máximo 90 dias</strong>. Só pode ser prorrogado <strong>uma única vez</strong>. (Ex: 30 + 60 dias, ou 45 + 45 dias). Se passar do prazo, vira contrato por prazo indeterminado automaticamente.</p>
+                        </div>
+                        <div class="bg-neutral-900 p-4 rounded-xl border-t-4 border-t-blue-500">
+                            <h4 class="text-white font-bold mb-2">Jovem Aprendiz</h4>
+                            <p class="text-xs text-neutral-400">Jovens de 14 a 24 anos. Requer matrícula em curso profissionalizante e na escola (se não concluiu o ensino médio). Carga horária reduzida (4 a 6 horas). Alíquota de FGTS é de <strong>apenas 2%</strong>.</p>
+                        </div>
+                        <div class="bg-neutral-900 p-4 rounded-xl border-t-4 border-t-green-500">
+                            <h4 class="text-white font-bold mb-2">Estagiário</h4>
+                            <p class="text-xs text-neutral-400">Regido por lei própria (Lei 11.788/08), <strong>não tem vínculo empregatício</strong> (CLT). Não paga INSS nem FGTS. Tem direito a Bolsa Auxílio, Auxílio-Transporte e Recesso Remunerado (férias de 30 dias após 1 ano), mas não recebe 13º nem aviso prévio.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Jornada -->
+            <section id="jornada" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Jornada de Trabalho e Adicionais</h2>
+                    <p class="section-subtitle">O controle do tempo e os riscos ocupacionais.</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- Jornada Básica -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-4">Regras de Jornada (CLT)</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-neutral-300">
+                            <div>
+                                <ul class="space-y-2 list-disc list-inside">
+                                    <li><strong>Limite Máximo:</strong> 8 horas diárias e 44 horas semanais.</li>
+                                    <li><strong>Jornada 12x36:</strong> Trabalha 12 horas seguidas e folga 36 horas. Muito comum em hospitais e portarias. Requer acordo escrito.</li>
+                                    <li><strong>Intervalo (Almoço/Pausa):</strong> 
+                                        <br>- Até 4h de trabalho: Sem intervalo.
+                                        <br>- De 4h a 6h: 15 minutos.
+                                        <br>- Mais de 6h: Mínimo 1 hora, máximo 2 horas.
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">DSR - Descanso Semanal Remunerado</strong>
+                                Todo trabalhador tem direito a um dia de folga paga por semana (preferencialmente aos domingos). O DSR já está embutido no salário dos mensalistas, mas para quem recebe horas extras ou comissões, o DP precisa calcular o <strong>Reflexo de DSR</strong>.
+                                <br><span class="text-xs text-orange-400 mt-1 block">Fórmula Reflexo: (Total Horas Extras / Dias Úteis do mês) x Domingos e Feriados do mês.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adicionais -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-4">Os 4 Adicionais Trabalhistas</h3>
+                        <div class="space-y-4">
+                            
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    1. Horas Extras
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-sm text-neutral-400">
+                                    Pagamento pelo tempo trabalhado além da jornada. O adicional <strong>mínimo é de 50%</strong> (em dias úteis) sobre a hora normal. Se a hora extra ocorrer em domingos ou feriados, o adicional <strong>costuma ser de 100%</strong> (paga o dobro). <em>Sempre confira a Convenção Coletiva (CCT) do sindicato, pois podem exigir percentuais maiores (ex: 60%, 75%).</em>
+                                </div>
+                            </details>
+
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    2. Adicional Noturno
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-sm text-neutral-400">
+                                    Trabalho urbano realizado entre <strong>22h e 05h</strong>. Tem acréscimo de no mínimo <strong>20%</strong> sobre a hora diurna. <br>
+                                    <em>Atenção DP:</em> A hora noturna é menor! Dura apenas 52 minutos e 30 segundos (a cada 52m30s trabalhados, paga-se 1 hora cheia).
+                                </div>
+                            </details>
+
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    3. Insalubridade
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-sm text-neutral-400">
+                                    Pago para quem trabalha exposto a agentes nocivos à saúde (ruído alto, produtos químicos, lixo hospitalar). Definido por laudo técnico (LTCAT). <br>
+                                    <strong>Base de cálculo:</strong> Salário Mínimo vigente (salvo convenção coletiva).<br>
+                                    <strong>Graus:</strong> Mínimo (10%), Médio (20%), Máximo (40%).
+                                </div>
+                            </details>
+
+                            <details class="bg-black rounded-lg border border-neutral-700 group">
+                                <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                                    4. Periculosidade
+                                    <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 text-sm text-neutral-400">
+                                    Pago para quem trabalha com risco iminente de morte (explosivos, inflamáveis, energia elétrica de alta tensão, vigilantes armados e motoboys). <br>
+                                    <strong>Base de cálculo:</strong> Salário Base do trabalhador (não incide sobre prêmios/comissões).<br>
+                                    <strong>Valor:</strong> Fixo de <strong>30%</strong>.<br>
+                                    <em>Nota: Não é possível acumular insalubridade e periculosidade. O empregado deve escolher o mais vantajoso.</em>
+                                </div>
+                            </details>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Folha -->
+            <section id="folha" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Folha de Pagamento</h2>
+                    <p class="section-subtitle">Do bruto ao líquido: Proventos e Descontos.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl mb-6 shadow-lg">
+                    <p class="text-sm text-neutral-300">O fechamento da folha exige apurar todas as ocorrências do mês (do dia 1 ao dia 30/31). O pagamento do salário deve ser efetuado, por lei, até o <strong>5º dia útil</strong> do mês subsequente (sábado conta como dia útil!).</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Proventos (Receitas) -->
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-green-500">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="text-green-500"></i> Proventos (O que o funcionário recebe)
+                        </h4>
+                        <ul class="text-sm text-neutral-400 space-y-2 list-disc list-inside">
+                            <li>Salário Base</li>
+                            <li>Horas Extras e DSR</li>
+                            <li>Adicionais (Insalubridade, Periculosidade, Noturno, Tempo de Serviço/Anuênio)</li>
+                            <li>Comissões e Prêmios</li>
+                            <li>Salário-Família (pago para trabalhadores de baixa renda com filhos menores de 14 anos)</li>
+                            <li>Salário-Maternidade</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Descontos -->
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl border-t-4 border-t-red-500">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="minus-circle" class="text-red-500"></i> Descontos (O que é deduzido)
+                        </h4>
+                        <ul class="text-sm text-neutral-400 space-y-2 list-disc list-inside">
+                            <li><strong>INSS:</strong> Tabela progressiva (faixas de 7,5% a 14%). É a contribuição para aposentadoria.</li>
+                            <li><strong>IRRF:</strong> Imposto de Renda (tabela da Receita Federal). Desconta dependentes e pensão alimentícia da base.</li>
+                            <li><strong>Faltas Injustificadas e Atrasos:</strong> Desconta-se as horas ausentes e, consequentemente, perde-se o valor do DSR daquela semana.</li>
+                            <li><strong>Vale-Transporte (VT):</strong> Desconto de até 6% do salário (veja mais na aba de Benefícios).</li>
+                            <li><strong>Benefícios:</strong> Coparticipação em Plano de Saúde, Vale-Alimentação, Empréstimo Consignado.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-black border border-neutral-700 p-5 rounded-xl">
+                    <h4 class="text-orange-500 font-bold mb-2">FGTS (O encargo patronal)</h4>
+                    <p class="text-sm text-neutral-300">
+                        O Fundo de Garantia <strong>não é descontado do funcionário</strong> (exceto a parcela do Saque-Aniversário em caso de empréstimo). O FGTS é uma obrigação da empresa, que deve depositar em uma conta da Caixa Econômica o equivalente a <strong>8% da remuneração bruta</strong> do trabalhador, até o dia 20 de cada mês (via FGTS Digital).
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Benefícios -->
+            <section id="beneficios" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Gestão de Benefícios</h2>
+                    <p class="section-subtitle">O que a empresa oferece para atrair e reter talentos (e como a lei enxerga isso).</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- VA e VR -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-yellow-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="utensils" class="text-yellow-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">Vale-Alimentação (VA) e Vale-Refeição (VR)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            O VA é destinado para compras em supermercados (alimentos in natura). O VR é para refeições prontas (restaurantes, lanchonetes). Não é uma obrigação legal da CLT concedê-los, <strong>mas quase 100% das Convenções Coletivas (CCT) obrigam o pagamento</strong>.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-1">Cuidado com o PAT</h4>
+                                <p class="text-neutral-400 text-xs">Se a empresa não estiver inscrita no PAT (Programa de Alimentação do Trabalhador) ou pagar o vale em dinheiro, esse valor <strong>integra o salário</strong>. Ou seja, vai incidir encargos pesados de INSS e FGTS sobre o valor da comida. Pague sempre em cartão benefício para ter a isenção dos encargos.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-1">Desconto em Folha</h4>
+                                <p class="text-neutral-400 text-xs">Pela CLT, a empresa poderia descontar até 20% do salário do funcionário referente à alimentação. <strong>Porém</strong>, na prática, os sindicatos fixam descontos menores (ex: desconto simbólico de R$ 1,00 ou 5% do valor do benefício). Sempre consulte a CCT.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saúde e Odonto -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-green-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="stethoscope" class="text-green-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">Plano de Saúde e Odontológico</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Benefício altamente valorizado. O valor pago pela empresa referente à assistência médica ou odontológica (mesmo se integral) <strong>não possui natureza salarial</strong> e não incide encargo trabalhista.
+                        </p>
+                        <div class="bg-black p-4 rounded-lg border border-neutral-700 text-sm">
+                            <ul class="text-neutral-400 space-y-2 list-disc list-inside">
+                                <li><strong>Coparticipação:</strong> O modelo mais sustentável. A empresa paga a mensalidade fixa, mas o funcionário paga uma pequena taxa (ex: R$ 20) toda vez que faz uma consulta/exame, e esse valor é descontado na folha de pagamento.</li>
+                                <li><strong>Dependentes:</strong> É comum a empresa subsidiar 100% para o titular, mas descontar 100% do valor referente à inclusão de filhos e cônjuges.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- VT -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-blue-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="bus-front" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">Vale-Transporte (VT)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-2">
+                            É o único benefício 100% obrigatório por lei federal (para quem utiliza transporte público).
+                        </p>
+                        <ul class="text-sm text-neutral-400 space-y-2 list-disc list-inside bg-black p-4 rounded-lg border border-neutral-700">
+                            <li>O funcionário assina um termo de opção dizendo se quer ou não (se for a pé ou de carro próprio, pode recusar).</li>
+                            <li>A empresa pode <strong>descontar até 6%</strong> do salário básico do empregado.</li>
+                            <li>Se o funcionário gasta R$ 200 de ônibus e 6% do salário dele dá R$ 150, a empresa desconta os R$ 150 e "inteira" os R$ 50 restantes.</li>
+                            <li><span class="text-red-400">Nunca pague VT em dinheiro!</span> Pagamentos em espécie perdem o caráter indenizatório e geram imposto e reflexos no 13º e férias.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Outros -->
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-neutral-900 p-5 rounded-xl border border-neutral-800">
+                            <h4 class="text-white font-bold mb-2 flex items-center gap-2">
+                                <i data-lucide="shield-check" class="text-orange-500 w-5 h-5"></i> Seguro de Vida
+                            </h4>
+                            <p class="text-xs text-neutral-400">Quase sempre exigido pela Convenção Coletiva de Trabalho (CCT) do Sindicato. Tem um custo muito baixo por vida (R$ 5 a R$ 15) e evita que a empresa pague indenizações milionárias em caso de acidentes fatais ou invalidez.</p>
+                        </div>
+                        <div class="bg-neutral-900 p-5 rounded-xl border border-neutral-800">
+                            <h4 class="text-white font-bold mb-2 flex items-center gap-2">
+                                <i data-lucide="baby" class="text-orange-500 w-5 h-5"></i> Auxílio-Creche
+                            </h4>
+                            <p class="text-xs text-neutral-400">Obrigatório pela CLT para empresas com pelo menos 30 funcionárias mulheres com mais de 16 anos, caso não possuam creche no local. O valor é indenizatório, pago diretamente na folha mediante comprovação dos gastos com babá ou escolinha infantil.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: PJ, Autônomos e Pró-labore -->
+            <section id="outras-contratacoes" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">PJ, Autônomos e Pró-labore</h2>
+                    <p class="section-subtitle">As diferentes formas de remunerar quem trabalha sem carteira assinada (e seus riscos).</p>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Pró-Labore -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="building-2" class="text-orange-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">O Pró-labore (O Salário do Sócio)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Pró-labore significa "pelo trabalho". É a remuneração paga aos sócios e administradores que efetivamente trabalham na operação da empresa. Não confunda com a distribuição de lucros (que é isenta de impostos, mas só pode ser paga se a empresa der lucro real).
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-neutral-300">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-2">Impostos Retidos do Sócio</h4>
+                                <ul class="space-y-1 text-xs text-neutral-400">
+                                    <li><strong>INSS:</strong> Desconta-se <strong>11%</strong> do valor bruto, limitado ao teto do INSS (Atualmente, se o teto é ~R$ 7.786, retém no máximo ~R$ 856). Isso garante a aposentadoria do dono.</li>
+                                    <li><strong>IRRF:</strong> Segue a mesma tabela progressiva e pesada dos funcionários normais da CLT (até 27,5%).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-2">Direitos e Obrigações</h4>
+                                <ul class="space-y-1 text-xs text-neutral-400">
+                                    <li>Sócio <strong>não tem</strong> FGTS, férias proporcionais, 13º salário nem rescisão garantida por lei. (A empresa só paga o 13º para o sócio se isso estiver escrito e acordado no Contrato Social).</li>
+                                    <li><strong>eSocial:</strong> O dono deve ser enviado ao eSocial como "Contribuinte Individual" e sua remuneração entra na folha (Evento S-1200).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Autônomo (RPA) -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 shadow-lg border-l-4 border-l-blue-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="user-cog" class="text-blue-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">Autônomo (O Pagamento via RPA)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            Você contratou um pintor, um eletricista ou um arquiteto (Pessoa Física, sem CNPJ) para um serviço pontual. Para legalizar o pagamento e lançar na contabilidade, o DP emite o <strong>Recibo de Pagamento a Autônomo (RPA)</strong>.
+                        </p>
+                        <div class="bg-black p-4 rounded-lg border border-neutral-700 text-sm">
+                            <h4 class="text-blue-400 font-bold mb-2">A carga tributária altíssima do RPA:</h4>
+                            <p class="text-xs text-neutral-400 mb-2">Pagar autônomo sai muito caro. Exemplo de um serviço de R$ 5.000,00:</p>
+                            <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside">
+                                <li><strong>Retenção do INSS (11%):</strong> Desconta do trabalhador (R$ 550,00).</li>
+                                <li><strong>Retenção do IRRF:</strong> Desconta do trabalhador usando a tabela progressiva.</li>
+                                <li><strong>Retenção do ISS:</strong> De 2% a 5% retido para a prefeitura (se ele não for cadastrado na prefeitura como autônomo isento).</li>
+                                <li><strong>O Custo Oculto da Empresa (CPP):</strong> A empresa que contrata o autônomo tem que pagar <strong>20% de INSS Patronal</strong> do próprio bolso sobre o valor do serviço (salvo se a empresa for Simples Nacional anexos I, II ou III).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Pejotização (Contratação PJ) -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 shadow-lg border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="alert-triangle" class="text-red-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">Contratação PJ (A Pejotização)</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            É o modelo onde a empresa contrata outra empresa (um MEI ou prestador de serviço LTDA). O prestador emite Nota Fiscal, não há folha de pagamento pelo DP (o pagamento é processado no setor fiscal e financeiro) e não há impostos trabalhistas (INSS, FGTS).
+                        </p>
+                        <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-lg">
+                            <h4 class="text-red-400 font-bold mb-3">O Risco Trabalhista (Fraude à CLT)</h4>
+                            <p class="text-sm text-neutral-300 mb-3">
+                                A Justiça do Trabalho não avalia o contrato de gaveta, ela avalia a <strong>realidade</strong> (Princípio da Primazia da Realidade). Se o seu contratado "PJ" cumpre os 4 pilares abaixo, ele é um funcionário oculto, e o juiz vai mandar a empresa pagar Férias, 13º, Horas Extras, FGTS e INSS retroativos:
+                            </p>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-none">
+                                <li><strong class="text-white">1. Pessoalidade:</strong> Só aquele "PJ" pode fazer o serviço. Ele não pode mandar outra pessoa no lugar dele caso fique doente.</li>
+                                <li><strong class="text-white">2. Subordinação:</strong> O "PJ" tem um chefe, recebe ordens, tem e-mail da empresa e precisa bater ponto (ou cumprir horário fixo).</li>
+                                <li><strong class="text-white">3. Habitualidade:</strong> O serviço não é pontual (ex: consertar um cano), ele vai todo dia ou toda semana na empresa como rotina.</li>
+                                <li><strong class="text-white">4. Onerosidade:</strong> Recebe um valor fixo mensal, como se fosse um salário.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Domesticos -->
+            <section id="domestico" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Empregados Domésticos</h2>
+                    <p class="section-subtitle">Regras da Lei Complementar nº 150/2015 e o eSocial Simplificado.</p>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl shadow-lg mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i data-lucide="home" class="text-orange-500 w-8 h-8"></i>
+                        <h3 class="text-2xl font-bold text-white">Quando vira vínculo doméstico?</h3>
+                    </div>
+                    <p class="text-sm text-neutral-300 mb-4">
+                        A lei é clara: se a pessoa trabalha para uma pessoa física ou família, em ambiente residencial (sem fins lucrativos para a família), por <strong>mais de 2 dias na semana (3 dias ou mais)</strong>, é obrigatório assinar a carteira como Empregado Doméstico. Se trabalhar 1 ou 2 dias, é considerado(a) Diarista (Autônomo), sem vínculo trabalhista.
+                    </p>
+                    <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                        <h4 class="text-orange-400 font-bold mb-2">Principais Direitos Assegurados:</h4>
+                        <ul class="space-y-2 text-xs text-neutral-400 list-disc list-inside">
+                            <li>Jornada máxima de 8h diárias e 44h semanais (com controle de ponto obrigatório, que pode ser manual).</li>
+                            <li>Pagamento de Horas Extras (mínimo 50%) e Adicional Noturno (20%).</li>
+                            <li>Férias vencidas, proporcionais, e 13º salário (com adiantamento obrigatório).</li>
+                            <li>Vale-Transporte (pode descontar até 6% do salário).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-green-500">
+                        <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="smartphone" class="text-green-500"></i> O eSocial Doméstico (DAE)
+                        </h4>
+                        <p class="text-xs text-neutral-300 mb-3">
+                            Ao contrário do eSocial de empresas, o empregador doméstico usa um portal web simplificado. Não é necessário enviar eventos complexos (S-1200, S-2200 via sistema), tudo é feito directamente na página da internet do eSocial Gov.br.
+                        </p>
+                        <p class="text-xs text-neutral-300">
+                            O sistema gera mensalmente uma <strong>guia única chamada DAE (Documento de Arrecadação do eSocial)</strong>, que vence todo dia 7, unificando todos os tributos.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-t-4 border-t-blue-500">
+                        <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="wallet" class="text-blue-500"></i> Composição da Guia DAE
+                        </h4>
+                        <ul class="space-y-1 text-xs text-neutral-400 list-disc list-inside">
+                            <li><strong>Encargos do Empregador:</strong> 8% de INSS Patronal + 8% de FGTS + 3,2% de Antecipação da Multa do FGTS (Reserva Indenizatória) + 0,8% de Seguro Acidente de Trabalho.</li>
+                            <li><strong>Descontos do Empregado:</strong> INSS (7,5% a 14%) + IRRF (se houver).</li>
+                        </ul>
+                        <div class="mt-4 bg-black p-3 rounded text-[12px] border border-blue-900 text-blue-300">
+                            <strong>Atenção à Multa do FGTS:</strong> O empregador doméstico paga a multa de 40% do FGTS "parcelada" todos os meses (através dos 3,2%). Se ele demitir a pessoa sem justa causa, a empregada saca esse valor. Se a empregada pedir demissão, o empregador tem o direito de sacar de volta esse valor acumulado.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Férias e 13 -->
+            <section id="ferias" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Férias e 13º Salário</h2>
+                    <p class="section-subtitle">O descanso anual e a gratificação natalina.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Férias -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="sun" class="text-yellow-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Férias</h3>
+                        </div>
+                        <div class="space-y-3 text-sm text-neutral-300">
+                            <p><strong>Período Aquisitivo:</strong> Os 12 meses trabalhados para ter direito a 30 dias de descanso.</p>
+                            <p><strong>Período Concessivo:</strong> Os 12 meses seguintes. A empresa DEVE conceder as férias dentro deste prazo, senão pagará as férias em dobro (Multa).</p>
+                            <p><strong>Pagamento:</strong> Salário + Terço Constitucional (1/3). Deve ser pago até 2 dias antes do início do gozo.</p>
+                            <div class="bg-black p-3 border border-neutral-700 rounded">
+                                <strong class="text-orange-400">Fracionamento (Reforma Trabalhista):</strong> 
+                                As férias podem ser divididas em até 3 períodos, desde que o empregado concorde. Regras:
+                                <ul class="list-disc list-inside mt-1 ml-2 text-neutral-400">
+                                    <li>Um período não pode ser menor que 14 dias corridos.</li>
+                                    <li>Os demais não podem ser menores que 5 dias corridos.</li>
+                                    <li>Não pode iniciar férias no prazo de 2 dias antes de feriado ou repouso semanal (DSR).</li>
+                                </ul>
+                            </div>
+                            <p><strong>Abono Pecuniário (Vender Férias):</strong> O empregado tem o direito de "vender" até 1/3 das suas férias (10 dias). A empresa não pode negar se solicitado até 15 dias antes de terminar o período aquisitivo.</p>
+                        </div>
+                    </div>
+
+                    <!-- 13º Salário -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="gift" class="text-green-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">13º Salário</h3>
+                        </div>
+                        <div class="space-y-3 text-sm text-neutral-300">
+                            <p>Gratificação de Natal devida a todo empregado que trabalhar pelo menos 15 dias no mês (esse mês já conta como 1/12 avos do 13º).</p>
+                            <div class="bg-black p-4 border border-neutral-700 rounded mb-2">
+                                <strong class="text-orange-400 block mb-1">1ª Parcela (Adiantamento)</strong>
+                                <ul>
+                                    <li>Paga entre fevereiro e o dia <strong>30 de Novembro</strong>.</li>
+                                    <li>Corresponde a 50% do salário do mês anterior.</li>
+                                    <li><strong>Não tem descontos</strong> de INSS ou IRRF nesta fase (apenas FGTS patronal).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 border border-neutral-700 rounded">
+                                <strong class="text-orange-400 block mb-1">2ª Parcela (Final)</strong>
+                                <ul>
+                                    <li>Paga até o dia <strong>20 de Dezembro</strong>.</li>
+                                    <li>Corresponde ao valor total do 13º, deduzindo-se a 1ª parcela já paga.</li>
+                                    <li><strong>Sofre todos os descontos:</strong> INSS e IRRF integrais incidentes sobre o valor total do 13º.</li>
+                                </ul>
+                            </div>
+                            <p class="text-xs text-neutral-400 mt-2">Médias: Quem recebe horas extras, comissões ou adicionais noturnos tem direito à média desses valores adicionada no 13º e nas férias.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Rescisao -->
+            <section id="rescisao" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Rescisão (Desligamento)</h2>
+                    <p class="section-subtitle">Todas as modalidades de fim de vínculo e as respectivas verbas rescisórias.</p>
+                </div>
+
+                <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 mb-6">
+                    <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                        <i data-lucide="calendar-clock" class="text-orange-500"></i> O Aviso Prévio (Apenas para contratos Indeterminados)
+                    </h3>
+                    <p class="text-sm text-neutral-300">
+                        Aviso prévio mínimo de 30 dias. Adiciona-se 3 dias para cada ano completo trabalhado na mesma empresa, até o limite de 90 dias.<br>
+                        - <strong>Trabalhado:</strong> O funcionário continua trabalhando. Na demissão sem justa causa, ele pode escolher reduzir a jornada em 2h/dia ou faltar 7 dias corridos ao final para procurar emprego.<br>
+                        - <strong>Indenizado:</strong> A empresa manda o funcionário embora no mesmo dia e paga o valor do salário (mais a projeção) na rescisão sem ele precisar trabalhar.
+                    </p>
+                    <p class="text-xs text-red-400 mt-2 font-bold">PRAZO DE PAGAMENTO: Todas as verbas rescisórias devem ser pagas em até 10 dias após o término do contrato, seja em que modalidade for. Atraso gera multa de 1 salário a favor do trabalhador.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Bloco Contratos de Experiência -->
+                    <div class="pt-2 pb-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Período de Experiência (Contrato Determinado)</div>
+                    
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                            Término do Contrato de Experiência (No prazo exacto)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            Ocorre quando o contrato acaba naturalmente na data prevista (ex: no 45º ou 90º dia).<br><br>
+                            <strong>O que recebe:</strong> Saldo de salário, Férias proporcionais + 1/3, 13º proporcional.<br>
+                            <strong>Direitos Extras:</strong> Saque total do FGTS.<br>
+                            <span class="text-red-400 font-bold">Atenção:</span> <strong>Não tem</strong> aviso prévio (pois já sabiam a data do fim), <strong>não tem</strong> multa de 40% sobre o FGTS e <strong>não tem</strong> direito a Seguro-Desemprego.
+                        </div>
+                    </details>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-orange-400 hover:text-orange-300 flex justify-between outline-none">
+                            Demissão Sem Justa Causa (Antes de acabar a Experiência)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            A empresa decide demitir o funcionário antes do prazo combinado acabar (ex: no 30º dia de um contrato de 45 dias).<br><br>
+                            <strong>Indenização (Art. 479 CLT):</strong> A empresa é obrigada a pagar metade (50%) da remuneração referente aos dias que faltavam para acabar o contrato.<br>
+                            <strong>O que recebe:</strong> Saldo de salário, Férias proporcionais + 1/3, 13º proporcional + a Indenização do Art. 479.<br>
+                            <strong>Direitos Extras:</strong> Saque total do FGTS + <strong>Multa de 40% do FGTS</strong>.
+                        </div>
+                    </details>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-orange-400 hover:text-orange-300 flex justify-between outline-none">
+                            Pedido de Demissão (Antes de acabar a Experiência)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            O funcionário decide sair da empresa antes de acabar o prazo combinado.<br><br>
+                            <strong>Indenização (Art. 480 CLT):</strong> A empresa <strong>tem o direito de descontar</strong> do funcionário 50% da remuneração dos dias que faltavam para acabar o contrato (desde que não ultrapasse o valor total que ele tem a receber na rescisão).<br>
+                            <strong>O que recebe:</strong> Saldo de salário, Férias proporcionais + 1/3, 13º proporcional (deduzindo-se o desconto do Art. 480).<br>
+                            <strong>Direitos Extras:</strong> O FGTS fica retido e sem multa de 40%.
+                        </div>
+                    </details>
+
+                    <!-- Bloco Contratos Indeterminados -->
+                    <div class="pt-6 pb-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Contrato Padrão (Prazo Indeterminado)</div>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                            Demissão Sem Justa Causa (Decisão da Empresa)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            <strong>O que recebe:</strong> Saldo de salário, Aviso Prévio, Férias vencidas + 1/3, Férias proporcionais + 1/3, 13º proporcional.<br>
+                            <strong>Direitos Extras:</strong> Saque total do FGTS, Multa de 40% sobre o saldo do FGTS pago pela empresa, Guias para Seguro-Desemprego.
+                        </div>
+                    </details>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                            Pedido de Demissão (Decisão do Empregado)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            <strong>O que recebe:</strong> Saldo de salário, Férias vencidas + 1/3, Férias proporcionais + 1/3, 13º proporcional.<br>
+                            <strong>O que perde:</strong> Não tem direito a sacar o FGTS (fica retido), Não recebe multa de 40%, Não tem Seguro-Desemprego.<br>
+                            <em>Atenção:</em> O empregado <strong>deve cumprir</strong> o aviso prévio de 30 dias. Se não cumprir (pedir para sair imediatamente), a empresa tem o direito de <strong>descontar</strong> o valor de 1 salário da sua rescisão.
+                        </div>
+                    </details>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between outline-none">
+                            Rescisão por Acordo (Art. 484-A CLT - Pós Reforma)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            Criado para evitar o famoso "acordo por fora". Ambas as partes querem encerrar o contrato amigavelmente.<br>
+                            <strong>O que recebe:</strong> Metade do Aviso Prévio (se indenizado), Metade da Multa do FGTS (20% em vez de 40%), e todas as outras verbas na integralidade (férias, 13º).<br>
+                            <strong>Limitações:</strong> O funcionário só pode movimentar até 80% do saldo do FGTS e <strong>não tem direito</strong> ao Seguro-Desemprego.
+                        </div>
+                    </details>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-red-500 hover:text-red-400 flex justify-between outline-none">
+                            Demissão Por Justa Causa (Falta Grave)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            Aplicada em casos de roubo, insubordinação grave, abandono de emprego (30 dias de falta sem justificativa), desídia, etc. Requer provas robustas e bem documentadas por parte da empresa.<br>
+                            <strong>O que recebe:</strong> APENAS Saldo de salário e Férias Vencidas + 1/3 (se tiver).<br>
+                            <strong>Perde tudo o resto:</strong> Férias proporcionais, 13º proporcional, FGTS, Multa, Seguro-Desemprego e Aviso Prévio.
+                        </div>
+                    </details>
+
+                    <!-- Bloco Jovens Aprendizes -->
+                    <div class="pt-6 pb-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Contratos Especiais</div>
+
+                    <details class="bg-black rounded-lg border border-neutral-700 group">
+                        <summary class="p-4 font-bold cursor-pointer text-blue-400 hover:text-blue-300 flex justify-between outline-none">
+                            Rescisão do Jovem Aprendiz
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-4 pt-0 text-sm text-neutral-400">
+                            O Jovem Aprendiz possui um contrato blindado. A empresa <strong>não pode</strong> demiti-lo sem justa causa de forma arbitrária antes do fim do contrato (não se aplica a indenização do Art. 479). O contrato só pode ser encerrado nestas hipóteses legais:<br><br>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Término no Prazo ou Idade:</strong> Quando acaba o tempo de contrato ou ele completa 24 anos. O jovem saca o FGTS, recebe férias proporcionais e 13º, mas não há multa de 40%.</li>
+                                <li><strong>Desempenho Insuficiente ou Falta na Escola:</strong> Se reprovar na escola por faltas injustificadas ou for reprovado no curso formador (exige documento do CIEE/SENAI atestando). Ele saca o FGTS, mas não há multa de 40%.</li>
+                                <li><strong>Falta Disciplinar (Justa Causa):</strong> Ocorrendo falta grave da CLT. Perde saque do FGTS, 13º e férias proporcionais.</li>
+                                <li><strong>A pedido do Aprendiz (Ele se demite):</strong> Recebe saldo de salário, 13º e férias proporcionais. Não saca FGTS.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- SECTION: eSocial -->
+            <section id="esocial" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Obrigações e eSocial</h2>
+                    <p class="section-subtitle">A digitalização e fiscalização eletrônica do Governo.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="monitor-dot" class="text-orange-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">O eSocial</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">Sistema do governo que unificou o envio de informações pelo empregador em relação aos seus empregados. Acabou com a necessidade de preencher papéis manuais antigos (CAGED, RAIS, DIRF, livro de registro).</p>
+                        <h4 class="text-white font-bold text-sm mb-2">Principais Eventos do DP:</h4>
+                        <ul class="text-xs text-neutral-400 space-y-2 font-mono">
+                            <li><span class="text-orange-400">S-2200:</span> Admissão Inicial</li>
+                            <li><span class="text-orange-400">S-2230:</span> Afastamento Temporário (Doença, Férias, Maternidade)</li>
+                            <li><span class="text-orange-400">S-2240:</span> Condições Ambientais do Trabalho (SST/Riscos)</li>
+                            <li><span class="text-orange-400">S-1200:</span> Remuneração (Folha de CLT, Autônomos e Pró-labore)</li>
+                            <li><span class="text-orange-400">S-1299:</span> Fechamento da Folha</li>
+                            <li><span class="text-orange-400">S-2299:</span> Desligamento (Rescisão)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="file-check-2" class="text-orange-500 w-8 h-8"></i>
+                            <h3 class="text-xl font-bold text-white">DCTFWeb e FGTS Digital</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">Após o DP enviar os eventos de folha (S-1200 e S-1299), as informações vão para as malhas do governo para gerar as guias de pagamento.</p>
+                        <div class="space-y-4">
+                            <div class="bg-black p-3 rounded border border-neutral-700">
+                                <h4 class="text-white font-bold text-sm">DCTFWeb</h4>
+                                <p class="text-xs text-neutral-400">Puxa o INSS calculado pelo eSocial e o IRRF (e também cruzamentos da Reinf feita pelo setor fiscal). O DP entra no e-CAC da Receita, transmite a DCTFWeb e emite a guia <strong>DARF Numerado</strong> (paga até dia 20).</p>
+                            </div>
+                            <div class="bg-black p-3 rounded border border-neutral-700">
+                                <h4 class="text-white font-bold text-sm">FGTS Digital</h4>
+                                <p class="text-xs text-neutral-400">O novo sistema que substituiu a horrível GFIP/SEFIP da Caixa Econômica. O FGTS agora é lido automaticamente direto do eSocial. A guia é gerada no portal próprio (via PIX) com vencimento dia 20.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-900/50 p-6 rounded-xl">
+                    <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle"></i> Saúde e Segurança do Trabalho (SST) no eSocial
+                    </h4>
+                    <p class="text-sm text-neutral-300">
+                        O DP agora atua em conjunto com a Segurança do Trabalho. Exames médicos (ASO), comunicação de acidentes de trabalho (CAT) e exposição a riscos (PPP) devem ser enviados religiosamente nos prazos (Geralmente até o dia 15 do mês seguinte ao evento). Multas começam em R$ 400,00 e podem passar de R$ 100.000,00.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Navegação de seções
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo - Departamento Societário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316; /* orange-500 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ea580c; /* orange-600 */
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        .step-number {
+            @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-64 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="briefcase" class="text-orange-500"></i>
+                <span class="text-orange-500">Societário</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Guia Prático e Modelos Avançados</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Início
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Rotinas Principais</div>
+            
+            <a href="#" onclick="showSection('rotinas-abertura')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="play-circle" class="w-5 h-5"></i> Abertura de Empresa
+            </a>
+            <a href="#" onclick="showSection('rotinas-alteracao')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="edit" class="w-5 h-5"></i> Alteração Contratual
+            </a>
+            <a href="#" onclick="showSection('rotinas-encerramento')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="x-circle" class="w-5 h-5"></i> Encerramento (Baixa)
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Naturezas Jurídicas</div>
+
+            <a href="#" onclick="showSection('natureza-empresario')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="user" class="w-5 h-5"></i> Empresário Individual
+            </a>
+            <a href="#" onclick="showSection('natureza-sociedade-simples')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="users" class="w-5 h-5"></i> Sociedade Simples
+            </a>
+            <a href="#" onclick="showSection('natureza-sociedade-empresaria')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="building-2" class="w-5 h-5"></i> Sociedade Empresária
+            </a>
+            <a href="#" onclick="showSection('natureza-terceiro-setor')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="heart-handshake" class="w-5 h-5"></i> Terceiro Setor
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Biblioteca</div>
+
+            <a href="#" onclick="showSection('modelos')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="file-text" class="w-5 h-5"></i> Modelos de Documentos
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Bem-vindo ao Departamento Societário</h2>
+                    <p class="text-neutral-400">O núcleo estratégico para a legalização, estruturação e reestruturação de negócios.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('rotinas-abertura')">
+                        <i data-lucide="play-circle" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Aberturas</h3>
+                        <p class="text-sm text-neutral-400">Fluxos de legalização, viabilidade, DBE, FCN, Junta Comercial, RCPJ, OAB e alvarás.</p>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('rotinas-alteracao')">
+                        <i data-lucide="edit" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Alterações</h3>
+                        <p class="text-sm text-neutral-400">Mudanças de QSA, endereço, capital, objeto social, transformação de natureza e consolidações.</p>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('rotinas-encerramento')">
+                        <i data-lucide="x-circle" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Encerramentos</h3>
+                        <p class="text-sm text-neutral-400">Processos de distrato social, liquidação, baixa na RFB, estado, prefeituras e órgãos de classe.</p>
+                    </div>
+                </div>
+
+                <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 shadow-2xl">
+                    <h3 class="text-xl font-bold text-orange-500 mb-4 flex items-center gap-2">
+                        <i data-lucide="library"></i> O que você encontrará neste portal
+                    </h3>
+                    <p class="text-neutral-300 leading-relaxed mb-4 text-sm">
+                        Este guia foi projetado para ser a fonte definitiva de consulta rápida e profunda do profissional societário e paralegal. Aqui você encontrará não apenas as definições básicas, mas os **passos práticos, exigências de registro, e particularidades** de cada órgão (Juntas Comerciais, Cartórios de Registro Civil de Pessoas Jurídicas - RCPJ, e OAB).
+                    </p>
+                    <p class="text-neutral-300 leading-relaxed text-sm">
+                        Navegue pelo menu esquerdo para mergulhar nas minúcias do Empresário Individual, Sociedades Empresárias (LTDA, S/A, SCP, SPE), Sociedades Simples e Terceiro Setor, além de ter acesso a esqueletos de contratos em nossa biblioteca.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Abertura (Mantida a estrutura base, mas agora as naturezas estão gigantes) -->
+            <section id="rotinas-abertura" class="content-section hidden animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Rotina Padrão: Abertura de Empresa</h2>
+                    <p class="text-neutral-400">O fluxo universal da REDESIM. (Veja detalhes específicos dentro de cada Natureza Jurídica).</p>
+                </div>
+                <!-- ... Conteúdo de Abertura Geral ... -->
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                    <p class="text-neutral-300 mb-4">Independentemente do tipo jurídico, a maioria das aberturas hoje passa pelo sistema federal REDESIM. O fluxo básico consiste em:</p>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex gap-4 items-start"><div class="step-number">1</div><div><strong class="text-white">Viabilidade:</strong> O município autoriza o endereço para aquelas atividades (CNAEs) e a Junta/Cartório autoriza o Nome Empresarial.</div></div>
+                        <div class="flex gap-4 items-start"><div class="step-number">2</div><div><strong class="text-white">DBE (Coletor Nacional):</strong> Solicitação do CNPJ perante a Receita Federal, amarrada ao protocolo da viabilidade aprovada.</div></div>
+                        <div class="flex gap-4 items-start"><div class="step-number">3</div><div><strong class="text-white">FCN / Requerimento Eletrônico:</strong> Preenchimento dos dados no portal do órgão de registro (Junta Comercial ou Cartório). Geração das taxas (DARE/DARF).</div></div>
+                        <div class="flex gap-4 items-start"><div class="step-number">4</div><div><strong class="text-white">Registro Digital:</strong> Envio do Contrato Social / Requerimento / Estatuto assinado com certificado digital (e-CPF ou Gov.br) pelos sócios.</div></div>
+                        <div class="flex gap-4 items-start"><div class="step-number">5</div><div><strong class="text-white">Inscrições e Licenças:</strong> Obtenção da Inscrição Estadual, Municipal e Alvarás (Bombeiros, Vigilância, Meio Ambiente).</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Alteracao (Mantida a estrutura base) -->
+            <section id="rotinas-alteracao" class="content-section hidden animate-fade-in">
+                <!-- Mantido o código original aqui para foco nas Naturezas -->
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Rotina: Alteração Contratual</h2>
+                    <p class="text-neutral-400">Atualização de dados e estrutura do negócio.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                    <p class="text-neutral-300 text-sm">
+                        As alterações contratuais podem ser Simples (apenas citam o que mudou) ou Consolidadas (reescrevem todo o contrato atualizado). <strong>A boa prática societária exige sempre a consolidação</strong> para evitar que a empresa tenha que apresentar dezenas de documentos antigos aos bancos e fornecedores.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Encerramento (Mantida a estrutura base) -->
+            <section id="rotinas-encerramento" class="content-section hidden animate-fade-in">
+                 <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Rotina: Encerramento (Baixa)</h2>
+                    <p class="text-neutral-400">Extinção legal da pessoa jurídica.</p>
+                </div>
+                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                    <p class="text-neutral-300 text-sm mb-4">
+                        O processo de baixa foi simplificado no Brasil. Hoje, a "Baixa com Débitos" permite extinguir o CNPJ rapidamente. No entanto, o passivo tributário não desaparece; ele é redirecionado imediatamente para o CPF dos sócios ou administradores, conforme o tipo societário.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION MONSTRUOSA: EMPRESARIO INDIVIDUAL -->
+            <!-- ========================================== -->
+            <section id="natureza-empresario" class="content-section hidden animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Empresário Individual (EI) & MEI</h2>
+                    <p class="text-neutral-400">A pessoa física exercendo atividade empresarial. Não há "sociedade", há titularidade.</p>
+                </div>
+
+                <!-- MEI Detalhado -->
+                <div class="mb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i data-lucide="user-check" class="text-orange-500 w-8 h-8"></i>
+                        <h3 class="text-2xl font-bold text-white">Microempreendedor Individual (MEI)</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                            <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-700 pb-2">Características Principais</h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc pl-4">
+                                <li><strong>Limite de Faturamento:</strong> R$ 81.000,00 anuais (proporcional no ano de abertura). <em>*Sempre confira atualizações legislativas em tramitação.</em></li>
+                                <li><strong>Natureza Jurídica:</strong> 213-5 (Empresário Individual). O MEI é apenas um <em>enquadramento tributário</em> do Simples Nacional (SIMEI).</li>
+                                <li><strong>Empregado:</strong> Permitida a contratação de apenas 1 funcionário, pagando o piso da categoria ou salário mínimo.</li>
+                                <li><strong>Atividades (CNAE):</strong> Restrito ao Anexo XI da Resolução CGSN. Exclui atividades intelectuais (médicos, advogados, engenheiros).</li>
+                                <li><strong>Impedimentos:</strong> O titular não pode ser sócio, administrador ou titular de outra empresa. Não pode ter filiais.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                            <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-700 pb-2">Obrigações e Benefícios</h4>
+                            <ul class="text-sm text-neutral-300 space-y-2 list-disc pl-4">
+                                <li><strong>Tributação:</strong> Valor fixo mensal (DAS), que inclui INSS (5% do salário mínimo) + ICMS (R$ 1) e/ou ISS (R$ 5).</li>
+                                <li><strong>Declaração Anual:</strong> DASN-SIMEI (entregue até 31 de maio de cada ano).</li>
+                                <li><strong>Benefícios INSS:</strong> Aposentadoria por idade, auxílio-doença, salário-maternidade. (Não dá direito a aposentadoria por tempo de contribuição, a menos que complemente a guia).</li>
+                                <li><strong>Alvará:</strong> Emissão de Dispensa de Alvará provisória na abertura.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-orange-500"></i> Passo a Passo de Abertura (MEI)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300">
+                            <div class="flex gap-3"><div class="step-number">1</div><p>Acesse o Portal do Empreendedor via Gov.br (necessário selo Prata ou Ouro).</p></div>
+                            <div class="flex gap-3"><div class="step-number">2</div><p>Preencha os dados pessoais, nome fantasia e selecione as ocupações (CNAEs). Informe o endereço onde a atividade será exercida (ou se será porta-a-porta/internet).</p></div>
+                            <div class="flex gap-3"><div class="step-number">3</div><p>Assine os termos de responsabilidade declarando que o local permite a atividade.</p></div>
+                            <div class="flex gap-3"><div class="step-number">4</div><p>Pronto! O sistema gera instantaneamente o <strong>CCMEI (Certificado da Condição de Microempreendedor Individual)</strong>, que tem força de Contrato Social, CNPJ e Alvará provisório.</p></div>
+                            <div class="flex gap-3"><div class="step-number">5</div><p><em>Pós-Abertura:</em> Para comércio, a SEFAZ estadual gera a Inscrição Estadual automaticamente na maioria dos estados. Para serviços, é necessário acessar o portal da Prefeitura para liberação de emissão de Nota Fiscal Eletrônica (NFS-e).</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EI Detalhado -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <i data-lucide="briefcase" class="text-orange-500 w-8 h-8"></i>
+                        <h3 class="text-2xl font-bold text-white">Empresário Individual (EI) - Tradicional</h3>
+                    </div>
+                    
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 mb-6">
+                        <h4 class="text-orange-400 font-bold mb-3">O Perigo Oculto: Responsabilidade Ilimitada</h4>
+                        <p class="text-sm text-neutral-300 mb-4">
+                            O Empresário Individual <strong>não possui personalidade jurídica distinta da pessoa física</strong>. O CNPJ é uma mera ficção jurídica para fins fiscais e tributários. Isso significa que o patrimônio pessoal do empresário (casa, carro, poupança pessoal) responde <strong>direta e ilimitadamente</strong> pelas dívidas trabalhistas, fiscais e comerciais da empresa. Não é necessário "desconsiderar a personalidade jurídica" num processo para atingir os bens da pessoa física, pois eles são um só. Devido a isso, e com a criação da SLU, abrir um EI tradicional caiu em forte desuso.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-neutral-700">
+                            <div>
+                                <h5 class="text-white font-semibold mb-2">Regras de Nome (Firma)</h5>
+                                <p class="text-xs text-neutral-400">O nome empresarial deve ser obrigatoriamente composto pelo Nome Civil do titular, completo ou abreviado. Ex: "J. DA SILVA MERCEARIA" ou "JOAO DA SILVA". Não se pode usar designações de fantasia no nome oficial.</p>
+                            </div>
+                            <div>
+                                <h5 class="text-white font-semibold mb-2">Capital Social</h5>
+                                <p class="text-xs text-neutral-400">Não há exigência de capital mínimo para abertura. O valor declarado no Requerimento é apenas indicativo do investimento inicial destacado para o negócio.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-orange-500"></i> Passo a Passo de Abertura (EI na Junta Comercial)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300">
+                            <div class="flex gap-3"><div class="step-number">1</div><p><strong>Viabilidade (REDESIM):</strong> Consulta prévia na Prefeitura para liberação do endereço e na Junta Comercial para reserva do nome (Firma).</p></div>
+                            <div class="flex gap-3"><div class="step-number">2</div><p><strong>DBE:</strong> Preenchimento no Coletor Nacional da Receita Federal usando o protocolo da viabilidade aprovada. Evento: Inscrição de Matriz.</p></div>
+                            <div class="flex gap-3"><div class="step-number">3</div><p><strong>Portal da Junta Comercial:</strong> Preenchimento da Ficha de Cadastro Nacional (FCN). Geração da guia de pagamento (DARE/Guia de Arrecadação).</p></div>
+                            <div class="flex gap-3"><div class="step-number">4</div><p><strong>Requerimento de Empresário:</strong> O sistema gera o formulário padrão ("Requerimento de Empresário" - não existe Contrato Social para EI).</p></div>
+                            <div class="flex gap-3"><div class="step-number">5</div><p><strong>Assinatura e Protocolo:</strong> O titular assina digitalmente via e-CPF ou Gov.br. Após a análise (deferimento) pelo vogal da Junta, o CNPJ e NIRE são emitidos.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION MONSTRUOSA: SOCIEDADE SIMPLES -->
+            <!-- ========================================== -->
+            <section id="natureza-sociedade-simples" class="content-section hidden animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Sociedade Simples & Advogados</h2>
+                    <p class="text-neutral-400">Focada na prestação de serviços intelectuais, de natureza científica, literária ou artística.</p>
+                </div>
+
+                <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 mb-8">
+                    <h3 class="text-2xl font-bold text-white mb-4">A Essência da Sociedade Simples</h3>
+                    <p class="text-neutral-300 mb-6 text-sm">
+                        O que diferencia a Simples da Empresária é o <strong>"Elemento de Empresa"</strong>. Na sociedade simples, a atividade fim depende da atuação pessoal dos sócios (ex: uma clínica onde os sócios são os próprios médicos atendendo). Se a clínica cresce a ponto dos sócios apenas administrarem e terem dezenas de médicos contratados atendendo, ela adquire elemento de empresa e deveria ser transformada em Sociedade Empresária.
+                        <br><br>
+                        <strong>Órgão de Registro:</strong> SEMPRE Cartório de Registro Civil de Pessoas Jurídicas (RCPJ) da comarca sede, NUNCA na Junta Comercial. (Exceção: OAB para advogados).
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-black p-5 rounded-lg border border-neutral-700">
+                            <h4 class="text-orange-500 font-bold mb-2">Sociedade Simples "Pura"</h4>
+                            <p class="text-xs text-neutral-400">A responsabilidade dos sócios não é limitada ao capital social. Se os bens da sociedade não cobrirem as dívidas, o patrimônio pessoal dos sócios responde (responsabilidade subsidiária, e geralmente proporcional à participação). O nome civil dos sócios costuma constar na razão social.</p>
+                        </div>
+                        <div class="bg-black p-5 rounded-lg border border-neutral-700">
+                            <h4 class="text-orange-500 font-bold mb-2">Sociedade Simples Limitada</h4>
+                            <p class="text-xs text-neutral-400">Usa a estrutura da Sociedade Limitada, mas sem o elemento de empresa. A responsabilidade é limitada ao capital social subscrito, mas todos respondem solidariamente pela integralização total. Usa a sigla "S/S LTDA" ou "Sociedade Simples Limitada" no final do nome empresarial.</p>
+                        </div>
+                    </div>
+
+                    <h4 class="text-white font-bold mb-4 flex items-center gap-2 mt-8">
+                        <i data-lucide="list-ordered" class="text-orange-500"></i> Passo a Passo de Abertura (RCPJ)
+                    </h4>
+                    <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                        <div class="flex gap-3"><div class="step-number">1</div><p><strong>Busca Prévia no Cartório:</strong> Solicita-se uma certidão de busca de nome no RCPJ local para garantir que a razão social está disponível.</p></div>
+                        <div class="flex gap-3"><div class="step-number">2</div><p><strong>Viabilidade Municipal:</strong> Via REDESIM, apenas para aprovação do endereço perante a prefeitura.</p></div>
+                        <div class="flex gap-3"><div class="step-number">3</div><p><strong>DBE:</strong> Geração do Documento Básico de Entrada na Receita Federal.</p></div>
+                        <div class="flex gap-3"><div class="step-number">4</div><p><strong>Elaboração do Contrato Social:</strong> Deve conter os requisitos do Art. 997 do Código Civil. <strong>Importante:</strong> Obrigatoriamente deve conter visto e assinatura de um Advogado (com número da OAB).</p></div>
+                        <div class="flex gap-3"><div class="step-number">5</div><p><strong>Protocolo Físico/Digital no RCPJ:</strong> Muitas cidades ainda exigem processo físico em papel no cartório (reconhecimento de firma), embora centrais como a RTDPJ estejam digitalizando o processo. O cartório cobra as custas (emolumentos) baseadas no valor do capital social.</p></div>
+                        <div class="flex gap-3"><div class="step-number">6</div><p><strong>Sincronização:</strong> O cartório registra, transmite para a Receita Federal, e o CNPJ é gerado.</p></div>
+                    </div>
+                </div>
+
+                <!-- Sociedade de Advogados -->
+                <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 border-l-4 border-l-blue-600">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i data-lucide="scale" class="text-blue-500 w-8 h-8"></i>
+                        <h3 class="text-2xl font-bold text-white">Sociedade de Advogados (OAB)</h3>
+                    </div>
+                    <p class="text-sm text-neutral-300 mb-4">
+                        Categoria única ("sui generis"). Não é empresária nem registra no RCPJ. É regida pelo Estatuto da Advocacia (Lei 8.906/94) e Provimentos do Conselho Federal da OAB. 
+                        Pode ser <strong>Pluripessoal</strong> (vários advogados) ou <strong>Sociedade Unipessoal de Advocacia - SUA</strong> (apenas 1 advogado titular).
+                    </p>
+                    <ul class="text-sm text-neutral-400 list-disc pl-5 mb-6 space-y-2">
+                        <li>Razão Social deve conter obrigatoriamente o nome de, pelo menos, um sócio, acrescido de "Sociedade de Advogados" ou "Sociedade Unipessoal de Advocacia". <span class="text-red-400">É estritamente proibido uso de nome fantasia ou siglas mercantilistas.</span></li>
+                        <li>Sócios respondem subsidiária e ilimitadamente pelos danos causados a clientes, sem limite de capital social.</li>
+                        <li>Não pode ter características mercantis (proibido focar em lucro puro e simples na redação, proibido marketing agressivo).</li>
+                    </ul>
+
+                    <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="list-ordered" class="text-blue-500"></i> Passo a Passo de Abertura (OAB)
+                    </h4>
+                    <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                        <div class="flex gap-3"><div class="step-number bg-blue-600">1</div><p><strong>Elaboração do Contrato:</strong> Seguir rigorosamente as minutas padrão fornecidas pela seccional da OAB do estado. Não é exigido visto de "outro" advogado, pois os próprios sócios o são.</p></div>
+                        <div class="flex gap-3"><div class="step-number bg-blue-600">2</div><p><strong>Protocolo na OAB:</strong> O requerimento e o contrato são enviados à seccional da OAB (hoje geralmente digital via sistema próprio da OAB estadual). Paga-se a taxa de registro.</p></div>
+                        <div class="flex gap-3"><div class="step-number bg-blue-600">3</div><p><strong>Análise:</strong> Uma comissão de sociedades da OAB analisa o contrato para garantir que não fere a ética profissional.</p></div>
+                        <div class="flex gap-3"><div class="step-number bg-blue-600">4</div><p><strong>DBE e CNPJ:</strong> Diferente da Junta/RCPJ, a maioria das OABs não é totalmente integrada à REDESIM. Após a OAB deferir e registrar o contrato, entra-se na REDESIM (viabilidade + DBE) informando que o documento <em>já foi registrado na OAB</em> em data X. O DBE gera um protocolo Dossiê Digital, que é enviado à Receita Federal para emissão do CNPJ.</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION MONSTRUOSA: SOCIEDADE EMPRESÁRIA -->
+            <!-- ========================================== -->
+            <section id="natureza-sociedade-empresaria" class="content-section hidden animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Sociedade Empresária</h2>
+                    <p class="text-neutral-400">Para negócios com intuito de lucro mercantil, produção e circulação de bens e serviços. Registro na Junta Comercial.</p>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <!-- LTDA e SLU -->
+                    <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 border-l-4 border-l-orange-500 shadow-lg">
+                        <h3 class="text-2xl font-bold text-white mb-4">Sociedade Limitada (LTDA) e SLU</h3>
+                        <p class="text-sm text-neutral-300 mb-6">
+                            Tipo societário preferido no Brasil pela proteção patrimonial. O capital é dividido em "quotas". A responsabilidade de cada sócio é restrita ao valor de suas quotas, mas todos respondem <strong>solidariamente pela integralização</strong> (pagamento) do capital social total acordado. Se o capital estiver 100% integralizado, o patrimônio pessoal dos sócios fica protegido (salvo casos de fraude, onde cabe desconsideração da personalidade jurídica).
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-black p-4 rounded-lg">
+                                <h4 class="text-orange-400 font-bold mb-2">A Revolução da SLU</h4>
+                                <p class="text-xs text-neutral-400">A Sociedade Limitada Unipessoal (SLU) não é uma nova natureza jurídica, mas uma LTDA formada por uma só pessoa. Criada pela Lei de Liberdade Econômica, substituiu a finada EIRELI. Vantagem absurda: permite que uma única pessoa abra uma empresa blindando seu patrimônio sem a exigência ridícula de declarar 100 salários mínimos de capital que a EIRELI exigia.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg">
+                                <h4 class="text-orange-400 font-bold mb-2">Administração</h4>
+                                <p class="text-xs text-neutral-400">A LTDA é administrada por uma ou mais pessoas. O Administrador pode ser Sócio ou Não-Sócio (designado no contrato ou ato separado). Se for administrador estrangeiro, deve possuir visto permanente. Pessoas jurídicas não podem ser administradoras.</p>
+                            </div>
+                        </div>
+
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-orange-500"></i> Passo a Passo de Abertura (LTDA/SLU)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                            <div class="flex gap-3"><div class="step-number">1</div><p><strong>REDESIM - Viabilidade:</strong> Consulta de Nome (ex: NOME FANTASIA COMERCIO DE ROUPAS LTDA) e consulta de localização pelo IPTU na Prefeitura.</p></div>
+                            <div class="flex gap-3"><div class="step-number">2</div><p><strong>REDESIM - Coleta Online (DBE):</strong> Transmissão do QSA (Quadro de Sócios e Administradores) e capital social para a Receita Federal. O DBE é liberado após cruzamento limpo.</p></div>
+                            <div class="flex gap-3"><div class="step-number">3</div><p><strong>Junta Comercial (FCN):</strong> Integra-se Viabilidade e DBE no portal da Junta. Preenche-se a Ficha de Cadastro Nacional com dados complementares.</p></div>
+                            <div class="flex gap-3"><div class="step-number">4</div><p><strong>Documento de Constituição:</strong> Pode-se usar o Contrato Social Padrão gerado pela própria Junta (ágil, aprovação automática em muitos estados para atividades de baixo risco) ou fazer upload de um Contrato Social Próprio (em PDF, requerendo análise humana de um Vogal).</p></div>
+                            <div class="flex gap-3"><div class="step-number">5</div><p><strong>Assinaturas:</strong> Os sócios (e contador, se constar) assinam usando certificado digital e-CPF ou selo Gov.br.</p></div>
+                            <div class="flex gap-3"><div class="step-number">6</div><p><strong>Emissão:</strong> Junta aprova o processo, gera o NIRE, assina digitalmente (chancela) e transmite à Receita, que defere o CNPJ.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- S/A -->
+                    <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 border-l-4 border-l-blue-500 shadow-lg">
+                        <h3 class="text-2xl font-bold text-white mb-4">Sociedade Anônima (S/A)</h3>
+                        <p class="text-sm text-neutral-300 mb-6">
+                            Focada em grandes capitais. A pessoa do sócio (acionista) importa menos que o capital que ele aporta. O capital divide-se em ações (Ordinárias - dão direito a voto; Preferenciais - preferência em dividendos, mas sem voto). Requer altíssima governança: Estatuto Social, Diretoria estatutária, Conselho de Administração (obrigatório em Capital Aberto), e Assembleias rigorosas.
+                        </p>
+
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-black p-4 rounded-lg">
+                                <h4 class="text-blue-400 font-bold mb-2">Capital Fechado</h4>
+                                <p class="text-xs text-neutral-400">Ações negociadas no "boca a boca" ou acordos privados. Não recorre a poupança pública. Ótimo para planejamento sucessório e holdings familiares gigantes devido à facilidade de transferir ações (livro de transferência) sem alterar o contrato na Junta.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg">
+                                <h4 class="text-blue-400 font-bold mb-2">Capital Aberto</h4>
+                                <p class="text-xs text-neutral-400">Valores mobiliários negociados na Bolsa de Valores (B3) ou mercado de balcão. Totalmente regulada e fiscalizada pela CVM (Comissão de Valores Mobiliários). Exige auditoria independente constante.</p>
+                            </div>
+                        </div>
+
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-blue-500"></i> Passo a Passo de Constituição (S/A Fechada)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                            <div class="flex gap-3"><div class="step-number bg-blue-500 text-white">1</div><p><strong>Depósito Bancário:</strong> Os fundadores devem abrir uma conta bancária prévia em nome dos fundadores/em formação e depositar no mínimo 10% do capital subscrito em dinheiro no Banco do Brasil ou Caixa Econômica.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-blue-500 text-white">2</div><p><strong>Assembleia de Constituição:</strong> Realiza-se a Assembleia Geral de Constituição onde os acionistas aprovam o projeto de Estatuto Social, avaliam bens (se houver integralização por imóveis/veículos via laudos de peritos), e elegem os primeiros diretores.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-blue-500 text-white">3</div><p><strong>Publicação Obrigatória (Legislação Antiga x Nova):</strong> Antigamente exigia-se D.O.U. e jornal de grande circulação. Hoje, a Lei das S/A permite publicações em portal centralizado da Junta e diários oficiais digitais (e dependendo do porte, até dispensa a S/A fechada de faturamento inferior a R$ 78 milhões dessas publicações onerosas).</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-blue-500 text-white">4</div><p><strong>Registro na Junta Comercial:</strong> Protocolo da Ata de Constituição, Estatuto Social, Lista de Subscritores, Recibo de Depósito Bancário (item 1), Viabilidade e DBE.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-blue-500 text-white">5</div><p><strong>Livros Societários:</strong> Abertura dos livros físicos (ou digitais) de Registro de Ações Nominativas, Transferência de Ações e Atas.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- SCP e SPE -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-neutral-900 rounded-xl p-6 border border-neutral-800 border-l-4 border-l-neutral-400">
+                            <h3 class="text-xl font-bold text-white mb-2">Sociedade em Conta de Participação (SCP)</h3>
+                            <p class="text-xs text-neutral-300 mb-4 leading-relaxed">
+                                Estrutura usada fortemente para investimentos em loteamentos imobiliários e startups. O investidor (Sócio Participante ou Oculto) aporta capital. Quem executa, fatura, emite nota e responde juridicamente é apenas o Sócio Ostensivo.
+                            </p>
+                            <div class="bg-black p-4 rounded text-xs text-neutral-400">
+                                <strong>Registro peculiar:</strong> A SCP <em>não tem personalidade jurídica</em>. Seu contrato existe apenas entre os sócios, sendo opcional registrar no Cartório de Títulos e Documentos (apenas para validade contra terceiros). NÃO se registra na Junta Comercial. Contudo, a Receita Federal <strong>obriga</strong> a tirar um CNPJ (DBE direto, sem viabilidade) amarrado ao CNPJ do Sócio Ostensivo, para controle tributário (EFD-Contribuições separada).
+                            </div>
+                        </div>
+
+                        <div class="bg-neutral-900 rounded-xl p-6 border border-neutral-800 border-l-4 border-l-green-500">
+                            <h3 class="text-xl font-bold text-white mb-2">Sociedade de Propósito Específico (SPE)</h3>
+                            <p class="text-xs text-neutral-300 mb-4 leading-relaxed">
+                                Muito comum em parcerias público-privadas (PPP) e construção civil. Não é um tipo societário próprio (forma-se uma LTDA ou S/A e coloca-se "SPE" no nome). O objeto social é restrito a um projeto exato (ex: "Construção do Edifício X e posterior venda das unidades").
+                            </p>
+                            <div class="bg-black p-4 rounded text-xs text-neutral-400">
+                                <strong>Abertura:</strong> Segue o passo a passo da LTDA ou S/A, mas o Contrato Social deve conter cláusulas de prazo de duração (geralmente ligado ao fim do propósito) e regras rigorosas sobre destino do patrimônio após a conclusão da obra.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- SECTION MONSTRUOSA: TERCEIRO SETOR -->
+            <!-- ========================================== -->
+            <section id="natureza-terceiro-setor" class="content-section hidden animate-fade-in">
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Terceiro Setor (Sem Fins Lucrativos)</h2>
+                    <p class="text-neutral-400">Organizações da Sociedade Civil (OSC). Foco social, cultural, religioso ou político. Regidas por Estatuto Social.</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-900/50 p-4 rounded-xl mb-8">
+                    <p class="text-sm text-red-200">
+                        <strong>Conceito Fundamental:</strong> Sem fins lucrativos não significa que a entidade não pode gerar receita, vender produtos ou prestar serviços remunerados. Significa que **todo o superávit (lucro) auferido deve ser integralmente reinvestido nos objetivos institucionais da entidade**. É terminantemente proibida a distribuição de lucros ou dividendos aos diretores, instituidores ou associados.
+                    </p>
+                </div>
+
+                <div class="grid gap-8">
+                    
+                    <!-- ASSOCIAÇÃO -->
+                    <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 border-l-4 border-l-purple-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="users" class="text-purple-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Associação</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-6">
+                            Constitui-se pela união de pessoas que se organizam para fins não econômicos. Órgão máximo: Assembleia Geral. Administração: Diretoria Executiva. Fiscalização: Conselho Fiscal.
+                        </p>
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-purple-500"></i> Passo a Passo de Abertura (Associação)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                            <div class="flex gap-3"><div class="step-number bg-purple-600 text-white">1</div><p><strong>Edital de Convocação:</strong> Os fundadores divulgam um edital convidando interessados para a assembleia de fundação.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-purple-600 text-white">2</div><p><strong>Assembleia Geral de Constituição:</strong> No dia marcado, leem, discutem e aprovam o Estatuto Social. Em seguida, elegem a primeira Diretoria Executiva e o Conselho Fiscal. Tudo é redigido na "Ata de Fundação e Eleição".</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-purple-600 text-white">3</div><p><strong>Assinaturas e Vistos:</strong> O Estatuto deve ser vistado por um Advogado. O presidente eleito assina a Ata e o Estatuto. É necessária uma "Lista de Presença" com qualificação de todos os fundadores.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-purple-600 text-white">4</div><p><strong>Viabilidade e DBE:</strong> Faz-se a Viabilidade na REDESIM para o endereço. Emite-se o DBE de Inscrição na Receita Federal informando o presidente eleito como representante (CPF perante o CNPJ).</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-purple-600 text-white">5</div><p><strong>Registro no Cartório (RCPJ):</strong> Protocolam-se: Ata, Estatuto, Lista de Presença, DBE, Viabilidade, Requerimento assinado pelo presidente e cópia dos RGs da diretoria. O RCPJ registra e o CNPJ é liberado.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- FUNDAÇÃO -->
+                    <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 border-l-4 border-l-teal-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i data-lucide="building" class="text-teal-500 w-8 h-8"></i>
+                            <h3 class="text-2xl font-bold text-white">Fundação Privada</h3>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-6">
+                            Não é união de pessoas, mas sim um <strong>patrimônio destacado</strong> (por testamento ou escritura pública) por um instituidor para servir a fins religiosos, morais, culturais ou assistenciais. Requer patrimônio livre e suficiente para manter o objetivo.
+                        </p>
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="text-teal-500"></i> Passo a Passo de Abertura (Fundação)
+                        </h4>
+                        <div class="space-y-3 text-sm text-neutral-300 bg-black p-6 rounded-xl border border-neutral-800">
+                            <div class="flex gap-3"><div class="step-number bg-teal-600 text-white">1</div><p><strong>Escritura Pública:</strong> O instituidor vai ao Cartório de Notas e lavra escritura dotando (doando) bens livres para a futura fundação.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-teal-600 text-white">2</div><p><strong>Elaboração do Estatuto:</strong> Feito por quem o instituidor encarregou, num prazo estipulado.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-teal-600 text-white">3</div><p><strong>Ministério Público (CRUCIAL):</strong> Todo o processo de criação de fundação <strong>exige aprovação do Curador de Fundações do Ministério Público Estadual</strong>. O MP analisa se os bens são suficientes e se o estatuto é legal.</p></div>
+                            <div class="flex gap-3"><div class="step-number bg-teal-600 text-white">4</div><p><strong>Registro RCPJ:</strong> Somente após a aprovação expressa do MP, a escritura, o estatuto e o DBE vão para registro no RCPJ para adquirir personalidade jurídica.</p></div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- IGREJAS -->
+                        <div class="bg-neutral-900 rounded-xl p-6 border border-neutral-800 border-l-4 border-l-yellow-500">
+                            <h3 class="text-xl font-bold text-white mb-2">Organização Religiosa</h3>
+                            <p class="text-xs text-neutral-300 mb-4">Igrejas, centros espíritas, templos. Livres para criação civil, organização e funcionamento. O Estado não pode interferir no funcionamento interno. Gozam de Imunidade Tributária Constitucional para impostos sobre patrimônio, renda e serviços vinculados às finalidades essenciais.</p>
+                            <div class="bg-black p-3 rounded text-xs text-neutral-400">
+                                <strong>Registro:</strong> Idêntico ao da Associação. Edital > Ata de Fundação e Eleição > Estatuto Vistado por Advogado > RCPJ + Receita Federal (CNPJ).
+                            </div>
+                        </div>
+
+                        <!-- PARTIDO -->
+                        <div class="bg-neutral-900 rounded-xl p-6 border border-neutral-800 border-l-4 border-l-indigo-500">
+                            <h3 class="text-xl font-bold text-white mb-2">Partido Político</h3>
+                            <p class="text-xs text-neutral-300 mb-4">Regidos por lei própria (Lei 9.096/95). Exigem estrutura hierárquica severa, filiações mínimas nacionais em múltiplos estados.</p>
+                            <div class="bg-black p-3 rounded text-xs text-neutral-400">
+                                <strong>Registro Duplo:</strong> Adquirem personalidade jurídica registrando o Estatuto no <strong>Cartório de RCPJ de Brasília (DF)</strong>, a cargo de seus fundadores (no mínimo 101 fundadores de 1/3 dos estados). Após a criação civil (CNPJ), devem registrar o estatuto no <strong>TSE (Tribunal Superior Eleitoral)</strong> para obter autorização para disputar eleições.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION: Modelos (Mantida a estrutura anterior) -->
+            <section id="modelos" class="content-section hidden animate-fade-in">
+                <!-- Mantido o código original dos modelos de contrato -->
+                <div class="border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Modelos: Contratos Societários</h2>
+                    <p class="text-neutral-400">Minutas padrão e referências para elaboração de atos.</p>
+                </div>
+                 <div class="bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl mb-8">
+                    <p class="text-sm text-orange-200">
+                        <strong>Nota:</strong> Os textos abaixo são esqueletos de modelos. Sempre adapte as cláusulas à realidade dos sócios e garanta a revisão por um profissional qualificado (advogado societário ou contador).
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Modelo 1 -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between items-center outline-none">
+                            Contrato Social Padrão (LTDA)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300 font-mono whitespace-pre-wrap bg-black">
+INSTRUMENTO PARTICULAR DE CONTRATO SOCIAL
+[NOME DA EMPRESA] LTDA.
+
+SÓCIO 1: [Nome Completo], [Nacionalidade], [Estado Civil], [Profissão], portador do RG nº [Número] e inscrito no CPF sob o nº [Número], residente e domiciliado na [Endereço completo].
+
+SÓCIO 2: [Nome Completo]... (mesma qualificação).
+
+Resolvem constituir uma Sociedade Limitada, mediante as seguintes cláusulas:
+
+CLÁUSULA PRIMEIRA - NOME EMPRESARIAL E SEDE
+A sociedade girará sob o nome empresarial [NOME DA EMPRESA] LTDA e terá sede e foro na [Endereço completo da empresa].
+
+CLÁUSULA SEGUNDA - OBJETO SOCIAL
+A sociedade terá como objeto a exploração do ramo de [Descrição detalhada da atividade, correspondente ao CNAE].
+
+CLÁUSULA TERCEIRA - CAPITAL SOCIAL
+O capital social é de R$ [Valor] ([Valor por extenso]), dividido em [Quantidade] quotas de valor nominal R$ [Valor da quota] cada uma, totalmente subscritas e integralizadas neste ato, em moeda corrente, divididas assim:
+- Sócio 1: [Quantidade] quotas, totalizando R$ [Valor].
+- Sócio 2: [Quantidade] quotas, totalizando R$ [Valor].
+
+CLÁUSULA QUARTA - ADMINISTRAÇÃO
+A administração da sociedade caberá ao(s) sócio(s) [Nome(s) do(s) Administrador(es)], com os poderes e atribuições de representação ativa e passiva na sociedade, judicial e extrajudicialmente, podendo praticar todos os atos compreendidos no objeto social, sempre em nome da sociedade, vedado, no entanto, o uso do nome empresarial em negócios estranhos aos fins sociais.
+
+CLÁUSULA QUINTA - EXERCÍCIO SOCIAL
+O exercício social coincidirá com o ano civil. Ao término de cada exercício, levantar-se-á o balanço patrimonial.
+
+Local e Data.
+
+_________________________         _________________________
+[Sócio 1]                         [Sócio 2]
+                        </div>
+                    </details>
+
+                    <!-- Modelo 2 -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between items-center outline-none">
+                            Alteração Contratual (Entrada de Sócio e Aumento de Capital)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300 font-mono whitespace-pre-wrap bg-black">
+[NÚMERO] ALTERAÇÃO DO CONTRATO SOCIAL
+[NOME DA EMPRESA] LTDA.
+
+CNPJ: [Número do CNPJ]
+NIRE: [Número do NIRE]
+
+(Qualificação dos sócios atuais - CEDENTES/SAINTES/REMANESCENTES)
+(Qualificação dos novos sócios - CESSIONÁRIOS/INGRESSANTES)
+
+Decidem de comum acordo promover a presente alteração contratual:
+
+CLÁUSULA PRIMEIRA - DO AUMENTO DE CAPITAL
+O Capital Social, que era de R$ [Valor Antigo], é aumentado neste ato para R$ [Valor Novo], mediante a injeção de R$ [Valor do Aumento] em moeda corrente nacional pelo novo sócio [Nome do Novo Sócio].
+
+CLÁUSULA SEGUNDA - DA ADMISSÃO DE SÓCIO
+A sociedade admite neste ato o ingresso do sócio [Nome do Novo Sócio], o qual subscreve e integraliza neste ato a quantidade de [N] quotas.
+
+CLÁUSULA TERCEIRA - DA NOVA DISTRIBUIÇÃO DO CAPITAL
+Em virtude da alteração acima, o capital social passa a ser distribuído da seguinte forma:
+- Sócio 1: [Quotas] - R$ [Valor]
+- Sócio 2 (Novo): [Quotas] - R$ [Valor]
+TOTAL: [Total Quotas] - R$ [Valor Total]
+
+CLÁUSULA QUARTA - CONSOLIDAÇÃO
+Para fins de clareza, os sócios resolvem consolidar o Contrato Social, que passa a vigorar com a seguinte redação:
+(Inserir aqui o contrato social completo atualizado)
+                        </div>
+                    </details>
+
+                     <!-- Modelo 3 -->
+                     <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex justify-between items-center outline-none">
+                            Distrato Social (Encerramento de LTDA)
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300 font-mono whitespace-pre-wrap bg-black">
+DISTRATO SOCIAL
+[NOME DA EMPRESA] LTDA.
+
+CNPJ: [Número do CNPJ] | NIRE: [Número do NIRE]
+
+(Qualificação de todos os sócios)
+
+Os acima qualificados, únicos sócios da sociedade empresária limitada que gira sob o nome empresarial [NOME DA EMPRESA], com sede na [Endereço], resolvem por mutuo acordo, dissolver e extinguir a sociedade, mediante as seguintes cláusulas:
+
+CLÁUSULA PRIMEIRA: A sociedade iniciou suas atividades em [Data de Abertura] e encerra suas atividades na presente data.
+
+CLÁUSULA SEGUNDA: A sociedade não possui ativo a ser partilhado, nem passivo a ser saldado. (OU: Os ativos e passivos da sociedade foram divididos e assumidos proporcionalmente às quotas de cada sócio).
+
+CLÁUSULA TERCEIRA: Os sócios dão entre si e à sociedade plena, geral e irrevogável quitação, para nada mais reclamarem um do outro.
+
+CLÁUSULA QUARTA: A guarda dos livros e documentos fiscais e contábeis da sociedade extinta ficará a cargo do sócio [Nome do Sócio Liquidante], residente na [Endereço], pelo prazo legal.
+
+E por estarem de perfeito acordo, assinam o presente distrato.
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Navegação de seções
+        function showSection(sectionId) {
+            // Esconder todas as seções
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            // Mostrar seção alvo
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            // Atualizar classes dos links (estado ativo)
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            // Adicionar classe ativa ao link clicado
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            // Fechar sidebar mobile se estiver aberta
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            // Scroll para o topo
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

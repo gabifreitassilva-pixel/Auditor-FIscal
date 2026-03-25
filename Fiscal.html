@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo - Departamento Fiscal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316; /* orange-500 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ea580c; /* orange-600 */
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        .step-number {
+            @apply flex-shrink-0 w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-sm;
+        }
+        .section-title {
+            @apply text-3xl font-bold text-white mb-2;
+        }
+        .section-subtitle {
+            @apply text-neutral-400;
+        }
+        .header-border {
+            @apply border-l-4 border-orange-500 pl-4 mb-8;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <!-- Sidebar / Menu Esquerdo -->
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="calculator" class="text-orange-500"></i>
+                <span class="text-orange-500">Fiscal</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Guia Tributário e Compliance</p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="nav-menu">
+            <a href="#" onclick="showSection('inicio')" class="nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i> Início
+            </a>
+            
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Tributação & Regimes</div>
+            
+            <a href="#" onclick="showSection('regimes')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i> Regimes Tributários
+            </a>
+            <a href="#" onclick="showSection('impostos')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="landmark" class="w-5 h-5"></i> Federais, Estaduais e Mun.
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Rotinas & Compliance</div>
+
+            <a href="#" onclick="showSection('rotinas')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="arrow-left-right" class="w-5 h-5"></i> Entradas e Saídas
+            </a>
+            <a href="#" onclick="showSection('retencoes')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="scissors" class="w-5 h-5"></i> Retenções na Fonte
+            </a>
+            <a href="#" onclick="showSection('obrigacoes')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="file-check-2" class="w-5 h-5"></i> Obrigações Acessórias
+            </a>
+
+            <div class="pt-4 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Dicionário Fiscal</div>
+
+            <a href="#" onclick="showSection('codigos')" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-colors">
+                <i data-lucide="barcode" class="w-5 h-5"></i> CFOP, CST, CSOSN e NCM
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-[#121212] relative">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <!-- SECTION: Início -->
+            <section id="inicio" class="content-section block animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Bem-vindo ao Departamento Fiscal</h2>
+                    <p class="section-subtitle">O coração financeiro-tributário: Apuração, Compliance e Planejamento.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('regimes')">
+                        <i data-lucide="pie-chart" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Planejamento Tributário</h3>
+                        <p class="text-sm text-neutral-400">Análise entre Simples Nacional, Lucro Presumido e Lucro Real.</p>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('rotinas')">
+                        <i data-lucide="file-spreadsheet" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Apuração de Impostos</h3>
+                        <p class="text-sm text-neutral-400">Fechamento mensal, cálculo de guias (DAS, DARF, DARE, GARE).</p>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl hover:border-orange-500 transition-colors cursor-pointer group" onclick="showSection('obrigacoes')">
+                        <i data-lucide="shield-check" class="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Obrigações Acessórias</h3>
+                        <p class="text-sm text-neutral-400">Entrega de SPED Fiscal, EFD-Contribuições, DCTFWeb, Reinf, etc.</p>
+                    </div>
+                </div>
+
+                <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800 shadow-2xl">
+                    <h3 class="text-xl font-bold text-orange-500 mb-4 flex items-center gap-2">
+                        <i data-lucide="info"></i> Sobre o Setor Fiscal
+                    </h3>
+                    <p class="text-neutral-300 leading-relaxed mb-4 text-sm">
+                        O Departamento Fiscal é responsável por garantir que a empresa opere em total conformidade com a complexa legislação tributária brasileira. O menor erro no cadastro de um produto (NCM/CEST) ou na escolha de um CFOP pode resultar em multas pesadas ou no pagamento de impostos indevidos.
+                    </p>
+                    <p class="text-neutral-300 leading-relaxed text-sm">
+                        Neste guia, desmembramos as regras de tributação, a hierarquia dos impostos (União, Estado e Município), as minúcias das retenções na fonte e o dicionário de códigos fiscais essenciais para o dia a dia.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION: Regimes Tributários -->
+            <section id="regimes" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Regimes Tributários</h2>
+                    <p class="section-subtitle">A escolha que define o destino financeiro da empresa.</p>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Simples Nacional -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-green-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-bold text-white">Simples Nacional</h3>
+                            <span class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded">Até R$ 4.8 Milhões/ano</span>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">Regime compartilhado de arrecadação, cobrança e fiscalização. Unifica 8 impostos (IRPJ, CSLL, PIS, COFINS, IPI, ICMS, ISS e INSS Patronal) em uma única guia: o <strong>DAS (Documento de Arrecadação do Simples Nacional)</strong>.</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-2">Os 5 Anexos</h4>
+                                <ul class="text-xs text-neutral-400 space-y-1">
+                                    <li><strong>Anexo I:</strong> Comércio</li>
+                                    <li><strong>Anexo II:</strong> Indústria</li>
+                                    <li><strong>Anexo III:</strong> Serviços (Manutenção, Contabilidade, Instalações)</li>
+                                    <li><strong>Anexo IV:</strong> Serviços (Limpeza, Vigilância, Obras, Advocacia) - <em>INSS Patronal é pago fora do DAS.</em></li>
+                                    <li><strong>Anexo V:</strong> Serviços Intelectuais/Técnicos (Engenharia, Medicina).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-2">O Fator R</h4>
+                                <p class="text-xs text-neutral-400">Mecanismo que permite a empresas sujeitas ao Anexo V serem tributadas no Anexo III (alíquotas menores). Acontece se a Folha de Pagamento (incluindo Pró-Labore) nos últimos 12 meses for <strong>igual ou superior a 28%</strong> do Faturamento Bruto do mesmo período.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lucro Presumido -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-blue-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-bold text-white">Lucro Presumido</h3>
+                            <span class="bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded">Até R$ 78 Milhões/ano</span>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">A Receita Federal "presume" qual é o lucro da empresa aplicando um percentual sobre o faturamento. Não importa se a empresa teve lucro real ou prejuízo; os impostos de renda serão pagos sobre essa presunção.</p>
+                        
+                        <div class="grid md:grid-cols-3 gap-4 mb-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-blue-400 font-bold mb-1 text-sm">Presunção IRPJ</h4>
+                                <ul class="text-xs text-neutral-400 space-y-1">
+                                    <li><strong>8%:</strong> Comércio e Indústria</li>
+                                    <li><strong>16%:</strong> Transporte de Passageiros</li>
+                                    <li><strong>32%:</strong> Serviços em geral</li>
+                                    <li><em>Alíquota do IRPJ: 15% (mais adicional de 10% se lucro trimestral > 60k)</em></li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-blue-400 font-bold mb-1 text-sm">Presunção CSLL</h4>
+                                <ul class="text-xs text-neutral-400 space-y-1">
+                                    <li><strong>12%:</strong> Comércio e Indústria</li>
+                                    <li><strong>32%:</strong> Serviços em geral</li>
+                                    <li><em>Alíquota da CSLL: 9%</em></li>
+                                </ul>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-blue-400 font-bold mb-1 text-sm">PIS / COFINS</h4>
+                                <p class="text-xs text-neutral-400">Regime <strong>Cumulativo</strong>.<br>Não gera créditos nas compras.<br>PIS: 0,65%<br>COFINS: 3,00%<br>Total: 3,65% sobre o faturamento.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lucro Real -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-bold text-white">Lucro Real</h3>
+                            <span class="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded">Obrigatório p/ Faturamento > 78 Mi e Setor Financeiro</span>
+                        </div>
+                        <p class="text-sm text-neutral-300 mb-4">O IRPJ e a CSLL são calculados sobre o Lucro Contábil efetivo da empresa, ajustado por adições e exclusões exigidas por lei (no LALUR - Livro de Apuração do Lucro Real). Se der prejuízo fiscal, não paga IRPJ/CSLL naquele período.</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-red-400 font-bold mb-2">PIS / COFINS (Não-Cumulativo)</h4>
+                                <p class="text-xs text-neutral-400">Alíquotas disparam para <strong>PIS: 1,65% e COFINS: 7,6% (Total: 9,25%)</strong>. Porém, a empresa tem o direito de descontar "créditos" destas mesmas alíquotas sobre compras de insumos, energia elétrica, aluguéis, etc. É necessário rigor extremo no lançamento de notas para separar o que dá direito a crédito.</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-red-400 font-bold mb-2">Apuração Trimestral ou Anual</h4>
+                                <p class="text-xs text-neutral-400">Pode ser calculado fechando o balanço a cada 3 meses, ou com apuração anual mediante recolhimentos mensais por estimativa (onde levanta-se balancetes de suspensão/redução para pagar menos).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Impostos -->
+            <section id="impostos" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">A Matriz dos Tributos</h2>
+                    <p class="section-subtitle">Federais, Estaduais e Municipais: Quem cobra o quê?</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- Federais -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-4 border-b border-neutral-800 pb-2">Tributos Federais (União)</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-1">IRPJ e CSLL</h4>
+                                <p class="text-xs text-neutral-400 mb-3">Tributam a Renda e o Lucro da empresa. Destinados ao tesouro nacional e seguridade social.</p>
+                                
+                                <h4 class="text-white font-bold text-sm mb-1">PIS e COFINS</h4>
+                                <p class="text-xs text-neutral-400 mb-3">Tributam a Receita/Faturamento. Financiamento da Seguridade Social, seguro-desemprego e abono salarial.</p>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-1">IPI (Imposto sobre Produtos Industrializados)</h4>
+                                <p class="text-xs text-neutral-400 mb-3">Tributa a industrialização e importação. É um imposto "seletivo": produtos essenciais têm alíquota zero, enquanto cigarros e bebidas têm alíquotas altíssimas.</p>
+                                
+                                <h4 class="text-white font-bold text-sm mb-1">II e IE</h4>
+                                <p class="text-xs text-neutral-400">Imposto de Importação e Imposto de Exportação. Têm função extrafiscal (regular mercado e balança comercial).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estaduais -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800 border-l-4 border-l-orange-500">
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-neutral-800 pb-2">Tributos Estaduais (O Pesadelo: ICMS)</h3>
+                        <p class="text-sm text-neutral-300 mb-4">O <strong>ICMS (Imposto sobre Circulação de Mercadorias e Serviços)</strong> é o imposto mais complexo do Brasil. Incide sobre venda de produtos, transporte interestadual/intermunicipal e comunicações.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-1 text-sm">Substituição Tributária (ICMS-ST)</h4>
+                                <p class="text-xs text-neutral-400">O Estado antecipa a cobrança de toda a cadeia. A indústria/importador cobra o ICMS dela mesma e já "recolhe" o ICMS que o atacadista e o varejista iriam pagar no futuro. Quando o varejo vende pro consumidor final, o produto já tem o ICMS retido (CFOP 5405).</p>
+                            </div>
+                            <div class="bg-black p-4 rounded-lg border border-neutral-700">
+                                <h4 class="text-orange-400 font-bold mb-1 text-sm">DIFAL (Diferencial de Alíquota)</h4>
+                                <p class="text-xs text-neutral-400">Criado para equilibrar a guerra fiscal. Se SP (alíquota interna 18%) vende para uma pessoa no PI (alíquota interestadual 7%), a diferença de 11% precisa ser paga ao estado de destino. Aplica-se em compras de ativo imobilizado, uso e consumo, e vendas a consumidores finais (EC 87/15).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Municipais -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-xl font-bold text-orange-500 mb-4 border-b border-neutral-800 pb-2">Tributos Municipais</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-1">ISS / ISSQN (Imposto Sobre Serviços)</h4>
+                                <p class="text-xs text-neutral-400 mb-3">Incide sobre os serviços da Lei Complementar 116/2003. Alíquota varia entre <strong>2% e 5%</strong>. A maior complexidade é definir <em>onde</em> o imposto é devido: na sede do prestador ou no local de execução do serviço? (Ex: Limpeza e Obras recolhem ISS no local da obra).</p>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-1">IPTU, ITBI e Taxas</h4>
+                                <p class="text-xs text-neutral-400">Imposto sobre propriedades urbanas, transmissão de imóveis e taxas como TFE (Taxa de Fiscalização de Estabelecimentos), Alvarás, e TFA (Taxa de Fiscalização de Anúncios).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Rotinas -->
+            <section id="rotinas" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Rotinas Práticas: Entradas e Saídas</h2>
+                    <p class="section-subtitle">O trabalho diário do analista e assistente fiscal.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="arrow-down-to-line" class="text-orange-500"></i> Entrada (Compras e Aquisições)
+                        </h3>
+                        <ul class="text-sm text-neutral-300 space-y-3 list-none">
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-green-500 w-4 h-4 mt-1"></i> <strong>Importação de XML:</strong> Puxar as NF-e dos fornecedores direto da SEFAZ ou via software (Sieg, Arquivei).</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-green-500 w-4 h-4 mt-1"></i> <strong>Conversão de CFOP:</strong> Quando o fornecedor emite uma nota de Venda (CFOP 5102), o fiscal converte na entrada de acordo com a destinação: Revenda (1102), Insumo (1101) ou Uso/Consumo (1556).</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-green-500 w-4 h-4 mt-1"></i> <strong>Apropriação de Créditos:</strong> Analisar se o produto permite abater ICMS, IPI, PIS ou COFINS, lançando no sistema com o CST correto de entrada.</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-green-500 w-4 h-4 mt-1"></i> <strong>Manifestação do Destinatário:</strong> Informar ao fisco "Sim, eu reconheço essa compra", evitando notas frias contra o CNPJ.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="arrow-up-from-line" class="text-orange-500"></i> Saída (Vendas e Serviços)
+                        </h3>
+                        <ul class="text-sm text-neutral-300 space-y-3 list-none">
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-blue-500 w-4 h-4 mt-1"></i> <strong>Conferência de Faturamento:</strong> Validar se a empresa faturou no mês atual usando os NCMs e regras corretas (Evitando pagar tributo sobre algo Isento ou Monofásico).</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-blue-500 w-4 h-4 mt-1"></i> <strong>Notas de Devolução / Remessa:</strong> Tratar notas que não geram receita, como remessa para conserto, demonstração, comodato.</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-blue-500 w-4 h-4 mt-1"></i> <strong>Carta de Correção (CC-e):</strong> Validar correções de dados triviais da nota (Atenção: não pode corrigir valores, quantidades e dados que mudem o imposto!).</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="text-blue-500 w-4 h-4 mt-1"></i> <strong>Fechamento Mensal:</strong> Cruzar totais de entradas, saídas e serviços para gerar o imposto final.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Retenções -->
+            <section id="retencoes" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Retenções na Fonte</h2>
+                    <p class="section-subtitle">Quando você vira o cobrador do governo (Responsabilidade Solidária).</p>
+                </div>
+
+                <div class="bg-black border border-neutral-800 p-6 rounded-xl mb-6 shadow-lg">
+                    <p class="text-sm text-neutral-300">A lógica da retenção é antecipar a arrecadação e transferir a responsabilidade. Se a Empresa "A" contrata a Empresa "B" para um serviço de limpeza (R$ 10.000), a Lei manda a Empresa A <strong>NÃO pagar o valor cheio</strong>. A Empresa A desconta uma parte, paga R$ 9.000 para B, e pega os R$ 1.000 e repassa direto pro Governo no nome da Empresa B.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-800 pb-2">1. CSRF (PIS, COFINS e CSLL) - Lei 10.833</h4>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                            <li><strong>Alíquota:</strong> 4,65% (0,65% PIS, 3% Cofins, 1% CSLL).</li>
+                            <li><strong>Quando ocorre:</strong> Serviços profissionais (limpeza, segurança, advocacia, engenharia, contabilidade) prestados de PJ para PJ.</li>
+                            <li><strong>Exceção:</strong> Se a empresa que presta o serviço for do Simples Nacional, <strong>NÃO SOFRE</strong> retenção de CSRF.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-800 pb-2">2. IRRF (Imposto de Renda Retido)</h4>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                            <li><strong>Alíquotas:</strong> 1% (limpeza/conservação/segurança) ou 1,5% (serviços profissionais/caráter intelectual).</li>
+                            <li><strong>Vencimento:</strong> Mudou recentemente! Geralmente recolhido no mês seguinte pelo portal e-CAC/DCTFWeb.</li>
+                            <li><strong>Simples Nacional:</strong> Quem é Simples Nacional também não sofre IRRF nas notas (salvo exceções raras de órgãos públicos).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-800 pb-2">3. Retenção de INSS (Previdência)</h4>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                            <li><strong>Alíquota:</strong> Regra geral de 11% sobre o valor da nota/fatura, ou 3,5% caso a empresa tenha desoneração da folha (CPRB).</li>
+                            <li><strong>Quando:</strong> Serviços prestados mediante "Cessão de Mão de Obra" ou Empreitada (ex: construção civil, vigilância, portaria, limpeza).</li>
+                            <li><strong>Particularidade:</strong> Muitas vezes abatido do INSS total que a empresa deve na sua própria folha de pagamento.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl">
+                        <h4 class="text-orange-400 font-bold mb-3 border-b border-neutral-800 pb-2">4. Retenção de ISS</h4>
+                        <ul class="text-sm text-neutral-300 space-y-2 list-disc list-inside">
+                            <li><strong>Alíquota:</strong> De 2% a 5%, definido pelo município.</li>
+                            <li><strong>Regra Mater:</strong> LC 116/03. A retenção é pesada quando o prestador é de um município e presta serviço em outro, ou no caso de Tomadores com obrigação de "Substituto Tributário" (grandes empresas eleitas pela prefeitura).</li>
+                            <li><em>CEPOM (Cadastro de Empresas de Fora do Município)</em>: Regra municipal que obriga o prestador de fora a se cadastrar na cidade, senão sofre retenção dobrada. (Muito comum em SP, RJ, Campinas).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Obrigacoes -->
+            <section id="obrigacoes" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Obrigações Acessórias (SPED)</h2>
+                    <p class="section-subtitle">O Big Brother Fiscal. Prestar contas é mais complexo que pagar.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Federal SPEDs -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="database" class="text-orange-500"></i> SPED e Federais
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-neutral-300">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">EFD ICMS/IPI (SPED Fiscal)</strong>
+                                Arquivo TXT gigante enviado mensalmente aos estados e RFB contendo TODAS as notas de entrada, saída, redução z, inventário e apuração de ICMS e IPI. Erro de cadastro aqui gera multa pesada.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">EFD-Contribuições</strong>
+                                O "SPED do PIS e da COFINS". Demonstra base de cálculo, alíquotas, receitas isentas, CSTs e blocos específicos para instituições financeiras e construtoras.
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">EFD-Reinf e DCTFWeb</strong>
+                                A Reinf concentra as informações de retenções na fonte (IR, CSLL, PIS, COFINS, INSS). Essas informações vão para a DCTFWeb, que cruza com o eSocial (do DP) para gerar o <strong>DARF Numerado</strong> unificado. (Substituiu a antiga DIRF).
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">ECF e ECD (Anuais)</strong>
+                                ECD = Escrituração Contábil Digital (O Livro Diário/Razão digitalizado). ECF = Escrituração Contábil Fiscal (Apuração final do IRPJ/CSLL baseada na contabilidade - O LALUR digital).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simples e Estaduais -->
+                    <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+                        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="file-text" class="text-orange-500"></i> Simples Nacional & Estaduais
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-neutral-300">
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">PGDAS-D e DEFIS</strong>
+                                PGDAS é a obrigação mensal para gerar o DAS. A DEFIS é a declaração anual do Simples Nacional entregue até 31 de março (informando saldo de caixa, despesas, nº empregados).
+                            </div>
+                            <div class="bg-black p-4 rounded border border-neutral-700">
+                                <strong class="text-white block mb-1">GIA / DeSTDA</strong>
+                                Declarações estaduais. GIA (Guia de Informação e Apuração do ICMS) é mensal para Lucro Presumido/Real. DeSTDA é exclusiva de empresas do Simples para declarar DIFAL e Substituição Tributária.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: Codigos -->
+            <section id="codigos" class="content-section hidden animate-fade-in">
+                <div class="header-border">
+                    <h2 class="section-title">Dicionário Fiscal: A Linguagem das Notas</h2>
+                    <p class="section-subtitle">CFOP, CST, CSOSN e NCM decodificados.</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- CFOP -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex items-center justify-between outline-none">
+                            <div class="flex items-center gap-2"><i data-lucide="hash"></i> CFOP - Código Fiscal de Operações e Prestações</div>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300">
+                            <p class="mb-4">Código de 4 dígitos. Define se é entrada ou saída, e de onde a mercadoria vem/vai.</p>
+                            <table class="w-full text-left bg-black rounded-lg overflow-hidden border border-neutral-800">
+                                <thead class="bg-neutral-800 text-orange-400">
+                                    <tr><th class="p-2">Início</th><th class="p-2">O que significa</th><th class="p-2">Exemplo Famoso</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-neutral-800"><td class="p-2">1.xxx</td><td class="p-2">ENTRADA - Dentro do Estado</td><td class="p-2">1102 (Compra p/ comercialização)</td></tr>
+                                    <tr class="border-b border-neutral-800"><td class="p-2">2.xxx</td><td class="p-2">ENTRADA - Fora do Estado</td><td class="p-2">2556 (Compra material de consumo)</td></tr>
+                                    <tr class="border-b border-neutral-800"><td class="p-2">3.xxx</td><td class="p-2">ENTRADA - Importação Exterior</td><td class="p-2">3101 (Compra insumo importado)</td></tr>
+                                    <tr class="border-b border-neutral-800"><td class="p-2">5.xxx</td><td class="p-2">SAÍDA - Dentro do Estado</td><td class="p-2">5102 (Venda de mercadoria) / 5949 (Outras saídas)</td></tr>
+                                    <tr class="border-b border-neutral-800"><td class="p-2">6.xxx</td><td class="p-2">SAÍDA - Fora do Estado</td><td class="p-2">6101 (Venda de prod. industrialização própria)</td></tr>
+                                    <tr><td class="p-2">7.xxx</td><td class="p-2">SAÍDA - Exportação Exterior</td><td class="p-2">7102 (Venda exp. mercadoria)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    <!-- CST / CSOSN -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex items-center justify-between outline-none">
+                            <div class="flex items-center gap-2"><i data-lucide="tag"></i> CST / CSOSN (Tributação do Item)</div>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300">
+                            <p class="mb-4">Diz se aquele produto exato vai pagar imposto, se é isento, ou se já foi pago por Substituição Tributária.</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-black p-4 border border-neutral-800 rounded">
+                                    <h5 class="text-orange-500 font-bold mb-2">CSOSN (Apenas para Simples Nacional)</h5>
+                                    <ul class="space-y-1">
+                                        <li><strong>101:</strong> Tributada pelo Simples (permite crédito).</li>
+                                        <li><strong>102:</strong> Tributada pelo Simples (sem crédito).</li>
+                                        <li><strong>500:</strong> ICMS cobrado anteriormente por Subst. Tributária (ST). *Reduz o DAS!*</li>
+                                        <li><strong>400:</strong> Não tributada.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-black p-4 border border-neutral-800 rounded">
+                                    <h5 class="text-orange-500 font-bold mb-2">CST (Para Presumido e Real) - ICMS</h5>
+                                    <ul class="space-y-1">
+                                        <li><strong>00:</strong> Tributada Integralmente.</li>
+                                        <li><strong>20:</strong> Com redução de Base de Cálculo.</li>
+                                        <li><strong>40:</strong> Isenta.</li>
+                                        <li><strong>60:</strong> ICMS cobrado anteriormente por ST.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-4 bg-neutral-800/50 p-3 rounded text-xs border-l-2 border-red-500">
+                                <strong>Origem da Mercadoria (1º Dígito do CST):</strong> 0 = Nacional, 1 = Importação Direta, 2 = Estrangeira adquirida no mercado interno, 3...8 = Nacional com percentuais de conteúdo de importação. Ex: "000" (Nacional e Tributada).
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- NCM e CEST -->
+                    <details class="bg-neutral-900 rounded-xl border border-neutral-800 group">
+                        <summary class="p-6 font-bold cursor-pointer text-white hover:text-orange-500 flex items-center justify-between outline-none">
+                            <div class="flex items-center gap-2"><i data-lucide="box"></i> NCM e CEST (Identidade do Produto)</div>
+                            <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="p-6 pt-0 border-t border-neutral-800 mt-2 text-sm text-neutral-300">
+                            <div class="space-y-4">
+                                <div>
+                                    <strong class="text-orange-400 block text-base mb-1">NCM (Nomenclatura Comum do Mercosul)</strong>
+                                    Código de 8 dígitos que identifica a natureza da mercadoria. O sistema tributário brasileiro inteiro olha para o NCM para definir a alíquota de IPI, PIS, COFINS, e ICMS. Ex: Se um NCM muda de "biscoito" para "pão", os impostos alteram drasticamente. Se o NCM estiver errado na nota, ela é rejeitada (Erro Sefaz).
+                                </div>
+                                <div>
+                                    <strong class="text-orange-400 block text-base mb-1">CEST (Código Especificador da Substituição Tributária)</strong>
+                                    Código de 7 dígitos que amarra o NCM à legislação da Substituição Tributária de ICMS. Se o produto tem ST naquele estado, a NF-e é obrigada a conter o CEST, ou não será autorizada.
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Navegação de seções
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-orange-600', 'text-white');
+                el.classList.add('text-neutral-300');
+            });
+
+            const activeLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if(activeLink) {
+                activeLink.classList.remove('text-neutral-300');
+                activeLink.classList.add('bg-orange-600', 'text-white');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+            
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</body>
+</html>
