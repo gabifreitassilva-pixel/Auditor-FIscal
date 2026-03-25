@@ -1,1240 +1,489 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raio X - Consulta Fiscal Avançada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --primary: #ff6600; /* Laranja */
-            --bg: #000000;      /* Preto */
-            --card-bg: #111111; /* Cinza Escuro */
-            --border: #333333;
-            --text-main: #ffffff;
-            --text-dim: #aaaaaa;
-            --success: #00ff00;
-            --warning: #ffcc00;
-            --danger: #ff3333;
-            --info: #33ccff;
-        }
+        /* Scrollbar personalizada igual ao Fiscal */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ea580c; }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* --- MENU LATERAL (NAV) --- */
-        #sidebar {
-            width: 280px;
-            background: #080808;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.8);
-            z-index: 10;
-        }
-
-        .sidebar-branding {
-            padding: 30px 20px;
-            background: #111;
-            text-align: center;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .sidebar-branding .logo-title {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin: 0 0 5px 0;
-            font-weight: 900;
-            letter-spacing: 2px;
-        }
-
-        .sidebar-branding .subtitle {
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid transparent;
-            padding: 15px 20px;
-            text-align: left;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-btn:hover {
-            background: #151515;
-            border-color: #333;
-        }
-
-        .nav-btn.active {
-            background: rgba(255, 102, 0, 0.1);
-            color: var(--primary);
-            border-color: var(--primary);
-            font-weight: bold;
-        }
-
-        /* --- ÁREA PRINCIPAL --- */
-        main {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .container-center {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        /* Views (Controla o que aparece na tela central) */
-        .view-section {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .view-section.active {
-            display: block;
-        }
+        body { background-color: #0a0a0a; color: #ffffff; }
+        .header-border { border-left: 4px border-orange-500; padding-left: 1rem; margin-bottom: 2rem; }
+        
+        .nav-link.active { @apply bg-orange-600 text-white shadow-lg; }
+        
+        input:focus { border-color: #f97316 !important; outline: none; }
+        
+        .card-base { @apply bg-neutral-900 border border-neutral-800 rounded-xl p-6 transition-all; }
+        .label-style { @apply text-xs font-bold text-orange-500 uppercase tracking-wider mb-1 block; }
+        .value-style { @apply text-lg font-medium text-white; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* --- TELA DE BUSCA --- */
-        .search-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 16px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: #080808;
-            color: #fff;
-            font-size: 1.1rem;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        button.btn-primary {
-            padding: 0 40px;
-            background: var(--primary);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            text-transform: uppercase;
-        }
-
-        button.btn-primary:hover {
-            background: #e65c00;
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background: #555 !important;
-            color: #888 !important;
-            cursor: not-allowed !important;
-        }
-
-        /* --- RESULTADOS DA BUSCA --- */
-        #result-container {
-            display: none;
-        }
-
-        .card-info {
-            background: var(--card-bg);
-            border-left: 5px solid var(--primary);
-            padding: 25px;
-            border-radius: 4px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .info-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .label {
-            color: var(--primary);
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .value { 
-            font-size: 1.1rem; 
-            font-weight: 500;
-        }
-
-        .section-title {
-            color: var(--text-main);
-            font-size: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cnae-card {
-            background: #0c0c0c;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            position: relative;
-            transition: border-color 0.2s;
-        }
-        
-        .cnae-card:hover {
-            border-color: #444;
-        }
-
-        .cnae-header {
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .cnae-desc {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: #eee;
-            padding-right: 150px;
-        }
-
-        .enquadramento-box {
-            background: #151515;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 3px solid #444;
-            margin-bottom: 10px;
-        }
-
-        .enquadramento-box .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .badge-anexo {
-            background: rgba(255, 102, 0, 0.15);
-            color: var(--primary);
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255, 102, 0, 0.3);
-            font-weight: bold;
-        }
-
-        .fator-r-alert {
-            color: var(--warning);
-            font-size: 0.85rem;
-            font-style: italic;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(255, 204, 0, 0.05);
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .unmapped-alert {
-            color: var(--text-dim);
-            font-style: italic;
-            font-size: 0.9rem;
-        }
-
-        .cnae-actions {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 8px;
-        }
-
-        /* --- PLANILHAS (TABELAS) --- */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .data-table th, .data-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-table th {
-            background: #080808;
-            color: var(--primary);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .data-table tr:hover {
-            background: #1a1a1a;
-        }
-
-        .data-table td {
-            color: #ddd;
-            font-size: 0.95rem;
-        }
-
-        /* Campo de Busca em Tabelas */
-        .table-search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .table-search-wrapper span {
-            position: absolute;
-            left: 12px;
-            font-size: 1.1rem;
-            pointer-events: none;
-        }
-
-        .table-search-wrapper input[type="text"] {
-            padding: 10px 15px 10px 40px !important;
-            font-size: 0.95rem !important;
-            border-radius: 6px !important;
-            width: 320px !important;
-            background: #0a0a0a !important;
-            border: 1px solid #444 !important;
-        }
-
-        .table-search-wrapper input[type="text"]:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
-        }
-
-        /* Botões pequenos (Ações) */
-        .btn-small {
-            background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-small:hover { background: #333; }
-        .btn-small.view { color: #fff; border-color: #666; }
-        .btn-small.view:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
-        .btn-small.edit { color: var(--info); border-color: var(--info); }
-        .btn-small.edit:hover { background: rgba(51, 204, 255, 0.1); }
-        .btn-small.delete { color: var(--danger); border-color: var(--danger); }
-        .btn-small.delete:hover { background: rgba(255, 51, 51, 0.1); }
-        .btn-small.action { color: var(--success); border-color: var(--success); }
-        .btn-small.action:hover { background: rgba(0, 255, 0, 0.1); }
-
-        #loading {
-            display: none;
-            color: var(--primary);
-            text-align: center;
-            margin-top: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* --- MODAL DE EDIÇÃO --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-            background: #111;
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            width: 800px;
-            max-width: 95%;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(255, 102, 0, 0.2);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--primary);
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--text-dim);
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            background: #0a0a0a;
-            color: #fff;
-            font-family: inherit;
-        }
-
-        .form-group input:read-only {
-            background: #1a1a1a;
-            color: #888;
-            border-color: #333;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .btn-cancel {
-            background: transparent;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .btn-cancel:hover { background: #222; }
-
-        .btn-save {
-            background: var(--primary);
-            color: #000;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-save:hover { background: #e65c00; }
-
-        /* Estilos da Linha Dinâmica do Modal */
-        .enquadramento-row {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px dashed #444;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .row-grid-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .btn-remove-row {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: transparent;
-            color: var(--danger);
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-remove-row:hover { transform: scale(1.2); }
-
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden font-sans antialiased">
 
-    <!-- BARRA LATERAL (NAV MENU) -->
-    <aside id="sidebar">
-        <div class="sidebar-branding">
-            <h1 class="logo-title">RAIO X</h1>
-            <p class="subtitle">Análise Fiscal</p>
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-orange-500 text-white p-2 rounded-lg shadow-lg">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <aside id="sidebar" class="w-72 bg-black border-r border-neutral-800 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 absolute md:relative z-40 h-full">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="search" class="text-orange-500"></i>
+                <span class="text-orange-500">RaioX</span><span class="text-white text-lg">PRO</span>
+            </h1>
+            <p class="text-xs text-neutral-400 mt-2">Inteligência e Mapeamento</p>
         </div>
 
-        <nav class="nav-menu">
-            <button class="nav-btn active" onclick="mudarView('view-busca', this)">
-                🔍 Nova Consulta
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+            <button onclick="mudarView('view-busca', this)" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-orange-600 text-white transition-all">
+                <i data-lucide="file-search" class="w-5 h-5"></i> Nova Consulta
             </button>
-            <button class="nav-btn" onclick="mudarView('view-historico', this)">
-                🏢 Histórico de Clientes
+            <button onclick="mudarView('view-historico', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-all">
+                <i data-lucide="building-2" class="w-5 h-5"></i> Histórico de Clientes
             </button>
-            <button class="nav-btn" onclick="mudarView('view-mapeados', this)">
-                📋 CNAEs Mapeados
+            <button onclick="mudarView('view-mapeados', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-orange-400 transition-all">
+                <i data-lucide="database" class="w-5 h-5"></i> CNAEs Mapeados
             </button>
         </nav>
+        
+        <div class="p-4 border-t border-neutral-800 text-[10px] text-neutral-600 uppercase tracking-widest text-center">
+            GFS Intelligence © 2026
+        </div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main>
-        
-        <!-- ================= TELA 1: BUSCA E RESULTADOS ================= -->
-        <div id="view-busca" class="view-section active">
-            <div class="container-center">
-                <div class="search-container">
-                    <input type="text" id="cnpjInput" placeholder="Digite o CNPJ para gerar o Raio X..." maxlength="18" onkeyup="aplicarMascaraCNPJ(this)">
-                    <button class="btn-primary" id="btnBuscar" onclick="buscarCNPJ()">Pesquisar</button>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
+
+    <main class="flex-1 overflow-y-auto bg-[#121212]">
+        <div class="max-w-5xl mx-auto p-6 md:p-10 pb-20">
+            
+            <section id="view-busca" class="view-section block animate-fade-in">
+                <div class="header-border border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Consulta Fiscal Avançada</h2>
+                    <p class="text-neutral-400">Identifique enquadramentos, anexos e códigos de serviço via CNPJ.</p>
                 </div>
 
-                <div id="loading">Consultando bases oficiais da Receita Federal...</div>
-
-                <div id="result-container">
-                    <div class="card-info" id="empresa-geral">
-                        <!-- Preenchido dinamicamente -->
+                <div class="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl shadow-2xl mb-10">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-1">
+                            <i data-lucide="hash" class="absolute left-4 top-4 text-neutral-500 w-5 h-5"></i>
+                            <input type="text" id="cnpjInput" placeholder="00.000.000/0000-00" maxlength="18" onkeyup="aplicarMascaraCNPJ(this)"
+                                class="w-full bg-black border border-neutral-700 p-4 pl-12 rounded-xl text-white text-lg focus:border-orange-500 transition-all">
+                        </div>
+                        <button id="btnBuscar" onclick="buscarCNPJ()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 px-8 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="play" class="w-5 h-5"></i> PESQUISAR
+                        </button>
                     </div>
-
-                    <div class="section-title">
-                        <span>CNAEs e Enquadramento Fiscal</span>
+                    <div id="loading" class="hidden mt-6 text-orange-500 flex items-center justify-center gap-3 font-medium animate-pulse">
+                        <i data-lucide="loader-2" class="animate-spin"></i> Consultando bases oficiais...
                     </div>
+                </div>
+
+                <div id="result-container" class="hidden space-y-8">
+                    <div id="empresa-geral" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
                     
-                    <div id="cnae-list">
-                        <!-- CNAEs preenchidos dinamicamente -->
+                    <div class="flex items-center gap-4">
+                        <div class="h-[1px] bg-neutral-800 flex-1"></div>
+                        <h3 class="text-neutral-500 text-xs font-black uppercase tracking-[0.2em]">CNAEs e Enquadramento</h3>
+                        <div class="h-[1px] bg-neutral-800 flex-1"></div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- ================= TELA 2: PLANILHA DE HISTÓRICO ================= -->
-        <div id="view-historico" class="view-section">
-            <div class="container-center">
-                <div class="section-title">
-                    <span>Histórico de Consultas Realizadas</span>
-                    <div class="table-search-wrapper">
-                        <span>🔍</span>
-                        <input type="text" id="pesquisaHistorico" onkeyup="filtrarHistorico()" placeholder="Buscar CNPJ ou Razão Social...">
-                    </div>
+                    <div id="cnae-list" class="space-y-4"></div>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>CNPJ</th>
-                            <th>Razão Social</th>
-                            <th style="text-align: right;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-historico">
-                        <!-- Preenchido via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            </section>
 
-        <!-- ================= TELA 3: PLANILHA DE CNAES MAPEADOS ================= -->
-        <div id="view-mapeados" class="view-section">
-            <div class="container-center">
-                <div class="section-title">
-                    <span>Banco de Dados: CNAEs Mapeados</span>
-                    <div class="table-search-wrapper">
-                        <span>🔍</span>
-                        <input type="text" id="pesquisaMapeados" onkeyup="filtrarMapeados()" placeholder="Buscar CNAE ou Descrição...">
-                    </div>
+            <section id="view-historico" class="view-section hidden animate-fade-in">
+                <div class="header-border border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Histórico de Clientes</h2>
+                    <p class="text-neutral-400">Empresas consultadas recentemente no sistema.</p>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Código CNAE</th>
-                            <th>Descrição</th>
-                            <th>Enquadramentos Salvos</th>
-                            <th style="text-align: right;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-mapeados">
-                        <!-- Preenchido via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
+                <div class="mb-6 relative">
+                    <i data-lucide="search" class="absolute left-4 top-3.5 text-neutral-500 w-5 h-5"></i>
+                    <input type="text" id="pesquisaHistorico" onkeyup="filtrarHistorico()" placeholder="Buscar CNPJ ou Razão Social..."
+                        class="w-full bg-neutral-900 border border-neutral-800 p-3.5 pl-12 rounded-xl text-white">
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-black/50 text-orange-500 text-xs uppercase font-bold tracking-wider">
+                            <tr>
+                                <th class="p-5">CNPJ</th>
+                                <th class="p-5">Razão Social</th>
+                                <th class="p-5 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-historico" class="divide-y divide-neutral-800 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-mapeados" class="view-section hidden animate-fade-in">
+                <div class="header-border border-l-4 border-orange-500 pl-4 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Banco de CNAEs</h2>
+                    <p class="text-neutral-400">Mapeamento personalizado de regras tributárias.</p>
+                </div>
+
+                <div class="mb-6 relative">
+                    <i data-lucide="database" class="absolute left-4 top-3.5 text-neutral-500 w-5 h-5"></i>
+                    <input type="text" id="pesquisaMapeados" onkeyup="filtrarMapeados()" placeholder="Buscar código ou descrição do CNAE..."
+                        class="w-full bg-neutral-900 border border-neutral-800 p-3.5 pl-12 rounded-xl text-white">
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-black/50 text-orange-500 text-xs uppercase font-bold tracking-wider">
+                            <tr>
+                                <th class="p-5">Código</th>
+                                <th class="p-5">Descrição</th>
+                                <th class="p-5">Enquadramentos</th>
+                                <th class="p-5 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-mapeados" class="divide-y divide-neutral-800 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
     </main>
 
-    <!-- MODAL DE EDIÇÃO DO BANCO DE DADOS DE CNAE -->
-    <div class="modal-overlay" id="modalMapeamento">
-        <div class="modal-content">
-            <h2>Mapear Enquadramento</h2>
-            
-            <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 15px;">
-                <div class="form-group">
-                    <label>Código CNAE</label>
-                    <input type="text" id="modCnaeCod" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Descrição do CNAE</label>
-                    <input type="text" id="modCnaeDesc" readonly>
-                </div>
+    <div class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4" id="modalMapeamento">
+        <div class="bg-neutral-900 border border-neutral-700 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-neutral-800 bg-black flex justify-between items-center">
+                <h2 class="text-xl font-bold text-orange-500 flex items-center gap-2">
+                    <i data-lucide="edit-3"></i> Mapear Enquadramento
+                </h2>
+                <button onclick="fecharModal()" class="text-neutral-500 hover:text-white"><i data-lucide="x"></i></button>
             </div>
             
-            <div style="border-top: 1px solid #333; margin-top: 15px; padding-top: 15px;">
-                <label style="display: block; color: var(--text-main); margin-bottom: 10px; font-weight: bold; font-size: 1.1rem;">
-                    Enquadramentos (Serviços / Anexos / Notas)
-                </label>
-                
-                <div id="enquadramentos-container">
-                    <!-- Linhas dinâmicas vão aparecer aqui -->
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-1">
+                        <label class="label-style">Código CNAE</label>
+                        <input type="text" id="modCnaeCod" readonly class="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-lg text-neutral-400">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="label-style">Descrição</label>
+                        <input type="text" id="modCnaeDesc" readonly class="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-lg text-neutral-400">
+                    </div>
                 </div>
                 
-                <button type="button" class="btn-small edit" onclick="adicionarLinhaEnquadramento()" style="margin-bottom: 15px; padding: 10px 15px; font-weight: bold;">
-                    + Adicionar Situação Fiscal
+                <div id="enquadramentos-container" class="space-y-4"></div>
+
+                <button onclick="adicionarLinhaEnquadramento()" class="w-full border-2 border-dashed border-neutral-700 hover:border-orange-500 p-4 rounded-xl text-neutral-500 hover:text-orange-500 transition-all flex items-center justify-center gap-2 font-bold uppercase text-xs">
+                    <i data-lucide="plus-circle"></i> Adicionar Situação Fiscal
                 </button>
             </div>
-            
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-                <button class="btn-save" onclick="salvarMapeamento()">Salvar no Banco</button>
+
+            <div class="p-6 bg-black/50 border-t border-neutral-800 flex justify-end gap-3">
+                <button onclick="fecharModal()" class="px-6 py-2 text-neutral-400 hover:text-white font-bold uppercase text-xs">Cancelar</button>
+                <button onclick="salvarMapeamento()" class="px-8 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-bold uppercase text-xs shadow-lg">Salvar no Banco</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO RÁPIDA (OLHO) -->
-    <div class="modal-overlay" id="modalVisualizacao">
-        <div class="modal-content" style="max-width: 900px; background: #080808;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
-                <h2 style="margin: 0; color: #fff; display: flex; align-items: center; gap: 10px;">👁️ Visualização Rápida</h2>
-                <button onclick="fecharModalVisualizacao()" style="background: transparent; color: #aaa; border: none; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
+    <div class="modal-overlay fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden items-center justify-center p-4" id="modalVisualizacao">
+        <div class="bg-[#121212] border border-neutral-700 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b border-neutral-800 bg-black flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i data-lucide="eye" class="text-orange-500"></i> Visualização</h2>
+                <button onclick="fecharModalVisualizacao()" class="text-neutral-500 hover:text-white"><i data-lucide="x"></i></button>
             </div>
-            
-            <div id="visualizacao-loading" style="display: none; color: var(--primary); text-align: center; padding: 40px; font-weight: bold; font-size: 1.2rem;">
-                Carregando informações fiscais...
-            </div>
-            
-            <div id="visualizacao-content">
-                <!-- Conteúdo injetado via JS -->
-            </div>
+            <div id="visualizacao-content" class="p-8 overflow-y-auto flex-1 space-y-8"></div>
         </div>
     </div>
 
     <script>
-        // --- NAVEGAÇÃO ENTRE TELAS ---
-        function mudarView(viewId, elementoBotao) {
-            // Esconder todas as views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            // Remover 'active' de todos os botões
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        // Inicialização
+        lucide.createIcons();
+        window.onload = () => { initDB(); carregarTabelaHistorico(); carregarTabelaMapeados(); };
+
+        // --- LÓGICA DE NAVEGAÇÃO ---
+        function mudarView(viewId, btn) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
             
-            // Ativar a view e o botão corretos
-            document.getElementById(viewId).classList.add('active');
-            if(elementoBotao) elementoBotao.classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-orange-600', 'text-white');
+                b.classList.add('text-neutral-300');
+            });
+            btn.classList.add('bg-orange-600', 'text-white');
+            btn.classList.remove('text-neutral-300');
 
-            // Limpa as buscas ao trocar de aba e recarrega os dados originais
-            document.getElementById('pesquisaHistorico').value = '';
-            document.getElementById('pesquisaMapeados').value = '';
-
-            // Atualizar os dados
-            if(viewId === 'view-historico') carregarTabelaHistorico();
-            if(viewId === 'view-mapeados') carregarTabelaMapeados();
+            if (window.innerWidth < 768) toggleMenu();
         }
 
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        function toggleMenu() { sidebar.classList.toggle('-translate-x-full'); overlay.classList.toggle('hidden'); }
+        mobileBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
 
-        // --- UTILITÁRIOS ---
-        function formatarDataBR(dataIso) {
-            if(!dataIso) return null;
-            const partes = dataIso.split('-');
-            if(partes.length !== 3) return dataIso;
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-
-        // --- BANCO DE DADOS LOCAL (CNAEs) ---
+        // --- FUNCIONALIDADES DO RAIO X (LOGICA ORIGINAL ADAPTADA) ---
+        
+        function formatarDataBR(d) { if(!d) return null; const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+        
         function initDB() {
             if (!localStorage.getItem('raiox_db_cnaes')) {
-                const baseInicial = {
-                    "6201500": { 
-                        descricao: "Desenvolvimento de programas de computador sob encomenda", 
-                        enquadramentos: [{ 
-                            codMunicipal: "01.01", 
-                            codFederal: "1.01", 
-                            anexo: "Anexo III ou V (Fator R)", 
-                            nota: "Se a folha de pagamento for >= 28% do faturamento (Fator R), tributa pelo Anexo III. Caso contrário, Anexo V." 
-                        }] 
-                    }
-                };
-                localStorage.setItem('raiox_db_cnaes', JSON.stringify(baseInicial));
+                localStorage.setItem('raiox_db_cnaes', JSON.stringify({
+                    "6201500": { descricao: "Desenvolvimento de programas de computador", enquadramentos: [{ codMunicipal: "01.01", codFederal: "1.01", anexo: "Anexo III ou V (Fator R)", nota: "Regra do Fator R: 28% da folha." }] }
+                }));
             }
         }
 
-        function getMapeamentoDB(codigoCnaeLimpo) {
-            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
-            return db[codigoCnaeLimpo] || null;
+        function getMapeamentoDB(c) { return JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}')[c] || null; }
+
+        function aplicarMascaraCNPJ(i) {
+            let v = i.value.replace(/\D/g, '');
+            if (v.length > 14) v = v.slice(0, 14);
+            if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+            else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4}).*/, '$1.$2.$3/$4');
+            i.value = v;
         }
-
-        function atualizarMapeamentoDB(codigo, dadosMapeados) {
-            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
-            db[codigo] = dadosMapeados;
-            localStorage.setItem('raiox_db_cnaes', JSON.stringify(db));
-        }
-
-        function deletarMapeamentoDB(codigo) {
-            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
-            if(db[codigo]) {
-                delete db[codigo];
-                localStorage.setItem('raiox_db_cnaes', JSON.stringify(db));
-            }
-        }
-
-
-        // --- FUNÇÕES DE MÁSCARA E BUSCAS NAS TABELAS ---
-        function aplicarMascaraCNPJ(input) {
-            let value = input.value.replace(/\D/g, ''); 
-            if (value.length > 14) value = value.slice(0, 14);
-            if (value.length > 12) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
-            else if (value.length > 8) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4}).*/, '$1.$2.$3/$4');
-            else if (value.length > 5) value = value.replace(/^(\d{2})(\d{3})(\d{3}).*/, '$1.$2.$3');
-            else if (value.length > 2) value = value.replace(/^(\d{2})(\d{3}).*/, '$1.$2');
-            input.value = value;
-        }
-
-        function filtrarHistorico() {
-            const input = document.getElementById("pesquisaHistorico");
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById("tabela-historico");
-            const tr = table.getElementsByTagName("tr");
-
-            for (let i = 0; i < tr.length; i++) {
-                let tdCnpj = tr[i].getElementsByTagName("td")[0];
-                let tdNome = tr[i].getElementsByTagName("td")[1];
-                
-                // Ignorar linha de mensagem "sem registros" se houver (possui colspan)
-                if(tdCnpj && tdCnpj.colSpan > 1) continue;
-
-                if (tdCnpj && tdNome) {
-                    let txtCnpj = tdCnpj.textContent || tdCnpj.innerText;
-                    let txtNome = tdNome.textContent || tdNome.innerText;
-                    if (txtCnpj.toUpperCase().indexOf(filter) > -1 || txtNome.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-
-        function filtrarMapeados() {
-            const input = document.getElementById("pesquisaMapeados");
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById("tabela-mapeados");
-            const tr = table.getElementsByTagName("tr");
-
-            for (let i = 0; i < tr.length; i++) {
-                let tdCnae = tr[i].getElementsByTagName("td")[0];
-                let tdDesc = tr[i].getElementsByTagName("td")[1];
-                let tdEnq = tr[i].getElementsByTagName("td")[2];
-                
-                // Ignorar linha de mensagem "sem registros"
-                if(tdCnae && tdCnae.colSpan > 1) continue;
-
-                if (tdCnae && tdDesc && tdEnq) {
-                    let txtCnae = tdCnae.textContent || tdCnae.innerText;
-                    let txtDesc = tdDesc.textContent || tdDesc.innerText;
-                    let txtEnq = tdEnq.textContent || tdEnq.innerText;
-                    
-                    if (txtCnae.toUpperCase().indexOf(filter) > -1 || 
-                        txtDesc.toUpperCase().indexOf(filter) > -1 || 
-                        txtEnq.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-
-
-        // --- FUNÇÃO PRINCIPAL DE BUSCA (API REAL) ---
-        let ultimosDadosReceita = null;
 
         async function buscarCNPJ() {
-            const inputVal = document.getElementById('cnpjInput').value;
-            const cnpjLimpo = inputVal.replace(/\D/g, ''); 
-            
-            if (cnpjLimpo.length !== 14) {
-                alert("Por favor, digite um CNPJ válido com 14 dígitos.");
-                return;
-            }
+            const cnpjLimpo = document.getElementById('cnpjInput').value.replace(/\D/g, '');
+            if (cnpjLimpo.length !== 14) return alert("CNPJ inválido.");
 
-            document.getElementById('result-container').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('btnBuscar').disabled = true;
+            const btn = document.getElementById('btnBuscar');
+            const load = document.getElementById('loading');
+            const res = document.getElementById('result-container');
 
-            try {
-                const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);
-                if (!response.ok) throw new Error('CNPJ não encontrado ou erro na base da Receita Federal.');
-                
-                ultimosDadosReceita = await response.json();
-                renderizarTela(ultimosDadosReceita);
-                salvarHistoricoPesquisa(inputVal, ultimosDadosReceita.razao_social);
-            } catch (error) {
-                alert(error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('btnBuscar').disabled = false;
-            }
-        }
-
-
-        // --- RENDERIZAÇÃO DA TELA DE RESULTADOS ---
-        function gerarHtmlEmpresaGeral(dados) {
-            const corSituacao = dados.descricao_situacao_cadastral === 'ATIVA' ? 'var(--success)' : 'var(--danger)';
-            const dataAbertura = formatarDataBR(dados.data_inicio_atividade) || "Não informada";
-            
-            let htmlDataEncerramento = '';
-            if (dados.descricao_situacao_cadastral !== 'ATIVA' && dados.data_baixa) {
-                htmlDataEncerramento = `
-                    <div class="info-group">
-                        <span class="label" style="color: var(--danger)">DATA DE ENCERRAMENTO</span>
-                        <span class="value">${formatarDataBR(dados.data_baixa)}</span>
-                    </div>
-                `;
-            }
-
-            let regimeTexto = "Normal (Lucro Presumido/Real)";
-            let corRegime = "var(--warning)";
-            if (dados.opcao_pelo_mei) { regimeTexto = "MEI"; corRegime = "var(--info)"; } 
-            else if (dados.opcao_pelo_simples) { regimeTexto = "Simples Nacional"; corRegime = "var(--success)"; }
-
-            return `
-                <div class="info-group">
-                    <span class="label">RAZÃO SOCIAL</span>
-                    <span class="value">${dados.razao_social}</span>
-                </div>
-                <div class="info-group">
-                    <span class="label">SITUAÇÃO CADASTRAL</span>
-                    <span class="value" style="color: ${corSituacao}; font-weight: bold;">${dados.descricao_situacao_cadastral}</span>
-                </div>
-                <div class="info-group">
-                    <span class="label">DATA DE ABERTURA</span>
-                    <span class="value">${dataAbertura}</span>
-                </div>
-                ${htmlDataEncerramento}
-                <div class="info-group">
-                    <span class="label">REGIME TRIBUTÁRIO (Apurado)</span>
-                    <span class="value" style="color: ${corRegime}; font-weight: bold;">${regimeTexto}</span>
-                </div>
-            `;
-        }
-
-        function gerarHtmlCnaes(dados, somenteLeitura = false) {
-            let htmlFinal = '';
-            let listaCnaes = [];
-            if(dados.cnae_fiscal) listaCnaes.push({ codigo: dados.cnae_fiscal, descricao: dados.cnae_fiscal_descricao, tipo: "PRINCIPAL" });
-            if (dados.cnaes_secundarios) {
-                dados.cnaes_secundarios.forEach(c => listaCnaes.push({ codigo: c.codigo, descricao: c.descricao, tipo: "SECUNDÁRIO" }));
-            }
-
-            listaCnaes.forEach(cnae => {
-                const cnaeLimpo = String(cnae.codigo).replace(/\D/g, '');
-                const codigoFormatado = cnaeLimpo.replace(/^(\d{4})(\d{1})(\d{2}).*/, '$1-$2/$3');
-                const mapeamento = getMapeamentoDB(cnaeLimpo);
-                
-                let conteudoHTML = "";
-                let botoesHTML = "";
-                const cnaeDataStr = `'${cnaeLimpo}', '${cnae.descricao.replace(/'/g, "\\'")}'`;
-
-                if (mapeamento) {
-                    let listaEnq = mapeamento.enquadramentos || [];
-                    
-                    if (listaEnq.length === 0 && mapeamento.servico) {
-                        listaEnq.push({ codMunicipal: mapeamento.servico, codFederal: "", anexo: mapeamento.anexo, nota: mapeamento.nota });
-                    }
-
-                    let enquadramentosHTML = listaEnq.map(enq => `
-                        <div class="enquadramento-box">
-                            <div class="details-grid">
-                                <div><span style="color: var(--text-dim); font-size: 0.85rem;">Cód. Municipal:</span> <br><strong>${enq.codMunicipal || '-'}</strong></div>
-                                <div><span style="color: var(--text-dim); font-size: 0.85rem;">Cód. Federal:</span> <br><strong>${enq.codFederal || '-'}</strong></div>
-                                <div><span style="color: var(--text-dim); font-size: 0.85rem;">Anexo:</span> <br><span class="badge-anexo">${enq.anexo || '-'}</span></div>
-                            </div>
-                            ${enq.nota ? `<div class="fator-r-alert">⚠️ ${enq.nota}</div>` : ''}
-                        </div>
-                    `).join('');
-
-                    conteudoHTML = enquadramentosHTML;
-                    
-                    if(!somenteLeitura) {
-                        botoesHTML = `
-                            <button class="btn-small edit" onclick="abrirModal(${cnaeDataStr})">Editar Info</button>
-                            <button class="btn-small delete" onclick="excluirMapeamento('${cnaeLimpo}')">Excluir</button>
-                        `;
-                    }
-                } else {
-                    conteudoHTML = `<div class="unmapped-alert">Nenhum enquadramento mapeado para este CNAE no banco de dados.</div>`;
-                    if(!somenteLeitura) {
-                        botoesHTML = `<button class="btn-small edit" onclick="abrirModal(${cnaeDataStr})">+ Mapear CNAE</button>`;
-                    }
-                }
-
-                htmlFinal += `
-                    <div class="cnae-card">
-                        <div class="cnae-actions">${botoesHTML}</div>
-                        <div class="cnae-header">CNAE ${cnae.tipo}: ${codigoFormatado}</div>
-                        <div class="cnae-desc">${cnae.descricao}</div>
-                        ${conteudoHTML}
-                    </div>
-                `;
-            });
-            
-            return htmlFinal;
-        }
-
-        function renderizarTela(dados) {
-            document.getElementById('empresa-geral').innerHTML = gerarHtmlEmpresaGeral(dados);
-            document.getElementById('cnae-list').innerHTML = gerarHtmlCnaes(dados, false);
-            document.getElementById('result-container').style.display = 'block';
-        }
-
-
-        // --- LÓGICA DO MODAL (ESTRUTURA NOVA POR LINHA) ---
-        function abrirModal(codigo, descricao) {
-            document.getElementById('modalMapeamento').style.display = 'flex';
-            document.getElementById('modCnaeCod').value = codigo;
-            document.getElementById('modCnaeDesc').value = descricao || "Descrição não encontrada";
-            document.getElementById('enquadramentos-container').innerHTML = ''; 
-            
-            const mapeamento = getMapeamentoDB(codigo);
-            if(mapeamento) {
-                let listaEnq = mapeamento.enquadramentos || [];
-                
-                // Compatibilidade com a versão antiga do modal
-                if (listaEnq.length === 0 && mapeamento.servico) {
-                    listaEnq.push({ codMunicipal: mapeamento.servico, codFederal: "", anexo: mapeamento.anexo, nota: mapeamento.nota });
-                }
-
-                if (listaEnq.length > 0) {
-                    listaEnq.forEach(enq => adicionarLinhaEnquadramento(enq.codMunicipal, enq.codFederal, enq.anexo, enq.nota));
-                } else {
-                    adicionarLinhaEnquadramento(); 
-                }
-            } else {
-                adicionarLinhaEnquadramento(); 
-            }
-        }
-
-        function adicionarLinhaEnquadramento(codMun = '', codFed = '', anexo = '', nota = '') {
-            const container = document.getElementById('enquadramentos-container');
-            const row = document.createElement('div');
-            row.className = 'enquadramento-row';
-            row.innerHTML = `
-                <button type="button" class="btn-remove-row" onclick="this.parentElement.remove()" title="Remover Situação">🗑️</button>
-                <div class="row-grid-inputs">
-                    <div class="form-group">
-                        <label>Cód. Municipal</label>
-                        <input type="text" class="input-mun" placeholder="Ex: 01.01" value="${codMun}">
-                    </div>
-                    <div class="form-group">
-                        <label>Cód. Federal</label>
-                        <input type="text" class="input-fed" placeholder="Ex: 1.01" value="${codFed}">
-                    </div>
-                    <div class="form-group">
-                        <label>Anexo Tributário</label>
-                        <input type="text" class="input-anexo" placeholder="Ex: Anexo III ou V" value="${anexo}">
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Alerta / Nota Explicativa para esta situação</label>
-                    <textarea class="input-nota" rows="2" placeholder="Ex: Regra do Fator R, isenções, etc...">${nota}</textarea>
-                </div>
-            `;
-            container.appendChild(row);
-        }
-
-        function fecharModal() {
-            document.getElementById('modalMapeamento').style.display = 'none';
-        }
-
-        function salvarMapeamento() {
-            const codigo = document.getElementById('modCnaeCod').value;
-            const descricao = document.getElementById('modCnaeDesc').value;
-            
-            const rows = document.querySelectorAll('.enquadramento-row');
-            let enquadramentos = [];
-            
-            rows.forEach(row => {
-                const codMunicipal = row.querySelector('.input-mun').value.trim();
-                const codFederal = row.querySelector('.input-fed').value.trim();
-                const anexo = row.querySelector('.input-anexo').value.trim();
-                const nota = row.querySelector('.input-nota').value.trim();
-                
-                if (codMunicipal || codFederal || anexo) {
-                    enquadramentos.push({ codMunicipal, codFederal, anexo, nota });
-                }
-            });
-
-            if(enquadramentos.length === 0) {
-                alert("Adicione pelo menos um Código ou Anexo válido.");
-                return;
-            }
-
-            atualizarMapeamentoDB(codigo, { descricao, enquadramentos });
-            fecharModal();
-            carregarTabelaMapeados(); // Se estiver na tela de planilhas, atualiza.
-
-            if(document.getElementById('view-busca').classList.contains('active') && ultimosDadosReceita) {
-                renderizarTela(ultimosDadosReceita);
-            }
-        }
-
-        function excluirMapeamento(codigo) {
-            if(confirm("Tem certeza que deseja excluir o mapeamento deste CNAE?")) {
-                deletarMapeamentoDB(codigo);
-                carregarTabelaMapeados();
-                if(document.getElementById('view-busca').classList.contains('active') && ultimosDadosReceita) {
-                    renderizarTela(ultimosDadosReceita);
-                }
-            }
-        }
-
-
-        // --- VISUALIZAÇÃO (MODAL DE LEITURA RÁPIDA) ---
-        async function visualizarHistorico(cnpj) {
-            const cnpjLimpo = cnpj.replace(/\D/g, ''); 
-            
-            document.getElementById('modalVisualizacao').style.display = 'flex';
-            document.getElementById('visualizacao-content').innerHTML = '';
-            document.getElementById('visualizacao-loading').style.display = 'block';
+            res.classList.add('hidden');
+            load.classList.remove('hidden');
+            btn.disabled = true;
 
             try {
                 const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);
-                if (!response.ok) throw new Error('CNPJ não encontrado ou erro na base da Receita Federal.');
-                
+                if (!response.ok) throw new Error('CNPJ não encontrado.');
                 const dados = await response.json();
                 
-                const htmlEmpresa = gerarHtmlEmpresaGeral(dados);
-                const htmlCnaes = gerarHtmlCnaes(dados, true); // true = somente leitura (oculta os botões de edição)
-                
-                document.getElementById('visualizacao-content').innerHTML = `
-                    <div class="card-info" style="margin-bottom: 25px;">${htmlEmpresa}</div>
-                    <div class="section-title" style="font-size: 1.3rem;"><span>CNAEs e Enquadramento Fiscal</span></div>
-                    <div>${htmlCnaes}</div>
-                `;
-                
-            } catch (error) {
-                document.getElementById('visualizacao-content').innerHTML = `<div style="color: var(--danger); text-align: center; font-size: 1.2rem;">${error.message}</div>`;
-            } finally {
-                document.getElementById('visualizacao-loading').style.display = 'none';
-            }
+                renderizarTela(dados);
+                salvarHistoricoPesquisa(document.getElementById('cnpjInput').value, dados.razao_social);
+            } catch (e) { alert(e.message); } 
+            finally { load.classList.add('hidden'); btn.disabled = false; }
         }
 
-        function visualizarCnae(codigo) {
-            const map = getMapeamentoDB(codigo);
-            if(!map) return;
-            
-            document.getElementById('modalVisualizacao').style.display = 'flex';
-            document.getElementById('visualizacao-loading').style.display = 'none';
-            
-            const codigoFormatado = codigo.replace(/^(\d{4})(\d{1})(\d{2}).*/, '$1-$2/$3');
-            const desc = map.descricao || "Descrição não registrada";
-            
-            let listaEnq = map.enquadramentos || [];
-            if (listaEnq.length === 0 && map.servico) {
-                listaEnq.push({ codMunicipal: map.servico, codFederal: "", anexo: map.anexo, nota: map.nota });
-            }
+        function renderizarTela(d) {
+            const container = document.getElementById('empresa-geral');
+            const situacaoCor = d.descricao_situacao_cadastral === 'ATIVA' ? 'text-green-500' : 'text-red-500';
+            const regime = d.opcao_pelo_mei ? 'MEI' : (d.opcao_pelo_simples ? 'Simples Nacional' : 'Lucro Presumido/Real');
 
-            let enquadramentosHTML = listaEnq.map(enq => `
-                <div class="enquadramento-box">
-                    <div class="details-grid">
-                        <div><span style="color: var(--text-dim); font-size: 0.85rem;">Cód. Municipal:</span> <br><strong>${enq.codMunicipal || '-'}</strong></div>
-                        <div><span style="color: var(--text-dim); font-size: 0.85rem;">Cód. Federal:</span> <br><strong>${enq.codFederal || '-'}</strong></div>
-                        <div><span style="color: var(--text-dim); font-size: 0.85rem;">Anexo:</span> <br><span class="badge-anexo">${enq.anexo || '-'}</span></div>
-                    </div>
-                    ${enq.nota ? `<div class="fator-r-alert">⚠️ ${enq.nota}</div>` : ''}
-                </div>
-            `).join('');
-
-            const html = `
-                <div class="cnae-card" style="border-color: var(--primary);">
-                    <div class="cnae-header">CNAE: ${codigoFormatado}</div>
-                    <div class="cnae-desc">${desc}</div>
-                    ${enquadramentosHTML || '<div class="unmapped-alert">Sem enquadramentos definidos.</div>'}
-                </div>
+            container.innerHTML = `
+                <div class="card-base"><span class="label-style">Razão Social</span><div class="value-style truncate" title="${d.razao_social}">${d.razao_social}</div></div>
+                <div class="card-base"><span class="label-style">Situação</span><div class="value-style ${situacaoCor}">${d.descricao_situacao_cadastral}</div></div>
+                <div class="card-base"><span class="label-style">Abertura</span><div class="value-style">${formatarDataBR(d.data_inicio_atividade)}</div></div>
+                <div class="card-base"><span class="label-style">Regime</span><div class="value-style text-orange-400">${regime}</div></div>
             `;
-            
-            document.getElementById('visualizacao-content').innerHTML = html;
+
+            document.getElementById('cnae-list').innerHTML = gerarHtmlCnaes(d);
+            document.getElementById('result-container').classList.remove('hidden');
+            lucide.createIcons();
         }
 
-        function fecharModalVisualizacao() {
-            document.getElementById('modalVisualizacao').style.display = 'none';
-        }
+        function gerarHtmlCnaes(d, readonly = false) {
+            let list = [{ cod: d.cnae_fiscal, desc: d.cnae_fiscal_descricao, tipo: "PRINCIPAL" }];
+            if (d.cnaes_secundarios) d.cnaes_secundarios.forEach(c => list.push({ cod: c.codigo, desc: c.descricao, tipo: "SECUNDÁRIO" }));
 
-
-        // --- PLANILHAS (TELA 2 E 3) ---
-
-        // TELA 2: HISTÓRICO
-        function salvarHistoricoPesquisa(cnpj, nome) {
-            let historico = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
-            historico = historico.filter(h => h.cnpj !== cnpj);
-            historico.unshift({ cnpj, nome });
-            if (historico.length > 30) historico.pop(); // Armazena até 30
-            localStorage.setItem('raiox_hist', JSON.stringify(historico));
-        }
-
-        function carregarTabelaHistorico() {
-            const tbody = document.getElementById('tabela-historico');
-            const historico = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
-            
-            if(historico.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Nenhum cliente consultado ainda.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = historico.map(h => `
-                <tr>
-                    <td style="font-weight: bold; color: #fff;">${h.cnpj}</td>
-                    <td>${h.nome}</td>
-                    <td style="text-align: right; white-space: nowrap; vertical-align: middle;">
-                        <button class="btn-small view" onclick="visualizarHistorico('${h.cnpj}')" title="Visualizar a consulta">👁️</button>
-                        <button class="btn-small edit" onclick="editarHistorico('${h.cnpj}')">Editar</button>
-                        <button class="btn-small delete" onclick="excluirHistorico('${h.cnpj}')">Excluir</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function excluirHistorico(cnpj) {
-            if(confirm("Tem certeza que deseja remover este cliente do histórico?")) {
-                let historico = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
-                historico = historico.filter(h => h.cnpj !== cnpj);
-                localStorage.setItem('raiox_hist', JSON.stringify(historico));
-                carregarTabelaHistorico(); // Atualiza a tabela na tela
-            }
-        }
-
-        function editarHistorico(cnpj) {
-            let historico = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
-            let index = historico.findIndex(h => h.cnpj === cnpj);
-            
-            if (index !== -1) {
-                let novoNome = prompt("Editar identificação (nome/apelido) da empresa no histórico:", historico[index].nome);
-                if (novoNome !== null && novoNome.trim() !== "") {
-                    historico[index].nome = novoNome.trim();
-                    localStorage.setItem('raiox_hist', JSON.stringify(historico));
-                    carregarTabelaHistorico(); // Atualiza a tabela na tela
-                }
-            }
-        }
-
-        // TELA 3: MAPEADOS
-        function carregarTabelaMapeados() {
-            const tbody = document.getElementById('tabela-mapeados');
-            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
-            const chaves = Object.keys(db);
-
-            if(chaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum CNAE salvo no banco de dados.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = chaves.map(codigo => {
-                const map = db[codigo];
-                const codigoFormatado = codigo.replace(/^(\d{4})(\d{1})(\d{2}).*/, '$1-$2/$3');
-                const desc = map.descricao || "Descrição não registrada";
-                const cnaeDataStr = `'${codigo}', '${desc.replace(/'/g, "\\'")}'`;
-
-                // Montar a visualização dos múltiplos enquadramentos daquele CNAE
-                const enquadramentosHtml = (map.enquadramentos || []).map(enq => {
-                    let parts = [];
-                    if(enq.codMunicipal) parts.push(`Mun: <strong>${enq.codMunicipal}</strong>`);
-                    if(enq.codFederal) parts.push(`Fed: <strong>${enq.codFederal}</strong>`);
-                    if(enq.anexo) parts.push(`Anexo: <span style="color:var(--primary); font-weight:bold;">${enq.anexo}</span>`);
-                    return `<div style="font-size: 0.85rem; padding: 4px 0; border-bottom: 1px dashed #333; margin-bottom: 2px;">${parts.join(' | ')}</div>`;
-                }).join('') || '<span style="color: #666; font-style: italic;">Sem enquadramentos</span>';
-
+            return list.map(c => {
+                const map = getMapeamentoDB(String(c.cod));
+                const cnaeParams = `'${c.cod}', '${c.desc.replace(/'/g, "\\'")}'`;
+                
                 return `
-                    <tr>
-                        <td style="font-weight: bold; color: var(--info);">${codigoFormatado}</td>
-                        <td>${desc}</td>
-                        <td>${enquadramentosHtml}</td>
-                        <td style="text-align: right; white-space: nowrap; vertical-align: middle;">
-                            <button class="btn-small view" onclick="visualizarCnae('${codigo}')" title="Visualizar a regra">👁️</button>
-                            <button class="btn-small edit" onclick="abrirModal(${cnaeDataStr})">Editar</button>
-                            <button class="btn-small delete" onclick="excluirMapeamento('${codigo}')">Excluir</button>
-                        </td>
-                    </tr>
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 relative group overflow-hidden">
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <span class="text-[10px] font-black text-orange-500/50 uppercase tracking-tighter">${c.tipo}</span>
+                                <h4 class="text-lg font-bold text-white mt-1">${c.cod.toString().replace(/^(\d{4})(\d{1})(\d{2}).*/, '$1-$2/$3')}</h4>
+                                <p class="text-sm text-neutral-400 mb-4">${c.desc}</p>
+                                
+                                <div class="space-y-3">
+                                    ${map ? map.enquadramentos.map(e => `
+                                        <div class="bg-black/40 border border-neutral-800 p-4 rounded-lg">
+                                            <div class="grid grid-cols-3 gap-4 text-[10px] uppercase font-bold tracking-wider mb-2">
+                                                <div class="text-neutral-500">Mun: <span class="text-white">${e.codMunicipal || '-'}</span></div>
+                                                <div class="text-neutral-500">Fed: <span class="text-white">${e.codFederal || '-'}</span></div>
+                                                <div class="text-orange-500">${e.anexo || '-'}</div>
+                                            </div>
+                                            ${e.nota ? `<p class="text-xs text-neutral-500 italic flex items-center gap-1"><i data-lucide="info" class="w-3 h-3 text-orange-500"></i> ${e.nota}</p>` : ''}
+                                        </div>
+                                    `).join('') : '<span class="text-xs text-neutral-600 italic">CNAE não mapeado no banco de dados.</span>'}
+                                </div>
+                            </div>
+                            ${!readonly ? `
+                            <div class="flex gap-2">
+                                <button onclick="abrirModal(${cnaeParams})" class="p-2 bg-neutral-800 hover:bg-orange-600 text-white rounded-lg transition-colors"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                                ${map ? `<button onclick="excluirMapeamento('${c.cod}')" class="p-2 bg-neutral-800 hover:bg-red-600 text-white rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+                            </div>` : ''}
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
 
-        // Permitir buscar apertando "Enter" no input de busca
-        document.getElementById('cnpjInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') buscarCNPJ();
-        });
+        // --- LOGICA DO MODAL ---
+        function abrirModal(cod, desc) {
+            document.getElementById('modalMapeamento').classList.remove('hidden');
+            document.getElementById('modalMapeamento').classList.add('flex');
+            document.getElementById('modCnaeCod').value = cod;
+            document.getElementById('modCnaeDesc').value = desc;
+            document.getElementById('enquadramentos-container').innerHTML = '';
+            
+            const map = getMapeamentoDB(cod);
+            if (map && map.enquadramentos) map.enquadramentos.forEach(e => adicionarLinhaEnquadramento(e.codMunicipal, e.codFederal, e.anexo, e.nota));
+            else adicionarLinhaEnquadramento();
+            lucide.createIcons();
+        }
 
-        // Inicia o sistema
-        window.onload = initDB;
+        function adicionarLinhaEnquadramento(m='', f='', a='', n='') {
+            const div = document.createElement('div');
+            div.className = 'bg-black p-4 rounded-xl border border-neutral-800 relative space-y-3';
+            div.innerHTML = `
+                <button onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                <div class="grid grid-cols-3 gap-3">
+                    <input type="text" class="input-mun bg-neutral-900 border border-neutral-800 p-2 rounded text-xs text-white" placeholder="Cód. Mun" value="${m}">
+                    <input type="text" class="input-fed bg-neutral-900 border border-neutral-800 p-2 rounded text-xs text-white" placeholder="Cód. Fed" value="${f}">
+                    <input type="text" class="input-anexo bg-neutral-900 border border-neutral-800 p-2 rounded text-xs text-white" placeholder="Anexo" value="${a}">
+                </div>
+                <textarea class="input-nota w-full bg-neutral-900 border border-neutral-800 p-2 rounded text-xs text-white" placeholder="Notas/Observações">${n}</textarea>
+            `;
+            document.getElementById('enquadramentos-container').appendChild(div);
+            lucide.createIcons();
+        }
 
+        function fecharModal() { document.getElementById('modalMapeamento').classList.add('hidden'); }
+
+        function salvarMapeamento() {
+            const cod = document.getElementById('modCnaeCod').value;
+            const desc = document.getElementById('modCnaeDesc').value;
+            const enqs = [];
+            document.querySelectorAll('#enquadramentos-container > div').forEach(row => {
+                enqs.push({
+                    codMunicipal: row.querySelector('.input-mun').value,
+                    codFederal: row.querySelector('.input-fed').value,
+                    anexo: row.querySelector('.input-anexo').value,
+                    nota: row.querySelector('.input-nota').value
+                });
+            });
+            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
+            db[cod] = { descricao: desc, enquadramentos: enqs };
+            localStorage.setItem('raiox_db_cnaes', JSON.stringify(db));
+            fecharModal();
+            carregarTabelaMapeados();
+            location.reload(); // Para atualizar a vista de busca se necessário
+        }
+
+        function excluirMapeamento(cod) {
+            if(!confirm("Excluir mapeamento?")) return;
+            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
+            delete db[cod];
+            localStorage.setItem('raiox_db_cnaes', JSON.stringify(db));
+            carregarTabelaMapeados();
+            location.reload();
+        }
+
+        // --- TABELAS ---
+        function salvarHistoricoPesquisa(c, n) {
+            let h = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
+            h = h.filter(x => x.cnpj !== c);
+            h.unshift({ cnpj: c, nome: n });
+            localStorage.setItem('raiox_hist', JSON.stringify(h.slice(0, 30)));
+            carregarTabelaHistorico();
+        }
+
+        function carregarTabelaHistorico() {
+            const h = JSON.parse(localStorage.getItem('raiox_hist') || '[]');
+            document.getElementById('tabela-historico').innerHTML = h.map(x => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-5 font-mono text-orange-400">${x.cnpj}</td>
+                    <td class="p-5 text-white font-medium">${x.nome}</td>
+                    <td class="p-5 text-right">
+                        <button onclick="visualizarHistorico('${x.cnpj}')" class="text-neutral-500 hover:text-white p-2"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" class="p-10 text-center text-neutral-600">Nenhum histórico encontrado.</td></tr>';
+            lucide.createIcons();
+        }
+
+        function carregarTabelaMapeados() {
+            const db = JSON.parse(localStorage.getItem('raiox_db_cnaes') || '{}');
+            const keys = Object.keys(db);
+            document.getElementById('tabela-mapeados').innerHTML = keys.map(k => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-5 font-bold text-orange-500">${k}</td>
+                    <td class="p-5 text-neutral-300 text-xs">${db[k].descricao}</td>
+                    <td class="p-5">
+                        <div class="flex flex-wrap gap-1">
+                            ${db[k].enquadramentos.map(e => `<span class="bg-orange-500/10 text-orange-500 text-[9px] px-2 py-0.5 rounded border border-orange-500/20">${e.anexo || 'S/A'}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-5 text-right">
+                        <button onclick="abrirModal('${k}', '${db[k].descricao}')" class="text-neutral-500 hover:text-orange-500 p-2"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" class="p-10 text-center text-neutral-600">Nenhum CNAE mapeado.</td></tr>';
+            lucide.createIcons();
+        }
+
+        async function visualizarHistorico(cnpj) {
+            const cnpjLimpo = cnpj.replace(/\D/g, '');
+            document.getElementById('modalVisualizacao').classList.remove('hidden');
+            document.getElementById('modalVisualizacao').classList.add('flex');
+            const content = document.getElementById('visualizacao-content');
+            content.innerHTML = '<div class="text-orange-500 animate-pulse text-center p-10 font-bold">CARREGANDO...</div>';
+            
+            try {
+                const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);
+                const dados = await response.json();
+                
+                const situacaoCor = dados.descricao_situacao_cadastral === 'ATIVA' ? 'text-green-500' : 'text-red-500';
+                
+                content.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-black p-6 rounded-xl border border-neutral-800">
+                            <span class="label-style">Empresa</span><div class="text-xl font-bold text-white">${dados.razao_social}</div>
+                        </div>
+                        <div class="bg-black p-6 rounded-xl border border-neutral-800">
+                            <span class="label-style">Status</span><div class="text-xl font-bold ${situacaoCor}">${dados.descricao_situacao_cadastral}</div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">${gerarHtmlCnaes(dados, true)}</div>
+                `;
+                lucide.createIcons();
+            } catch (e) { content.innerHTML = "Erro ao carregar."; }
+        }
+
+        function fecharModalVisualizacao() { document.getElementById('modalVisualizacao').classList.add('hidden'); }
+
+        function filtrarHistorico() {
+            const filter = document.getElementById('pesquisaHistorico').value.toUpperCase();
+            const rows = document.querySelectorAll('#tabela-historico tr');
+            rows.forEach(row => {
+                const text = row.innerText.toUpperCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function filtrarMapeados() {
+            const filter = document.getElementById('pesquisaMapeados').value.toUpperCase();
+            const rows = document.querySelectorAll('#tabela-mapeados tr');
+            rows.forEach(row => {
+                const text = row.innerText.toUpperCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
     </script>
 </body>
 </html>
