@@ -100,36 +100,69 @@
 
         const DashboardView = () => {
             const [searchNews, setSearchNews] = useState('');
+            
+            // Manchetes simuladas dos portais oficiais fornecidos
             const allNews = [
                 { title: "RFB: Publicado novo regulamento do Imposto de Renda 2024", desc: "Instrução Normativa RFB nº 2178 consolida regras para o exercício atual.", date: "Hoje", url: "https://www.gov.br/receitafederal/pt-br/assuntos/noticias" },
                 { title: "IOB: Mudanças no ICMS-ST para o setor automotivo e eletrônicos", desc: "Convênio ICMS sofre alterações nas alíquotas internas e protocolos interestaduais.", date: "Ontem", url: "https://noticias.iob.com.br/" },
                 { title: "CRC-SP: Abertas inscrições para Exame de Suficiência 2024.1", desc: "Conselho abre período de inscrições para bacharéis de todo o estado.", date: "Hoje", url: "https://online.crcsp.org.br/portal/noticias/noticias.asp" },
                 { title: "Econet: Alerta sobre o vencimento da DEFIS e do DASN-SIMEI", desc: "Prazo final para entrega das obrigações acessórias do Simples Nacional se aproxima.", date: "2 dias atrás", url: "https://www.econeteditora.com.br/links_pagina_inicial/noticias20.php" },
                 { title: "Contábeis: Reforma Tributária - O que muda no Simples em 2025", desc: "Análise técnica sobre a transição para o IBS e CBS nas micro e pequenas empresas.", date: "Hoje", url: "https://www.contabeis.com.br/conteudo/noticias/" },
-                { title: "SEFAZ SP: Novos campos obrigatórios na NF-e para ICMS-ST", desc: "Nota Fiscal eletrônica ganha validações de preenchimento para base de cálculo retida.", date: "3 dias atrás", url: "https://portal.fazenda.sp.gov.br/Noticias" }
+                { title: "SEFAZ SP: Novos campos obrigatórios na NF-e para ICMS-ST", desc: "Nota Fiscal eletrônica ganha validações de preenchimento para base de cálculo retida.", date: "3 dias atrás", url: "https://portal.fazenda.sp.gov.br/Noticias" },
+                { title: "Cenofisco: Manual de Retenção de Serviços Tomados atualizado", desc: "Guia prático sobre ISS, PCC e IRRF de acordo com a nova IN 2110.", date: "4 dias atrás", url: "https://www.cenofisco.com.br/" },
+                { title: "Domínio: Webinar gratuito sobre FGTS Digital e eSocial", desc: "Sistemas Domínio realizam treinamento sobre a nova forma de recolhimento do FGTS.", date: "5 dias atrás", url: "https://www.dominiosistemas.com.br/blog/" },
+                { title: "Jornal Contábil: Passo a passo para a Declaração do IRPF", desc: "Tudo o que você precisa saber para não cair na malha fina este ano.", date: "1 semana atrás", url: "https://jornalcontabil.ig.com.br/" }
             ];
 
             const handleNewsSearch = (e) => {
                 e.preventDefault();
-                const domains = ["gov.br/receitafederal", "iob.com.br", "econeteditora.com.br", "crcsp.org.br", "contabeis.com.br", "fazenda.sp.gov.br", "cenofisco.com.br", "dominiosistemas.com.br"];
+                // Pesquisa no Google filtrando apenas pelos domínios confiáveis fornecidos
+                const domains = [
+                    "gov.br/receitafederal",
+                    "iob.com.br",
+                    "econeteditora.com.br",
+                    "crcsp.org.br",
+                    "contabeis.com.br",
+                    "fazenda.sp.gov.br",
+                    "cenofisco.com.br",
+                    "dominiosistemas.com.br",
+                    "jornalcontabil.ig.com.br"
+                ];
                 const siteFilter = domains.map(d => `site:${d}`).join(' OR ');
                 const googleSearchUrl = `https://www.google.com.br/search?q=(${siteFilter}) ${encodeURIComponent(searchNews)}`;
                 window.open(googleSearchUrl, '_blank');
             };
 
-            const obligationsMap = { 7: "FGTS Digital", 10: "IPI Dec.", 15: "Reinf/eSocial", 20: "DAS/DCTFWeb", 25: "IPI Mensal" };
+            const obligationsMap = {
+                7: "FGTS Digital / DAE Doméstico",
+                10: "IPI (Decendial)",
+                15: "EFD-Reinf / eSocial / EFD-Contribuições",
+                20: "PGDAS-D / DCTFWeb / INSS / IRRF",
+                25: "IPI (Mensal)",
+                31: "Fechamento Trimestral IRPJ/CSLL"
+            };
+
             const [currentDate, setCurrentDate] = useState(new Date());
+
+            const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+            const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+
             const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
             const startDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
             const totalDays = daysInMonth(currentDate.getMonth(), currentDate.getFullYear());
+
             const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
             const calendarCells = [];
             for (let i = 0; i < startDay; i++) calendarCells.push(<div key={`empty-${i}`} className="calendar-day day-empty"></div>);
             for (let d = 1; d <= totalDays; d++) {
                 const isObligationDay = obligationsMap[d];
-                const isToday = d === new Date().getDate() && currentDate.getMonth() === new Date().getMonth();
-                calendarCells.push(<div key={d} className={`calendar-day ${isObligationDay ? 'day-active' : ''} ${isToday ? 'day-today' : ''}`}>{d}</div>);
+                const isToday = d === new Date().getDate() && currentDate.getMonth() === new Date().getMonth() && currentDate.getFullYear() === new Date().getFullYear();
+                calendarCells.push(
+                    <div key={d} className={`calendar-day ${isObligationDay ? 'day-active' : ''} ${isToday ? 'day-today' : ''}`} title={isObligationDay || ""}>
+                        {d}
+                    </div>
+                );
             }
 
             return (
@@ -138,45 +171,72 @@
                         <div className="flex flex-col md:flex-row justify-between items-end border-b-2 border-orange-500 pb-2 mb-8 gap-4">
                             <h2 className="text-2xl font-bold text-white uppercase tracking-widest flex items-center gap-3 shrink-0"><Icon name="Newspaper" size={24}/> Radar Tributário</h2>
                             <form onSubmit={handleNewsSearch} className="relative w-full max-w-md">
-                                <input type="text" value={searchNews} onChange={(e) => setSearchNews(e.target.value)} placeholder="Pesquisar nos portais oficiais..." className="w-full bg-[#111] border border-gray-800 p-2 pl-10 rounded-xl text-xs text-white focus:border-orange-500 outline-none" />
+                                <input 
+                                    type="text" 
+                                    value={searchNews}
+                                    onChange={(e) => setSearchNews(e.target.value)}
+                                    placeholder="Pesquisar nos portais oficiais..." 
+                                    className="w-full bg-[#111] border border-gray-800 p-2 pl-10 rounded-xl text-xs text-white focus:border-orange-500 outline-none"
+                                />
                                 <Icon name="Search" size={14} className="absolute left-3 top-2.5 text-gray-500" />
                             </form>
                         </div>
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {allNews.map((n, i) => (
                                 <div key={i} className="p-5 rounded-2xl bg-[#111] border border-gray-800 hover:border-orange-500 transition-all cursor-pointer group flex flex-col justify-between shadow-xl">
                                     <div>
-                                        <span className="text-[9px] text-gray-500 font-mono bg-black/50 px-2 py-0.5 rounded">{n.date}</span>
-                                        <h4 className="text-sm font-bold text-white group-hover:text-orange-400 mt-2 mb-2">{n.title}</h4>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-[9px] text-gray-500 font-mono bg-black/50 px-2 py-0.5 rounded">{n.date}</span>
+                                        </div>
+                                        <h4 className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors leading-snug mb-3">{n.title}</h4>
                                         <p className="text-[11px] text-gray-400 line-clamp-3 mb-4">{n.desc}</p>
                                     </div>
-                                    <a href={n.url} target="_blank" className="text-orange-500 text-[10px] font-black uppercase flex items-center gap-1 group-hover:gap-2 transition-all">Ler matéria completa <Icon name="ChevronRight" size={12}/></a>
+                                    <a 
+                                        href={n.url} 
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-orange-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-1 group-hover:gap-2 transition-all"
+                                    >
+                                        Ler matéria completa <Icon name="ChevronRight" size={12}/>
+                                    </a>
                                 </div>
                             ))}
                         </div>
                     </div>
+
                     <div className="lg:col-span-1">
                         <div className="flex justify-between items-end border-b-2 border-cyan-500 pb-2 mb-8">
                             <h2 className="text-2xl font-bold text-white uppercase tracking-widest flex items-center gap-3"><Icon name="Calendar" size={24}/> Agenda</h2>
                         </div>
+                        
                         <div className="bg-[#111] border border-gray-800 rounded-[2rem] p-6 shadow-2xl mb-6">
                             <div className="flex justify-between items-center mb-6">
-                                <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))} className="p-1 hover:text-orange-500"><Icon name="ChevronLeft" size={18}/></button>
-                                <span className="text-xs font-black uppercase text-white">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
-                                <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))} className="p-1 hover:text-orange-500"><Icon name="ChevronRight" size={18}/></button>
+                                <button onClick={prevMonth} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-400 hover:text-orange-500"><Icon name="ChevronLeft" size={18}/></button>
+                                <span className="text-sm font-black uppercase tracking-tighter text-white text-center flex-1">{monthNames[currentDate.getMonth()]} de {currentDate.getFullYear()}</span>
+                                <button onClick={nextMonth} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-400 hover:text-orange-500"><Icon name="ChevronRight" size={18}/></button>
                             </div>
+                            
                             <div className="calendar-grid">
                                 {['D','S','T','Q','Q','S','S'].map(h => <div key={h} className="day-header">{h}</div>)}
                                 {calendarCells}
                             </div>
                         </div>
-                        <div className="space-y-3 bg-black/40 p-4 rounded-2xl border border-gray-900">
-                            {Object.entries(obligationsMap).map(([day, task]) => (
-                                <div key={day} className="flex items-center gap-3">
-                                    <div className="w-7 h-7 rounded-full bg-orange-600/20 border border-orange-500 flex items-center justify-center text-[10px] font-black text-orange-500">{day}</div>
-                                    <p className="text-[10px] font-bold text-gray-300 uppercase leading-tight">{task}</p>
-                                </div>
-                            ))}
+
+                        <div className="space-y-4 bg-black/40 p-4 rounded-2xl border border-gray-900">
+                            <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[3px] mb-4">Legenda de Vencimentos</h3>
+                            <div className="space-y-3">
+                                {Object.entries(obligationsMap).map(([day, task]) => (
+                                    <div key={day} className="flex items-start gap-3 group">
+                                        <div className="w-8 h-8 rounded-full bg-orange-600/10 border border-orange-500/30 flex items-center justify-center text-[10px] font-black text-orange-500 group-hover:bg-orange-500 group-hover:text-black transition-all shrink-0">
+                                            {day.padStart(2, '0')}
+                                        </div>
+                                        <div className="flex-1 border-b border-gray-800 pb-2">
+                                            <p className="text-[10px] font-bold text-gray-300 group-hover:text-white transition-colors uppercase leading-tight">{task}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,62 +250,82 @@
                     <Icon name={icon} size={72} className="text-orange-500 mb-6 mx-auto relative z-10" />
                     <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-widest relative z-10">{title}</h2>
                     <p className="text-gray-400 text-center max-w-lg mx-auto mb-10 leading-relaxed relative z-10 text-lg">
-                        {description || `Acesse o ambiente especializado deste departamento através do link seguro abaixo.`}
+                        {description || `Este módulo especializado possui um ambiente dedicado. Utilize o link de acesso direto abaixo para carregar as ferramentas deste departamento.`}
                     </p>
                     <div className="bg-black border border-gray-800 p-8 rounded-2xl flex flex-col items-center gap-6 relative z-10">
-                        <span className="text-lg font-bold text-cyan-400 font-mono italic">{filename}</span>
-                        <a href={filename} className="btn-access w-full py-4 px-12 rounded-xl text-black font-black uppercase tracking-widest text-sm text-center">Acessar Módulo Agora</a>
+                        <div className="flex flex-col gap-1 items-center">
+                            <span className="text-gray-500 text-[10px] uppercase font-black tracking-[3px]">Caminho do Arquivo</span>
+                            <span className="text-lg font-bold text-cyan-400 font-mono italic">{filename}</span>
+                        </div>
+                        <a 
+                            href={filename} 
+                            className="btn-access w-full py-4 px-12 rounded-xl text-black font-black uppercase tracking-widest text-sm text-center"
+                        >
+                            Acessar Módulo Agora
+                        </a>
                     </div>
                 </div>
             </div>
         );
 
+        // ==========================================
+        // APP PRINCIPAL
+        // ==========================================
         function App() {
           const [activeId, setActiveId] = useState('dashboard');
+          const [isUnlocked, setIsUnlocked] = useState(false);
+          const [pwdInput, setPwdInput] = useState('');
 
           const menu = [
             { name: 'Geral', items: [
                 { id: 'dashboard', name: 'Dashboard (Radar)', icon: 'Newspaper' },
-                { id: 'raiox', name: 'Raio-X Tributário', icon: 'Search', filename: 'Raio X Tributario.html' },
-                { id: 'simuladores', name: 'Central de Simuladores', icon: 'Zap', filename: 'Central de Simuladores.html' },
+                { id: 'raiox', name: 'Raio-X Tributário', icon: 'Search' },
+                { id: 'historico', name: 'Histórico de Consultas', icon: 'Clock' },
+                { id: 'simuladores', name: 'Central de Simuladores', icon: 'Zap' },
               ]},
             { name: 'Inteligência', items: [
-                { id: 'cnae_codserv', name: 'Cnae x Cod Serv', icon: 'Database', filename: 'Cnae_CodServ.html' },
-                { id: 'retencao_pers', name: 'Retenção Personalizada', icon: 'UserCheck', filename: 'Retencao_Personalizada.html' },
-                { id: 'ncm', name: 'Consulta NCM/CEST', icon: 'Barcode', filename: 'Consulta_NCM.html' },
-                { id: 'config_notas', name: 'Configurador de Notas', icon: 'ScrollText', filename: 'Configurador_Notas.html' },
+                { id: 'projecao', name: 'Projeção Tributária', icon: 'TrendingUp' },
+                { id: 'ncm', name: 'Consulta NCM/CEST', icon: 'Barcode' },
+                { id: 'config_notas', name: 'Configurador de Notas', icon: 'ScrollText' },
+                { id: 'cnae_codserv', name: 'Cnae x Cod Serv', icon: 'Database' },
+                { id: 'codigos_servico', name: 'Códigos de Serviço', icon: 'FileText' },
+                { id: 'retencao_pers', name: 'Retenção Personalizada', icon: 'UserCheck' },
               ]},
             { name: 'Departamentos', items: [
-                { id: 'dep_contabil', name: 'Contábil', icon: 'Calculator', filename: 'Contabil.html' },
-                { id: 'dep_dp', name: 'Dep. Pessoal (DP)', icon: 'Users', filename: 'Departamento pessoal.html' },
-                { id: 'dep_fiscal', name: 'Fiscal', icon: 'FileText', filename: 'Fiscal.html' },
-                { id: 'dep_obrigacoes', name: 'Obrigações Acessórias', icon: 'Calendar', filename: 'Obrigacoes acessorias.html' },
-                { id: 'dep_societario', name: 'Societário', icon: 'Building', filename: 'Societario.html' },
+                { id: 'dep_contabil', name: 'Contábil', icon: 'Calculator' },
+                { id: 'dep_dp', name: 'Dep. Pessoal (DP)', icon: 'Users' },
+                { id: 'dep_fiscal', name: 'Fiscal', icon: 'FileText' },
+                { id: 'dep_obrigacoes', name: 'Obrigações Acessórias', icon: 'Calendar' },
+                { id: 'dep_societario', name: 'Societário', icon: 'Building' },
+                { id: 'dep_exportacao', name: 'Exportação', icon: 'Globe' },
               ]},
             { name: 'Serviços Premium', items: [
-                { id: 'dep_restituicao', name: 'Recuperação Tributária', icon: 'Gem', filename: 'Restituição-recuperação.html' },
-                { id: 'dep_bpo', name: 'BPO Financeiro', icon: 'DollarSign', filename: 'bpo.html' },
-                { id: 'planejamento', name: 'Planejamento Tributário', icon: 'Scale', filename: 'Planejamento_Tributario.html' },
-                { id: 'dep_exportacao', name: 'Exportação', icon: 'Globe', filename: 'Exportacao.html' },
+                { id: 'cnds', name: 'Central de Certidões (CND)', icon: 'FileBadge' },
+                { id: 'parcelamentos', name: 'Parcelamentos', icon: 'ScrollText' },
+                { id: 'planejamento', name: 'Planejamento Tributário', icon: 'Scale' },
+                { id: 'dep_restituicao', name: 'Recuperação Tributária', icon: 'Gem' },
+                { id: 'dep_bpo', name: 'BPO Financeiro', icon: 'DollarSign' },
               ]},
             { name: 'Apoio Operacional', items: [
-                { id: 'biblioteca', name: 'Modelos e Downloads', icon: 'Library', filename: 'Biblioteca.html' },
-                { id: 'honorarios', name: 'Calculadora de Honorários', icon: 'BadgeDollarSign', filename: 'Honorarios.html' },
-              ]}
+                { id: 'biblioteca', name: 'Modelos e Downloads', icon: 'Library' },
+                { id: 'honorarios', name: 'Calculadora de Honorários', icon: 'BadgeDollarSign' },
+                { id: 'check_diag', name: 'Checklist de Diagnóstico', icon: 'ClipboardCheck' },
+              ]},
+            { name: 'Admin', adminOnly: true, items: [
+                { id: 'lote', name: 'Cadastro em Lote DB', icon: 'Settings' },
+                { id: 'crm', name: 'Base de Clientes (CRM)', icon: 'Folder' },
+              ]},
           ];
-
-          // Encontra o item de menu atual para pegar o filename
-          const currentItem = menu.flatMap(cat => cat.items).find(i => i.id === activeId);
 
           return (
             <div className="flex h-screen bg-[#0a0a0a] font-sans overflow-hidden">
-              <aside className="w-72 bg-[#000] border-r border-gray-800 flex flex-col h-full relative z-20 shadow-2xl">
+              <aside className="w-72 bg-[#000] border-r border-gray-800 flex flex-col h-full relative z-20">
                 <div className="h-20 flex items-center px-8 border-b border-gray-900 shrink-0">
                   <Icon name="Globe" className="text-orange-500 mr-3" size={24} />
                   <span className="text-white font-extrabold tracking-[3px] text-lg uppercase">GFS<span className="text-orange-500"> Intelligence</span></span>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
-                  {menu.map(cat => (
+                  {menu.map(cat => (!cat.adminOnly || isUnlocked) && (
                     <div key={cat.name}>
                       <span className="uppercase text-[10px] font-black text-gray-600 tracking-[2px] mb-3 block">{cat.name}</span>
                       <ul className="space-y-1">
@@ -259,14 +339,21 @@
                     </div>
                   ))}
                 </div>
-                <div className="p-6 bg-black border-t border-gray-900 text-center">
-                    <span className="text-[8px] font-black text-orange-500/50 uppercase tracking-[2px]">Desenvolvido por Gabriela Freitas</span>
+                <div className="p-6 bg-black border-t border-gray-900">
+                   {!isUnlocked ? (
+                     <div className="flex flex-col gap-3">
+                        <input type="password" value={pwdInput} onChange={e=>setPwdInput(e.target.value)} placeholder="Acesso Administração" className="bg-gray-900 border border-gray-800 text-xs p-3 rounded-lg text-white outline-none focus:border-orange-500" />
+                        <button onClick={() => pwdInput === '12345' ? setIsUnlocked(true) : alert('Acesso Negado')} className="w-full py-3 bg-gray-800 text-gray-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all">Desbloquear Admin</button>
+                     </div>
+                   ) : (
+                     <button onClick={() => setIsUnlocked(false)} className="w-full py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all bg-gray-800 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white">Bloquear Sistema</button>
+                   )}
                 </div>
               </aside>
 
               <main className="flex-1 flex flex-col bg-[#050505] relative overflow-hidden shadow-inner">
                 <header className="h-20 border-b border-gray-900 flex items-center justify-between px-10 shrink-0 bg-black/50 backdrop-blur-md z-10">
-                  <span className="text-[10px] font-black text-orange-500/50 uppercase tracking-[4px]">GFS INTELLIGENCE v1.0</span>
+                  <span className="text-[10px] font-black text-orange-500/50 uppercase tracking-[4px]">Desenvolvido por Gabriela Freitas</span>
                   <div className="flex items-center gap-4 group cursor-pointer">
                     <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Consultor PRO</span>
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-800 to-gray-700 flex items-center justify-center text-[10px] text-orange-500 border border-gray-600 group-hover:border-orange-500 transition-all shadow-lg">GF</div>
@@ -274,15 +361,34 @@
                 </header>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
-                  {activeId === 'dashboard' ? (
-                      <DashboardView />
-                  ) : (
-                      <PlaceholderView 
-                        title={currentItem.name} 
-                        filename={currentItem.filename} 
-                        icon={currentItem.icon} 
-                      />
-                  )}
+                  {activeId === 'dashboard' && <DashboardView />}
+                  
+                  {/* LINKS PARA OS ARQUIVOS REAIS */}
+                  {activeId === 'cnae_codserv' && <PlaceholderView title="Cnae x Cod Serv" filename="Cnae_CodServ.html" icon="Database" description="Matrix para vincular CNAEs aos códigos de serviço e prever impostos antes da abertura." />}
+                  {activeId === 'retencao_pers' && <PlaceholderView title="Retenção Personalizada" filename="Retencao_Personalizada.html" icon="UserCheck" description="Auditoria de retenções para serviços tomados baseada no regime do prestador." />}
+                  {activeId === 'raiox' && <PlaceholderView title="Raio-X Tributário" filename="Raio_X.html" icon="Search" />}
+                  {activeId === 'historico' && <PlaceholderView title="Histórico" filename="Historico.html" icon="Clock" />}
+                  {activeId === 'simuladores' && <PlaceholderView title="Central de Simuladores" filename="Simuladores.html" icon="Zap" />}
+                  {activeId === 'projecao' && <PlaceholderView title="Projeção Tributária" filename="Projecao_Tributaria.html" icon="TrendingUp" />}
+                  {activeId === 'ncm' && <PlaceholderView title="Consulta NCM/CEST" filename="Consulta_NCM.html" icon="Barcode" />}
+                  {activeId === 'config_notas' && <PlaceholderView title="Configurador de Notas" filename="Configurador_Notas.html" icon="ScrollText" />}
+                  {activeId === 'codigos_servico' && <PlaceholderView title="Códigos de Serviço" filename="Codigos_Servico.html" icon="FileText" />}
+                  {activeId === 'planejamento' && <PlaceholderView title="Planejamento Tributário" filename="Planejamento_Tributario.html" icon="Scale" />}
+                  {activeId === 'dep_restituicao' && <PlaceholderView title="Recuperação Tributária" filename="recuperacao_tributaria.html" icon="Gem" />}
+                  {activeId === 'dep_bpo' && <PlaceholderView title="BPO Financeiro" filename="bpo_financeiro.html" icon="DollarSign" />}
+                  {activeId === 'dep_exportacao' && <PlaceholderView title="Exportação" filename="Exportacao.html" icon="Globe" />}
+                  {activeId === 'cnds' && <PlaceholderView title="Central de CNDs" filename="CND.html" icon="FileBadge" />}
+                  {activeId === 'parcelamentos' && <PlaceholderView title="Parcelamentos" filename="Parcelamentos.html" icon="ScrollText" />}
+                  {activeId === 'biblioteca' && <PlaceholderView title="Modelos e Downloads" filename="Biblioteca.html" icon="Library" />}
+                  {activeId === 'honorarios' && <PlaceholderView title="Calculadora de Honorários" filename="Honorarios.html" icon="BadgeDollarSign" />}
+                  {activeId === 'check_diag' && <PlaceholderView title="Checklist de Diagnóstico" filename="Checklist.html" icon="ClipboardCheck" />}
+
+                  {/* DEPARTAMENTOS */}
+                  {activeId === 'dep_contabil' && <PlaceholderView title="Contábil" filename="contabil.html" icon="Calculator" />}
+                  {activeId === 'dep_dp' && <PlaceholderView title="DP" filename="dp.html" icon="Users" />}
+                  {activeId === 'dep_fiscal' && <PlaceholderView title="Fiscal" filename="fiscal.html" icon="FileText" />}
+                  {activeId === 'dep_obrigacoes' && <PlaceholderView title="Obrigações" filename="obrigacoes.html" icon="Calendar" />}
+                  {activeId === 'dep_societario' && <PlaceholderView title="Societário" filename="societario.html" icon="Building" />}
                 </div>
               </main>
             </div>
