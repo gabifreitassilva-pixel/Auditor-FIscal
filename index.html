@@ -363,25 +363,21 @@
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                   {activeId === 'dashboard' && <DashboardView />}
                   
-                  {/* LINKS PARA OS ARQUIVOS REAIS */}
-                  {activeId === 'cnae_codserv' && <PlaceholderView title="Cnae x Cod Serv" filename="Cnae_CodServ.html" icon="Database" description="Matrix para vincular CNAEs aos códigos de serviço e prever impostos antes da abertura." />}
-                  {activeId === 'retencao_pers' && <PlaceholderView title="Retenção Personalizada" filename="Retencao_Personalizada.html" icon="UserCheck" description="Auditoria de retenções para serviços tomados baseada no regime do prestador." />}
-                  {activeId === 'raiox' && <PlaceholderView title="Raio-X Tributário" filename="Raio_X.html" icon="Search" />}
-                  {activeId === 'historico' && <PlaceholderView title="Histórico" filename="Historico.html" icon="Clock" />}
-                  {activeId === 'simuladores' && <PlaceholderView title="Central de Simuladores" filename="Simuladores.html" icon="Zap" />}
-                  {activeId === 'projecao' && <PlaceholderView title="Projeção Tributária" filename="Projecao_Tributaria.html" icon="TrendingUp" />}
-                  {activeId === 'ncm' && <PlaceholderView title="Consulta NCM/CEST" filename="Consulta_NCM.html" icon="Barcode" />}
-                  {activeId === 'config_notas' && <PlaceholderView title="Configurador de Notas" filename="Configurador_Notas.html" icon="ScrollText" />}
-                  {activeId === 'codigos_servico' && <PlaceholderView title="Códigos de Serviço" filename="Codigos_Servico.html" icon="FileText" />}
-                  {activeId === 'planejamento' && <PlaceholderView title="Planejamento Tributário" filename="Planejamento_Tributario.html" icon="Scale" />}
-                  {activeId === 'dep_restituicao' && <PlaceholderView title="Recuperação Tributária" filename="recuperacao_tributaria.html" icon="Gem" />}
-                  {activeId === 'dep_bpo' && <PlaceholderView title="BPO Financeiro" filename="bpo_financeiro.html" icon="DollarSign" />}
-                  {activeId === 'dep_exportacao' && <PlaceholderView title="Exportação" filename="Exportacao.html" icon="Globe" />}
-                  {activeId === 'cnds' && <PlaceholderView title="Central de CNDs" filename="CND.html" icon="FileBadge" />}
-                  {activeId === 'parcelamentos' && <PlaceholderView title="Parcelamentos" filename="Parcelamentos.html" icon="ScrollText" />}
-                  {activeId === 'biblioteca' && <PlaceholderView title="Modelos e Downloads" filename="Biblioteca.html" icon="Library" />}
-                  {activeId === 'honorarios' && <PlaceholderView title="Calculadora de Honorários" filename="Honorarios.html" icon="BadgeDollarSign" />}
-                  {activeId === 'check_diag' && <PlaceholderView title="Checklist de Diagnóstico" filename="Checklist.html" icon="ClipboardCheck" />}
+                 {/* CARREGAMENTO AUTOMÁTICO DOS ARQUIVOS VIA IFRAME */}
+                  {activeId === 'raiox' && <ModuleLoader filename="Raio X Tributario.html" />}
+                  {activeId === 'simuladores' && <ModuleLoader filename="Central de Simuladores.html" />}
+                  {activeId === 'dep_contabil' && <ModuleLoader filename="Contabil.html" />}
+                  {activeId === 'dep_fiscal' && <ModuleLoader filename="Fiscal.html" />}
+                  {activeId === 'dep_obrigacoes' && <ModuleLoader filename="Obrigações acessórios.html" />}
+                  {activeId === 'dep_societario' && <ModuleLoader filename="Sociedade.html" />}
+                  {activeId === 'dep_restituicao' && <ModuleLoader filename="Restituição-recuperação.html" />}
+                  {activeId === 'dep_bpo' && <ModuleLoader filename="bpo.html" />}
+                  {activeId === 'dep_dp' && <ModuleLoader filename="Departamento.html" />}
+                </div>
+              </main>
+            </div>
+          );
+        }
 
                   {/* DEPARTAMENTOS */}
                   {activeId === 'dep_contabil' && <PlaceholderView title="Contábil" filename="contabil.html" icon="Calculator" />}
