@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Fiscal - Conferência de Retenções</title>
+    <style>
+        :root { --orange: #ff6600; --dark: #121212; --card: #1e1e1e; --green: #00ff88; --white: #e0e0e0; --red: #ff4444; --yellow: #ffcc00; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--white); margin: 0; padding: 20px; }
+        .dashboard { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .module { flex: 1; min-width: 380px; background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.5); transition: all 0.3s ease; }
+        .locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+        h2 { color: var(--orange); text-transform: uppercase; font-size: 1rem; border-bottom: 2px solid var(--orange); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        label { display: block; color: var(--orange); font-weight: bold; font-size: 11px; text-transform: uppercase; margin: 15px 0 5px 0; }
+        select, input { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; outline: none; }
+        .tax-status { font-weight: bold; text-transform: uppercase; padding: 3px 6px; border-radius: 4px; font-size: 10px; }
+        .status-sim { color: var(--green); border: 1px solid var(--green); }
+        .status-nao { color: var(--red); border: 1px solid var(--red); }
+        .hidden { display: none; }
+        .sim-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2a2a2a; font-size: 14px; }
+        .total-value { font-size: 22px; font-weight: bold; color: var(--green); }
+        .alert-box { background: rgba(255, 68, 68, 0.1); border: 1px solid var(--red); color: var(--red); padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 13px; font-weight: bold; text-align: center; line-height: 1.4; }
+        .btn-nova { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        .btn-solicitar { background: transparent; color: var(--yellow); border: 1px solid var(--yellow); width: 100%; padding: 8px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 10px; text-transform: uppercase; }
+        #adminPanel { background: #252525; border: 1px dashed var(--orange); padding: 15px; border-radius: 8px; margin: 15px 0; }
+        footer { position: fixed; bottom: 10px; right: 20px; opacity: 0.3; cursor: pointer; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="module" id="mod1">
+        <h2>1. Identificação <button class="btn-nova" onclick="location.reload()">🔄 Nova Consulta</button></h2>
+        <label>CNPJ do Prestador</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="cnpjInput" placeholder="00.000.000/0000-00">
+            <button onclick="buscarPrestador()" style="width: auto; padding: 0 20px; background: var(--orange); border:none; border-radius:6px; color:white; cursor:pointer; font-weight:bold;">Buscar</button>
+        </div>
+        <div id="resPrestador" style="display:none; margin-top:15px; padding:10px; background:#252525; border-radius:8px;">
+            <div id="resRazao"></div>
+            <div id="resRegime" style="font-weight:bold; color:var(--yellow)"></div>
+        </div>
+        <label>Tomador</label>
+        <select id="tipoTomador" onchange="validarFluxo()">
+            <option value="">-- Selecione --</option>
+            <option value="PJ">Pessoa Jurídica</option>
+            <option value="CONDOMINIO">Condomínio</option>
+        </select>
+    </div>
+
+    <div class="module locked" id="mod2">
+        <h2>2. Regras de Retenção</h2>
+        <label>Código de Serviço</label>
+        <select id="fedCodeSelect" onchange="processarRegras()">
+            <option value="">Carregando...</option>
+        </select>
+        <button class="btn-solicitar" onclick="solicitarCodigo()">Não achou o código? Faça aqui Solicitação de inclusão</button>
+        <div style="margin-top: 20px;">
+            <div class="sim-row"><span>ISS Retido</span><span id="stISS" class="tax-status status-nao">Não</span></div>
+            <div class="sim-row"><span>IRRF Retido</span><span id="stIRRF" class="tax-status status-nao">Não</span></div>
+            <div class="sim-row"><span>PCC Retido (4,65%)</span><span id="stPCC" class="tax-status status-nao">Não</span></div>
+            <div class="sim-row"><span>INSS Retido</span><span id="stINSS" class="tax-status status-nao">Não</span></div>
+        </div>
+
+        <div id="adminPanel" class="hidden">
+            <h4 style="color:var(--green); font-size:11px; margin:10px 0;">🛠 MODO CRIADOR</h4>
+            <input type="text" id="newCod" placeholder="Cód: 7.02" style="margin-bottom:5px;">
+            <input type="text" id="newDesc" placeholder="Descrição" style="margin-bottom:5px;">
+            <div style="display: flex; gap: 10px; margin-top: 10px; font-size: 10px;">
+                <label><input type="checkbox" id="flagISS"> ISS</label>
+                <label><input type="checkbox" id="flagINSS"> INSS</label>
+                <label><input type="checkbox" id="flagPCC"> PCC</label>
+                <label><input type="checkbox" id="flagIR"> IR</label>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="gerarJSON()" style="flex: 1; background:var(--green); color:black; font-weight:bold; border:none; padding:8px; border-radius:4px; cursor:pointer;">GERAR JSON</button>
+                <button onclick="copiarTexto()" style="flex: 1; background:var(--white); color:black; font-weight:bold; border:none; padding:8px; border-radius:4px; cursor:pointer;">COPIAR</button>
+            </div>
+            <textarea id="outputNuvem" class="hidden" style="width:100%; margin-top:10px; height:60px; font-size:10px; background:#000; color:var(--green); font-family:monospace;"></textarea>
+        </div>
+    </div>
+
+    <div class="module locked" id="mod3">
+        <h2>3. Simulação Financeira</h2>
+        <input type="number" id="vTotal" placeholder="Valor Bruto da Nota" oninput="calcularTudo()">
+        
+        <div id="areaISS" class="hidden" style="margin-top:10px; padding:10px; border:1px solid var(--green); border-radius:4px;">
+            <label style="color:var(--green); margin:0;">Alíquota ISS (%) Manual</label>
+            <input type="number" id="aliqISS" value="5.00" step="0.01" oninput="calcularTudo()">
+        </div>
+
+        <div id="areaAbatimento" class="hidden" style="margin-top:10px; padding:10px; border:1px solid var(--yellow); border-radius:4px; background: rgba(255, 204, 0, 0.05);">
+            <label style="color:var(--yellow); margin:0;">Dedução (Materiais/Equip.)</label>
+            <input type="number" id="vDeducao" placeholder="0,00" oninput="calcularTudo()">
+            <div id="infoBase" style="font-size: 10px; margin-top: 5px; color: #aaa;"></div>
+        </div>
+
+        <div id="resSim" class="hidden" style="margin-top:20px;">
+            <div class="sim-row"><span>ISS</span><span id="valISS">R$ 0,00</span></div>
+            <div class="sim-row"><span>INSS</span><span id="valINSS">R$ 0,00</span></div>
+            <div class="sim-row"><span>IR</span><span id="valIR">R$ 0,00</span></div>
+            <div class="sim-row"><span>PIS (0,65%)</span><span id="valPIS">R$ 0,00</span></div>
+            <div class="sim-row"><span>COFINS (3,00%)</span><span id="valCOFINS">R$ 0,00</span></div>
+            <div class="sim-row"><span>CSLL (1,00%)</span><span id="valCSLL">R$ 0,00</span></div>
+            <div class="sim-row" style="color:var(--yellow); font-weight:bold;"><span>TOTAL PCC (4,65%)</span><span id="valPCC">R$ 0,00</span></div>
+            <div class="sim-row" style="margin-top:10px; border-top: 2px solid var(--green); padding-top:10px;">
+                <span style="color:var(--green); font-weight:bold;">VALOR LÍQUIDO</span>
+                <span id="vLiquido" class="total-value">R$ 0,00</span>
+            </div>
+            <div class="alert-box">⚠️ SE DIVERGIR DA NOTA, NÃO PAGUE. ENTRE EM CONTATO.</div>
+        </div>
+    </div>
+</div>
+
+<footer onclick="ativarAdmin()">⚙️</footer>
+
+<script>
+    const LINK_NUVEM = "https://gist.githubusercontent.com/gabifreitassilva-pixel/969b06493ae7642340b3ba741e18959a/raw/regras.json"; 
+    let REGRAS = {}, regimePrestador = "", tomador = "";
+
+    async function inicializar() {
+        try { const resp = await fetch(LINK_NUVEM); REGRAS = resp.ok ? await resp.json() : {}; } catch (e) {}
+        const sel = document.getElementById('fedCodeSelect');
+        sel.innerHTML = '<option value="">-- Selecione o Código --</option>';
+        Object.keys(REGRAS).sort().forEach(k => { sel.innerHTML += `<option value="${k}">${k} - ${REGRAS[k].desc}</option>`; });
+    }
+
+    function buscarPrestador() {
+        const cnpj = document.getElementById('cnpjInput').value.replace(/\D/g, '');
+        const s = document.createElement('script');
+        s.src = `https://receitaws.com.br/v1/cnpj/${cnpj}?callback=cbPrest`;
+        document.body.appendChild(s);
+    }
+
+    function cbPrest(d) {
+        document.getElementById('resRazao').innerText = d.nome;
+        regimePrestador = (d.simples && d.simples.optante) ? "SIMPLES" : "NORMAL";
+        document.getElementById('resRegime').innerText = `REGIME: ${regimePrestador}`;
+        document.getElementById('resPrestador').style.display = 'block';
+        processarRegras(); 
+    }
+
+    function validarFluxo() {
+        tomador = document.getElementById('tipoTomador').value;
+        document.getElementById('mod2').className = tomador ? "module" : "module locked";
+        document.getElementById('mod3').className = tomador ? "module" : "module locked";
+        processarRegras();
+    }
+
+    function processarRegras() {
+        const cod = document.getElementById('fedCodeSelect').value;
+        const r = REGRAS[cod];
+        if (!r) return;
+
+        setSt('stISS', r.iss === "S");
+        const retemIR = (tomador !== "CONDOMINIO" && regimePrestador !== "SIMPLES" && r.ir > 0);
+        setSt('stIRRF', retemIR);
+        setSt('stPCC', (regimePrestador !== "SIMPLES" && r.pcc > 0));
+        setSt('stINSS', r.inss > 0);
+
+        document.getElementById('areaISS').className = (r.iss === "S") ? "" : "hidden";
+        
+        // REGRA DE EXIBIÇÃO DA DEDUÇÃO: Apenas códigos autorizados
+        const permitidos = ["07.02", "07.05", "07.10", "07.11", "11.02", "14.01"];
+        document.getElementById('areaAbatimento').className = permitidos.includes(cod) ? "" : "hidden";
+        
+        calcularTudo();
+    }
+
+    function setSt(id, v) { 
+        const e = document.getElementById(id); 
+        e.innerText = v ? "SIM" : "NÃO"; 
+        e.className = "tax-status " + (v ? "status-sim" : "status-nao"); 
+    }
+
+    function calcularTudo() {
+        const vBruto = parseFloat(document.getElementById('vTotal').value) || 0;
+        const vDed = parseFloat(document.getElementById('vDeducao').value) || 0;
+        const cod = document.getElementById('fedCodeSelect').value;
+        const r = REGRAS[cod];
+        if (vBruto <= 0 || !r) return;
+
+        // Base INSS = Bruto - Dedução (Se o código permitir dedução)
+        const permitidos = ["07.02", "07.05", "07.10", "07.11", "11.02", "14.01"];
+        let baseINSS = (permitidos.includes(cod)) ? Math.max(0, vBruto - vDed) : vBruto;
+        
+        if (r.inss > 0 && permitidos.includes(cod)) {
+            document.getElementById('infoBase').innerText = "Base de Cálculo INSS: " + fmt(baseINSS);
+        } else {
+            document.getElementById('infoBase').innerText = "";
+        }
+
+        let vISS = (r.iss === "S") ? vBruto * (parseFloat(document.getElementById('aliqISS').value)/100) : 0;
+        let vINSS = (r.inss > 0) ? baseINSS * (r.inss/100) : 0;
+        let vIR = (tomador !== "CONDOMINIO" && regimePrestador !== "SIMPLES" && r.ir > 0) ? vBruto * (r.ir/100) : 0;
+        
+        let vPIS = 0, vCOFINS = 0, vCSLL = 0, vPCC = 0;
+        if (regimePrestador !== "SIMPLES" && r.pcc > 0) {
+            vPIS = vBruto * 0.0065; vCOFINS = vBruto * 0.03; vCSLL = vBruto * 0.01; vPCC = vPIS + vCOFINS + vCSLL;
+        }
+
+        document.getElementById('valISS').innerText = fmt(vISS);
+        document.getElementById('valINSS').innerText = fmt(vINSS);
+        document.getElementById('valIR').innerText = fmt(vIR);
+        document.getElementById('valPIS').innerText = fmt(vPIS);
+        document.getElementById('valCOFINS').innerText = fmt(vCOFINS);
+        document.getElementById('valCSLL').innerText = fmt(vCSLL);
+        document.getElementById('valPCC').innerText = fmt(vPCC);
+        document.getElementById('vLiquido').innerText = fmt(vBruto - (vISS + vINSS + vIR + vPCC));
+        document.getElementById('resSim').classList.remove('hidden');
+    }
+
+    function solicitarCodigo() {
+        const nome = prompt("Qual o seu nome?");
+        const mun = prompt("Qual o município do prestador?");
+        const cod = prompt("Qual código deseja incluir?");
+        if(nome && mun && cod) {
+            const msg = window.encodeURIComponent(`Olá! Sou ${nome}. Solicito inclusão do código ${cod} (Município: ${mun}).`);
+            window.open(`https://api.whatsapp.com/send?phone=5511911224407&text=${msg}`, '_blank');
+        }
+    }
+
+    function ativarAdmin() { if(prompt("Senha:") === "admin123") document.getElementById('adminPanel').classList.remove('hidden'); }
+    
+    function gerarJSON() {
+        const c = document.getElementById('newCod').value;
+        const d = document.getElementById('newDesc').value;
+        const novoObjeto = {
+            [c]: {
+                desc: d,
+                iss: document.getElementById('flagISS').checked ? "S" : "N",
+                ir: document.getElementById('flagIR').checked ? 1.5 : 0,
+                inss: document.getElementById('flagINSS').checked ? 11 : 0,
+                pcc: document.getElementById('flagPCC').checked ? 4.65 : 0
+            }
+        };
+        const area = document.getElementById('outputNuvem');
+        area.value = JSON.stringify(novoObjeto, null, 2);
+        area.classList.remove('hidden');
+    }
+
+    function copiarTexto() { 
+        const area = document.getElementById('outputNuvem');
+        area.select();
+        navigator.clipboard.writeText(area.value);
+        alert("Copiado! Agora cole no seu arquivo JSON.");
+    }
+
+    function fmt(v) { return v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}); }
+    inicializar();
+</script>
+</body>
+</html>
