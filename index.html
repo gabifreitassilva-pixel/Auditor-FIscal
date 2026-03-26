@@ -174,7 +174,8 @@
                 { id: 'simuladores', name: 'Central de Simuladores', icon: 'Zap' },
               ]},
             { name: 'Inteligência', items: [
-                { id: 'projecao SN', name: 'Projeção Tributária', icon: 'TrendingUp' },
+                { id: 'projecao SN', name: 'Projeção Tributária SN', icon: 'TrendingUp' },
+                { id: 'projecao LP', name: 'Projeção Tributária LP', icon: 'TrendingUp' },
                 { id: 'ncm', name: 'Consulta NCM/CEST', icon: 'Barcode' },
                 { id: 'config_notas', name: 'Configurador de Notas', icon: 'ScrollText' },
                 { id: 'cnae_codserv', name: 'Cnae x Cod Serv', icon: 'Database' },
@@ -257,6 +258,7 @@
                   {activeId === 'raiox' && <ModuleLoader filename="Raio X Tributario.html" />}
                   {activeId === 'simuladores' && <ModuleLoader filename="Central de Simuladores.html" />}
                   {activeId === 'projecao SN' && <ModuleLoader filename="simples.html" />}
+                  {activeId === 'projecao LP' && <ModuleLoader filename="projecao_lp.html" />}
                   {activeId === 'ncm' && <ModuleLoader filename="Consulta_NCM.html" />}
                   {activeId === 'config_notas' && <ModuleLoader filename="Configurador_Notas.html" />}
                   {activeId === 'cnae_codserv' && <ModuleLoader filename="Cnae_CodServ.html" />}
