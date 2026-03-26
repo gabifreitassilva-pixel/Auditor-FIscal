@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de DAS 12 Meses - GFS Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Biblioteca PDF.js para leitura direta da declaração PGDAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <style>
+        /* Scrollbar Premium */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #ff7300; border-radius: 4px; }
+
+        body { background-color: #0a0a0a !important; color: #ffffff !important; }
+
+        /* Estilização dos Inputs Premium */
+        input[type="text"], input[type="number"], select, textarea { 
+            background-color: #000000 !important; 
+            color: #ffffff !important; 
+            border: 1px solid #333 !important;
+            padding: 10px 14px;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus { 
+            border-color: #ff7300 !important; 
+            box-shadow: 0 0 10px rgba(255, 115, 0, 0.2) !important; 
+        }
+
+        .module-card { 
+            background-color: #111111 !important; 
+            border: 1px solid #222 !important;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        label.title-label { 
+            display: block; font-size: 10px; font-weight: 900; color: #ff7300;
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
+        }
+
+        /* Checkbox Customizado */
+        .check-label {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            color: #ffffff; transition: color 0.3s ease; font-weight: bold; font-size: 11px;
+        }
+        .check-label:has(input:checked) { color: #ff7300; }
+        input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ff7300; cursor: pointer; }
+
+        /* TABELA PREMIUM AJUSTÁVEL */
+        .table-wrapper { width: 100%; overflow-x: auto; background: #000; border: 1px solid #333; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; white-space: nowrap; table-layout: auto; }
+        th { background-color: #ff7300; color: #000; font-weight: 900; padding: 8px 4px; text-transform: uppercase; border-bottom: 2px solid #cc5c00; }
+        td { padding: 6px 4px; border-bottom: 1px solid #222; border-right: 1px solid #222; vertical-align: middle; }
+        tbody tr.main-row:nth-child(4n-3) { background-color: #080808; }
+        tbody tr.main-row:nth-child(4n-1) { background-color: #111; }
+        tbody tr.main-row:hover { background-color: #1a1a1a; }
+        .td-highlight { font-weight: bold; color: #00ff88; font-size: 12px; }
+        .th-group { background-color: #cc5c00; color: white; border-right: 1px solid #aa4d00; }
+
+        /* TFOOT DE TOTAIS */
+        tfoot tr { background-color: #0a0a0a; border-top: 2px solid #ff7300; font-weight: 900; color: #fff; font-size: 11px; }
+
+        /* Input DENTRO da tabela */
+        .input-tabela { 
+            background-color: #1a1a1a !important; color: #fff !important; 
+            border: 1px solid #444 !important; text-align: center; font-weight: bold; 
+            padding: 4px !important; border-radius: 4px !important; font-size: 10px !important; 
+            width: 100%; min-width: 65px; max-width: 90px; margin: 0 auto;
+        }
+        .input-tabela:focus { border-color: #ff7300 !important; background-color: #000 !important; }
+
+        /* Estilos do Sub-row (OLHO INLINE) */
+        .subrow-td { padding: 0 !important; border: none !important; }
+        .breakdown-box { background: #050505; border-bottom: 2px solid #ff7300; padding: 12px; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); }
+
+        /* HEADER DE RELATÓRIO (Excel e Impressão) */
+        #relatorioHeader { display: none; }
+
+        /* Para impressão */
+        @media print {
+            body { background-color: #fff !important; color: #000 !important; }
+            aside, .no-print, button, .module-card:not(.table-module), .breakdown-box { display: none !important; }
+            .table-module { box-shadow: none !important; border: none !important; width: 100% !important; padding: 0 !important; margin: 0 !important;}
+            .input-tabela { border: none !important; background: transparent !important; color: #000 !important; padding: 0 !important; font-size: 11px !important; }
+            th { background-color: #eee !important; color: #000 !important; border-color: #000 !important; -webkit-print-color-adjust: exact; }
+            td { border-color: #000 !important; color: #000 !important; }
+            tfoot tr { background-color: #ddd !important; border-top: 2px solid #000 !important; color: #000 !important; }
+            #relatorioHeader { display: block !important; margin-bottom: 20px; padding: 15px; border: 1px solid #000; page-break-after: avoid; }
+        }
+
+        /* Modal Overlay Importação */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #111; border: 1px solid #ff7300; border-radius: 12px; width: 100%; max-width: 600px; padding: 24px; box-shadow: 0 20px 40px rgba(255, 115, 0, 0.2); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased bg-black">
+
+    <!-- Sidebar Lateral Exclusiva para Histórico -->
+    <aside class="w-80 bg-black border-r border-neutral-800 flex flex-col h-full z-40 no-print">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="zap" class="text-orange-500"></i>
+                <span class="text-orange-500">Simulador</span><span class="text-white text-lg">PRO</span>
+            </h1>
+        </div>
+        
+        <div class="p-4 flex-1 flex flex-col gap-4 overflow-hidden">
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <span class="text-[10px] text-neutral-500 font-black uppercase tracking-widest border-b border-neutral-800 pb-2 block w-full shrink-0">Histórico de Simulações</span>
+                <div id="listaHistorico" class="mt-2 space-y-2 overflow-y-auto flex-1 custom-scrollbar pr-2">
+                    <!-- Lista injetada via JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-neutral-800 text-[9px] text-neutral-600 uppercase font-black tracking-widest text-center">
+            GFS Intelligence © 2026
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <main class="flex-1 overflow-y-auto bg-[#050505] p-6 md:p-8" id="mainArea">
+        <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
+            
+            <div class="border-l-4 border-orange-500 pl-6 mb-6 no-print">
+                <h2 class="text-3xl font-black text-white uppercase tracking-tight">Projeção Tributária Inteligente</h2>
+                <p class="text-neutral-500 text-sm uppercase font-bold tracking-tighter mt-1">Simples Nacional 12 Meses com Fator R e Isenções</p>
+            </div>
+
+            <!-- PAINEL SUPERIOR: CONFIGURAÇÕES -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                
+                <!-- 1. IDENTIFICAÇÃO -->
+                <div class="module-card">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-3">
+                        <i data-lucide="building" class="text-orange-500 w-5 h-5"></i> Empresa & Datas
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="title-label">Nome do Cliente / Empresa</label>
+                            <input type="text" id="nomeEmpresa" placeholder="" onchange="atualizarCabecalhoRelatorio()">
+                        </div>
+
+                        <div>
+                            <label class="title-label">Situação da Empresa</label>
+                            <select id="tipoEmpresa" onchange="toggleDatas()">
+                                <option value="existente" selected>Empresa Existente (Já possui histórico)</option>
+                                <option value="nova">Empresa Nova (Abertura Recente)</option>
+                            </select>
+                        </div>
+
+                        <div id="dataAberturaDiv">
+                            <label class="title-label text-orange-400">Mês/Ano de Abertura:</label>
+                            <div class="flex gap-2">
+                                <select id="mesAbertura" onchange="iniciarSimulacao()" class="flex-1"></select>
+                                <select id="anoAbertura" onchange="iniciarSimulacao()" class="flex-1"></select>
+                            </div>
+                        </div>
+
+                        <div id="mesApuracaoDiv">
+                            <label class="title-label">Mês Atual (Início da Projeção):</label>
+                            <div class="flex gap-2">
+                                <select id="mesApuracao" onchange="atualizaGridRbt12(); iniciarSimulacao()" class="flex-1"></select>
+                                <select id="anoApuracao" onchange="atualizaGridRbt12(); iniciarSimulacao()" class="flex-1"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. REGIME & ANEXOS -->
+                <div class="module-card">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-3">
+                        <i data-lucide="layers" class="text-orange-500 w-5 h-5"></i> Enquadramento
+                    </h3>
+                    <label class="title-label">Selecione os Anexos e Situações</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" onchange="atualizaGridRbt12(); iniciarSimulacao()">
+                        <div class="space-y-3">
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoI"> I (Comércio Geral)</label>
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoI_ST"> I (Comércio c/ ICMS ST)</label>
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoI_Mono"> I (Com. Monofásico PIS/COF)</label>
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoII"> II (Indústria)</label>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoIII"> III (Serviços Sem Fator R)</label>
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoIV"> IV (Obras/Adv/Limpeza)</label>
+                            <label class="check-label"><input type="checkbox" name="anexo" value="anexoV"> V (Serv. Sujeitos Fator R)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ISENÇÕES E DICAS -->
+                <div class="module-card bg-[#150a00] border-orange-500/30 relative overflow-hidden">
+                    <h3 class="text-orange-500 font-black mb-4 flex items-center gap-2 border-b border-orange-500/20 pb-3 z-10 relative">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i> Inteligência Fiscal
+                    </h3>
+                    
+                    <label class="title-label z-10 relative">Filtros Globais de Isenção</label>
+                    <div class="space-y-3 mb-4 z-10 relative">
+                        <label class="check-label"><input type="checkbox" id="chkExportacao" onchange="iniciarSimulacao()"> Exportação (Isenta PIS/COF/ISS/ICMS)</label>
+                        <label class="check-label"><input type="checkbox" id="chkIssFixo" onchange="iniciarSimulacao()"> ISS Retido/Fixo (Abate o ISS do DAS)</label>
+                        <span class="text-[10px] text-neutral-500 block leading-tight mt-2">*O abatimento de ICMS ST e PIS/COFINS Monofásico para revenda agora é feito marcando as opções de Anexo I exclusivas no passo 2.</span>
+                    </div>
+
+                    <div id="boxDicaFatorR" class="hidden p-3 rounded-lg border border-orange-500/50 bg-orange-500/10 text-[11px] font-bold text-white z-10 relative"></div>
+                    <i data-lucide="brain-circuit" class="absolute -right-4 -bottom-4 w-32 h-32 text-orange-500 opacity-10 z-0"></i>
+                </div>
+
+            </div>
+
+            <!-- HISTÓRICO RBT12 -->
+            <div class="module-card no-print" id="receitaMesesDiv">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b border-neutral-800 pb-3 gap-4">
+                    <h3 class="text-white font-bold flex items-center gap-2">
+                        <i data-lucide="history" class="text-orange-500 w-5 h-5"></i> Histórico Base (12 Meses Anteriores)
+                    </h3>
+                    
+                    <!-- INPUT DE ARQUIVO OCULTO -->
+                    <input type="file" id="pdfUpload" accept=".pdf" class="hidden" onchange="processarPDF(event)">
+                    
+                    <button id="btnImportar" onclick="document.getElementById('pdfUpload').click()" class="text-[10px] bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-black uppercase tracking-widest shadow-lg">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Importar PGDAS (PDF)
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3" id="gridRbt12">
+                    <!-- Inputs de meses retroativos gerados via JS -->
+                </div>
+            </div>
+
+            <!-- CABEÇALHO INVISIVEL PARA RELATÓRIO EXCEL/PDF -->
+            <div id="relatorioHeader">
+                <h2 style="font-weight:bold; font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px;">RELATÓRIO DE PROJEÇÃO TRIBUTÁRIA</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 15px;">
+                    <div><strong>Empresa:</strong> <span id="relNome">-</span></div>
+                    <div><strong>Data Simulação:</strong> <span id="relData">-</span></div>
+                    <div><strong>Abertura:</strong> <span id="relAbertura">-</span></div>
+                    <div><strong>Início Projeção:</strong> <span id="relProjecao">-</span></div>
+                    <div style="grid-column: span 2;"><strong>Anexos e Situações Faturadas:</strong> <span id="relAnexos">-</span></div>
+                    <div style="grid-column: span 2;"><strong>Inteligência / Filtros:</strong> <span id="relFiltros">-</span></div>
+                </div>
+            </div>
+
+            <!-- TABELA DE PROJEÇÃO -->
+            <div class="module-card !p-0 overflow-hidden border border-orange-500/30 table-module">
+                <div class="bg-[#150a00] p-4 border-b border-orange-500/30 flex justify-between items-center no-print">
+                    <h3 class="text-white font-black flex items-center gap-2 uppercase tracking-widest text-sm"><i data-lucide="table" class="text-orange-500 w-4 h-4"></i> Tabela de Projeção Mês a Mês</h3>
+                </div>
+                <div class="table-wrapper custom-scrollbar">
+                    <div id="resultadoSimulacao"></div>
+                </div>
+                
+                <!-- BOTÕES DE AÇÃO NO FINAL DA TABELA -->
+                <div class="p-4 bg-black border-t border-orange-500/30 flex flex-col md:flex-row justify-end gap-3 no-print">
+                    <button onclick="location.reload()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-neutral-900 text-neutral-400 font-bold text-xs hover:bg-neutral-800 hover:text-white transition-all border border-neutral-800">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Limpar Simulação
+                    </button>
+                    <button onclick="exportarExcel()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-green-700/20 text-green-500 border border-green-700/50 hover:bg-green-700/40 hover:text-green-400 font-bold text-xs transition-all uppercase tracking-widest">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel
+                    </button>
+                    <button onclick="window.print()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-blue-700/20 text-blue-500 border border-blue-700/50 hover:bg-blue-700/40 hover:text-blue-400 font-bold text-xs transition-all uppercase tracking-widest">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                    </button>
+                    <button onclick="salvarSimulacao()" class="flex items-center justify-center gap-2 px-8 py-2 rounded-lg bg-orange-600 text-white font-black text-xs shadow-lg hover:bg-orange-500 transition-all uppercase tracking-widest">
+                        <i data-lucide="save" class="w-4 h-4"></i> Salvar Simulação
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // VARIAVEIS GLOBAIS DE ESTADO
+        window.simulacaoData = []; 
+        window.cacheRBT12 = {}; 
+        window.mesesProjetados = [];
+        window.anexosAtivos = [];
+
+        const mesesOptions = [
+            { v: 1, n: "Jan" }, { v: 2, n: "Fev" }, { v: 3, n: "Mar" }, { v: 4, n: "Abr" }, 
+            { v: 5, n: "Mai" }, { v: 6, n: "Jun" }, { v: 7, n: "Jul" }, { v: 8, n: "Ago" }, 
+            { v: 9, n: "Set" }, { v: 10, n: "Out" }, { v: 11, n: "Nov" }, { v: 12, n: "Dez" }
+        ];
+
+        // TABELAS OFICIAIS DO SIMPLES ATUALIZADAS COM ST E MONOFASICO
+        const tabelasSimples = {
+            anexoI: {
+                faixas: [ [0.04, 0, 180000], [0.073, 5940, 360000], [0.095, 13860, 720000], [0.107, 22500, 1800000], [0.143, 87300, 3600000], [0.19, 378000, 4800000] ],
+                rep: { irpj: 0.055, csll: 0.035, cofins: 0.1274, pis: 0.0276, cpp: 0.415, icms: 0.34, iss: 0, ipi: 0 }
+            },
+            anexoI_ST: { 
+                faixas: [ [0.04, 0, 180000], [0.073, 5940, 360000], [0.095, 13860, 720000], [0.107, 22500, 1800000], [0.143, 87300, 3600000], [0.19, 378000, 4800000] ],
+                rep: { irpj: 0.055, csll: 0.035, cofins: 0.1274, pis: 0.0276, cpp: 0.415, icms: 0, iss: 0, ipi: 0 }
+            },
+            anexoI_Mono: { 
+                faixas: [ [0.04, 0, 180000], [0.073, 5940, 360000], [0.095, 13860, 720000], [0.107, 22500, 1800000], [0.143, 87300, 3600000], [0.19, 378000, 4800000] ],
+                rep: { irpj: 0.055, csll: 0.035, cofins: 0, pis: 0, cpp: 0.415, icms: 0.34, iss: 0, ipi: 0 }
+            },
+            anexoII: {
+                faixas: [ [0.045, 0, 180000], [0.078, 5940, 360000], [0.10, 13860, 720000], [0.112, 22500, 1800000], [0.147, 85500, 3600000], [0.30, 720000, 4800000] ],
+                rep: { irpj: 0.055, csll: 0.035, cofins: 0.1151, pis: 0.0249, cpp: 0.375, icms: 0.32, iss: 0, ipi: 0.075 }
+            },
+            anexoIII: { 
+                faixas: [ [0.06, 0, 180000], [0.112, 9360, 360000], [0.135, 17640, 720000], [0.16, 35640, 1800000], [0.21, 125640, 3600000], [0.33, 648000, 4800000] ],
+                rep: { irpj: 0.04, csll: 0.035, cofins: 0.1282, pis: 0.0278, cpp: 0.434, icms: 0, iss: 0.335, ipi: 0 }
+            },
+            anexoIV: {
+                faixas: [ [0.045, 0, 180000], [0.09, 8100, 360000], [0.102, 12420, 720000], [0.14, 39780, 1800000], [0.22, 183780, 3600000], [0.33, 828000, 4800000] ],
+                rep: { irpj: 0.188, csll: 0.152, cofins: 0.1767, pis: 0.0383, cpp: 0, icms: 0, iss: 0.445, ipi: 0 }
+            },
+            anexoV: { 
+                faixas: [ [0.155, 0, 180000], [0.18, 4500, 360000], [0.195, 9900, 720000], [0.205, 17100, 1800000], [0.23, 62100, 3600000], [0.305, 540000, 4800000] ],
+                rep: { irpj: 0.25, csll: 0.15, cofins: 0.1436, pis: 0.0305, cpp: 0.2885, icms: 0, iss: 0.1374, ipi: 0 }
+            }
+        };
+
+        // Helper para nomes curtos na Tabela
+        function getNomeAbreviado(anexo) {
+            const map = {
+                'anexoI': 'I (GERAL)',
+                'anexoI_ST': 'I (ST)',
+                'anexoI_Mono': 'I (MONO)',
+                'anexoII': 'II',
+                'anexoIII': 'III',
+                'anexoIV': 'IV',
+                'anexoV': 'V'
+            };
+            return map[anexo] || anexo;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            populaDatas();
+            atualizaGridRbt12();
+            toggleDatas();
+            renderSidebarHistory();
+            iniciarSimulacao(); 
+        });
+
+        function formataMoedaBR(valor) {
+            if (isNaN(valor) || valor === null) return '0,00';
+            return parseFloat(valor).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function limpaMoeda(str) {
+            if (typeof str !== 'string') return parseFloat(str) || 0;
+            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+        }
+
+        // FUNÇÃO DE FORMATAÇÃO E RECALCULO OTIMIZADA (MANTÉM O FOCO DO TAB)
+        function formataInput(e) {
+            const val = limpaMoeda(e.target.value);
+            e.target.value = formataMoedaBR(val);
+            
+            if(e.target.classList.contains('rbt12-receita')) window.cacheRBT12[`rec-${e.target.dataset.idx}`] = val;
+            if(e.target.classList.contains('rbt12-folha')) window.cacheRBT12[`fol-${e.target.dataset.idx}`] = val;
+            
+            // Apenas recalcula os valores in-place, mantendo o elemento de input intacto e o foco do TAB ativo
+            executarCalculoMatematico(window.mesesProjetados, window.anexosAtivos);
+        }
+
+        function replicarValor(btn, col) {
+            const inputOrigem = btn.previousElementSibling;
+            const valorStr = inputOrigem.value;
+            const startRow = parseInt(inputOrigem.dataset.row);
+            
+            const table = document.getElementById('tblSimulacao');
+            const inputs = table.querySelectorAll(`.input-tabela[data-col="${col}"]`);
+            inputs.forEach(inp => {
+                if (parseInt(inp.dataset.row) > startRow) {
+                    inp.value = valorStr;
+                }
+            });
+            executarCalculoMatematico(window.mesesProjetados, window.anexosAtivos);
+        }
+
+        function populaDatas() {
+            const anoAtual = new Date().getFullYear();
+            const mesAtual = new Date().getMonth() + 1;
+            
+            ['mesAbertura', 'mesApuracao'].forEach(id => {
+                document.getElementById(id).innerHTML = mesesOptions.map(m => `<option value="${m.v}" ${m.v === mesAtual ? 'selected' : ''}>${m.n}</option>`).join('');
+            });
+
+            // Anos para Apuração (Janela menor para focar no presente/futuro)
+            let anosApuracao = '';
+            for(let i = anoAtual - 3; i <= anoAtual + 2; i++) anosApuracao += `<option value="${i}" ${i === anoAtual ? 'selected' : ''}>${i}</option>`;
+            document.getElementById('anoApuracao').innerHTML = anosApuracao;
+
+            // Anos para Abertura (Menu expansivo de 1950 até o ano atual)
+            let anosAbertura = '';
+            for(let i = 1950; i <= anoAtual + 1; i++) anosAbertura += `<option value="${i}" ${i === anoAtual ? 'selected' : ''}>${i}</option>`;
+            document.getElementById('anoAbertura').innerHTML = anosAbertura;
+        }
+
+        function atualizaGridRbt12() {
+            const isAnexoV = Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.value).includes('anexoV');
+            const mApuracao = parseInt(document.getElementById('mesApuracao').value);
+            const aApuracao = parseInt(document.getElementById('anoApuracao').value);
+            
+            let dataApuracao = new Date(aApuracao, mApuracao - 1, 1);
+            let html = '';
+            
+            for(let i = 1; i <= 12; i++) {
+                let dRetro = new Date(dataApuracao);
+                dRetro.setMonth(dRetro.getMonth() - i);
+                let nomeMes = mesesOptions[dRetro.getMonth()].n + '/' + dRetro.getFullYear();
+                
+                let vRec = window.cacheRBT12[`rec-${i}`] || 0;
+                let vFol = window.cacheRBT12[`fol-${i}`] || 0;
+
+                html += `
+                <div class="bg-black p-2 rounded-xl border border-neutral-800 hover:border-orange-500/50 transition-colors">
+                    <div class="text-orange-500 font-bold text-[9px] uppercase mb-1 text-center tracking-widest">${nomeMes}</div>
+                    <div class="space-y-1">
+                        <div>
+                            <span class="text-[8px] text-neutral-500 uppercase font-black block">Receita</span>
+                            <input type="text" class="input-tabela w-full rbt12-receita" data-idx="${i}" value="${formataMoedaBR(vRec)}" onblur="formataInput(event)">
+                        </div>
+                        ${isAnexoV ? `
+                        <div>
+                            <span class="text-[8px] text-neutral-500 uppercase font-black block">Folha</span>
+                            <input type="text" class="input-tabela w-full rbt12-folha" data-idx="${i}" value="${formataMoedaBR(vFol)}" onblur="formataInput(event)">
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            }
+            document.getElementById('gridRbt12').innerHTML = html;
+        }
+
+        function toggleDatas() {
+            const tipo = document.getElementById('tipoEmpresa').value;
+            document.getElementById('dataAberturaDiv').classList.remove('hidden'); // Sempre visível
+            document.getElementById('receitaMesesDiv').classList.toggle('hidden', tipo !== 'existente');
+            iniciarSimulacao();
+        }
+
+        function atualizarCabecalhoRelatorio() {
+            document.getElementById('relNome').innerText = document.getElementById('nomeEmpresa').value || 'Não informado';
+            document.getElementById('relData').innerText = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            const selMesAbt = document.getElementById('mesAbertura');
+            document.getElementById('relAbertura').innerText = selMesAbt.options[selMesAbt.selectedIndex].text + '/' + document.getElementById('anoAbertura').value;
+
+            const selMesProj = document.getElementById('mesApuracao');
+            document.getElementById('relProjecao').innerText = selMesProj.options[selMesProj.selectedIndex].text + '/' + document.getElementById('anoApuracao').value;
+
+            const anexosSelecionados = Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.parentNode.textContent.trim()).join(', ');
+            document.getElementById('relAnexos').innerText = anexosSelecionados || 'Nenhum';
+
+            let filtros = [];
+            if(document.getElementById('chkExportacao').checked) filtros.push('Exportação');
+            if(document.getElementById('chkIssFixo').checked) filtros.push('ISS Retido/Fixo');
+            document.getElementById('relFiltros').innerText = filtros.join(', ') || 'Nenhum filtro aplicado';
+        }
+
+        function iniciarSimulacao() {
+            atualizarCabecalhoRelatorio();
+
+            const anexos = Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.value);
+            if(anexos.length === 0) {
+                document.getElementById('resultadoSimulacao').innerHTML = '<div class="text-center text-orange-500 font-bold p-10 uppercase text-xs tracking-widest">⚠️ Selecione pelo menos 1 anexo no passo 2 para gerar a tabela.</div>';
+                document.getElementById('boxDicaFatorR').classList.add('hidden');
+                return;
+            }
+
+            const tipo = document.getElementById('tipoEmpresa').value;
+            const ano = parseInt(document.getElementById(tipo === 'existente' ? 'anoApuracao' : 'anoAbertura').value);
+            const mes = parseInt(document.getElementById(tipo === 'existente' ? 'mesApuracao' : 'mesAbertura').value);
+            
+            let dataAtual = new Date(ano, mes - 1, 1);
+            let mesesProjetados = [];
+            for (let i = 0; i < 12; i++) {
+                mesesProjetados.push(new Date(dataAtual.getFullYear(), dataAtual.getMonth() + i, 1));
+            }
+            
+            window.mesesProjetados = mesesProjetados;
+            window.anexosAtivos = anexos;
+
+            let inputsSalvos = window.restoringInputs || {};
+            if(!window.restoringInputs) {
+                document.querySelectorAll('.input-tabela.faturamento-inp, .input-tabela.folha-inp').forEach(inp => {
+                    inputsSalvos[`${inp.dataset.row}-${inp.dataset.col}`] = limpaMoeda(inp.value);
+                });
+            }
+
+            montarHTMLTabela(mesesProjetados, anexos, inputsSalvos);
+            executarCalculoMatematico(mesesProjetados, anexos);
+        }
+
+        function montarHTMLTabela(meses, anexos, inputsSalvos) {
+            const hasAnexoV = anexos.includes('anexoV');
+            
+            let html = `
+                <table id="tblSimulacao">
+                    <thead>
+                        <tr>
+                            <th class="th-group" style="width: 60px;">Mês</th>
+                            <th class="th-group">RBT12 Rec.</th>
+                            ${hasAnexoV ? '<th class="th-group text-neutral-300">RBT12 Folha</th>' : ''}
+                            ${anexos.map(a => `<th class="th-group bg-[#a64b00]">FAT. ${getNomeAbreviado(a)}</th>`).join('')}
+                            ${hasAnexoV ? '<th class="th-group bg-[#803a00]">FOLHA MÊS</th><th class="th-group">Fator R</th>' : ''}
+                            ${anexos.map(a => `<th class="th-group bg-[#592900]">Aliq. ${getNomeAbreviado(a).replace(' (GERAL)', '').replace(' (ST)', '').replace(' (MONO)', '')}</th><th class="th-group bg-[#592900]">DAS ${getNomeAbreviado(a)}</th>`).join('')}
+                            <th class="th-group bg-green-600">Total DAS</th>
+                            <th class="th-group no-print" style="width: 40px;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            meses.forEach((data, i) => {
+                let mNome = mesesOptions[data.getMonth()].n + '/' + data.getFullYear().toString().substr(-2);
+                let fVal = hasAnexoV ? (inputsSalvos[`${i}-folha`] || 0) : 0;
+
+                html += `<tr class="main-row" id="row-${i}">
+                    <td class="text-center font-black text-neutral-400 uppercase tracking-widest">${mNome}</td>
+                    <td id="rbt12-rec-${i}" class="text-center text-orange-500 font-bold">0,00</td>
+                    ${hasAnexoV ? `<td id="rbt12-fol-${i}" class="text-center text-neutral-400 font-bold">0,00</td>` : ''}
+                    `;
+                
+                anexos.forEach(a => {
+                    let v = inputsSalvos[`${i}-${a}`] || 0;
+                    html += `<td>
+                        <div class="flex items-center gap-1 justify-center">
+                            <input type="text" class="input-tabela faturamento-inp" data-row="${i}" data-col="${a}" value="${formataMoedaBR(v)}" onblur="formataInput(event)">
+                            <button tabindex="-1" onclick="replicarValor(this, '${a}')" class="text-neutral-500 hover:text-orange-500 no-print" title="Replicar p/ baixo"><i data-lucide="chevrons-down" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>`;
+                });
+
+                if (hasAnexoV) {
+                    html += `<td>
+                        <div class="flex items-center gap-1 justify-center">
+                            <input type="text" class="input-tabela folha-inp" data-row="${i}" data-col="folha" value="${formataMoedaBR(fVal)}" onblur="formataInput(event)">
+                            <button tabindex="-1" onclick="replicarValor(this, 'folha')" class="text-neutral-500 hover:text-orange-500 no-print" title="Replicar p/ baixo"><i data-lucide="chevrons-down" class="w-4 h-4"></i></button>
+                        </div>
+                    </td><td id="fatorR-${i}" class="text-center font-black">-</td>`;
+                }
+                
+                anexos.forEach(a => {
+                    html += `<td id="aliqEfetiva-${i}-${a}" class="text-center font-bold text-neutral-300">-</td>`;
+                    html += `<td id="dasValor-${i}-${a}" class="text-center font-bold text-orange-400">0,00</td>`;
+                });
+
+                html += `
+                    <td id="dasTotal-${i}" class="text-center td-highlight">0,00</td>
+                    <td class="text-center no-print"><button tabindex="-1" onclick="toggleComposicaoInline(${i})" class="bg-neutral-800 p-1.5 rounded hover:bg-orange-600 text-orange-500 hover:text-white transition-all shadow-md" title="Ver Distribuição"><i data-lucide="eye" class="w-3 h-3"></i></button></td>
+                </tr>`;
+
+                // SUB ROW (Detalhamento do DAS na mesma linha por anexo)
+                html += `
+                <tr id="subrow-${i}" class="hidden bg-[#050505] no-print">
+                    <td colspan="100%" class="subrow-td">
+                        <div class="breakdown-box flex-col gap-4" id="bd-container-${i}">
+                            <!-- Detalhes por Anexo Injetados Aqui -->
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            // LINHA DE TOTAIS DA TABELA
+            html += `
+                </tbody>
+                <tfoot>
+                    <tr class="bg-neutral-900 border-t-2 border-orange-500 font-bold text-white">
+                        <td colspan="${hasAnexoV ? 3 : 2}" class="text-right uppercase p-3">Total Projetado (1 ano):</td>
+                        ${anexos.map(a => `<td id="tot-fat-${a}" class="text-center text-orange-400">0,00</td>`).join('')}
+                        ${hasAnexoV ? '<td id="tot-folha" class="text-center text-orange-400">0,00</td><td class="text-center">-</td>' : ''}
+                        ${anexos.map(a => `<td class="text-center">-</td><td id="tot-das-${a}" class="text-center text-[#00ff88]">0,00</td>`).join('')}
+                        <td id="tot-das-geral" class="text-center text-[#00ff88] text-sm">0,00</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tfoot>
+            </table>`;
+            
+            document.getElementById('resultadoSimulacao').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function getFaixa(rbt12, tabela) {
+            return tabela.faixas.find(f => rbt12 <= f[2]) || tabela.faixas[5];
+        }
+
+        function executarCalculoMatematico(meses, anexos) {
+            const anoAbertura = parseInt(document.getElementById('anoAbertura').value) || new Date().getFullYear();
+            const mesAbertura = parseInt(document.getElementById('mesAbertura').value) || 1;
+            const hasAnexoV = anexos.includes('anexoV');
+            
+            const isExp = document.getElementById('chkExportacao').checked;
+            const isIssFixo = document.getElementById('chkIssFixo').checked;
+
+            let histRec = [];
+            let histFol = [];
+            
+            for(let idx=12; idx>=1; idx--) { 
+                histRec.push(limpaMoeda(document.querySelector(`.rbt12-receita[data-idx="${idx}"]`)?.value || "0"));
+                histFol.push(hasAnexoV ? limpaMoeda(document.querySelector(`.rbt12-folha[data-idx="${idx}"]`)?.value || "0") : 0);
+            }
+
+            window.simulacaoData = [];
+            let mesesComFaltaDeFatorR = [];
+            let faturamentoGlobal = 0;
+
+            // Acumuladores de TOTAIS DA TABELA
+            let sumFatGlob = {};
+            let sumFolGlob = 0;
+            let sumDasGlob = {};
+            let sumDasTotal = 0;
+            anexos.forEach(a => { sumFatGlob[a] = 0; sumDasGlob[a] = 0; });
+
+            meses.forEach((data, i) => {
+                let mNome = mesesOptions[data.getMonth()].n + '/' + data.getFullYear().toString().substr(-2);
+                let fatTotalMes = 0;
+                let faturamentosAnexo = {};
+                anexos.forEach(a => {
+                    let v = limpaMoeda(document.querySelector(`.input-tabela[data-row="${i}"][data-col="${a}"]`)?.value || "0");
+                    faturamentosAnexo[a] = v;
+                    fatTotalMes += v;
+                    sumFatGlob[a] += v;
+                });
+                faturamentoGlobal += fatTotalMes;
+
+                let folhaMes = hasAnexoV ? limpaMoeda(document.querySelector(`.folha-inp[data-row="${i}"]`)?.value || "0") : 0;
+                sumFolGlob += folhaMes;
+
+                // LÓGICA INTELIGENTE DO RBT12 (Mês a Mês Proporcionalizado espelhando a RFB)
+                let numMesesExistencia = (data.getFullYear() - anoAbertura) * 12 + (data.getMonth() - (mesAbertura - 1)) + 1;
+                if (numMesesExistencia < 1) numMesesExistencia = 1;
+
+                let rbt12Rec = 0;
+                let rbt12Fol = 0;
+                let rbt12p = 0;
+                let fatorR = 0;
+
+                if (numMesesExistencia === 1) {
+                    // 1º mês
+                    rbt12Rec = 0;
+                    rbt12Fol = 0;
+                    rbt12p = fatTotalMes * 12;
+                    
+                    if (fatTotalMes > 0) {
+                        fatorR = folhaMes / fatTotalMes;
+                    } else {
+                        fatorR = 0.28; // Se 0/0, PGDAS assume 28% (Anexo III) default
+                    }
+                } else {
+                    // Do 2º mês em diante
+                    let prevMonthsCount = Math.min(12, numMesesExistencia - 1);
+                    rbt12Rec = histRec.reduce((a,b)=>a+b, 0);
+                    rbt12Fol = histFol.reduce((a,b)=>a+b, 0);
+                    
+                    rbt12p = (rbt12Rec / prevMonthsCount) * 12;
+
+                    // Lógica fiel ao PGDAS para Fator R: se RBT12 Receita for zero, PGDAS atribui o Fator R de 28% para garantir Anexo III
+                    if (rbt12Rec > 0) {
+                        fatorR = rbt12Fol / rbt12Rec;
+                    } else {
+                        fatorR = 0.28; 
+                    }
+                }
+
+                document.getElementById(`rbt12-rec-${i}`).innerText = formataMoedaBR(rbt12Rec);
+                if(hasAnexoV) document.getElementById(`rbt12-fol-${i}`).innerText = formataMoedaBR(rbt12Fol);
+                
+                let eFatorR = document.getElementById(`fatorR-${i}`);
+                if (eFatorR) {
+                    eFatorR.innerText = (fatorR * 100).toFixed(2).replace('.', ',') + '%';
+                    eFatorR.style.color = fatorR >= 0.28 ? '#00ff88' : '#ff4444';
+                }
+
+                // Monitoramento Completo do Fator R (Aviso de Folha Faltante)
+                if (hasAnexoV && fatTotalMes > 0 && fatorR < 0.28) {
+                    let folhaNecessaria = (numMesesExistencia === 1) ? (fatTotalMes * 0.28) : (rbt12Rec * 0.28);
+                    let falta = (numMesesExistencia === 1) ? (folhaNecessaria - folhaMes) : (folhaNecessaria - rbt12Fol);
+                    if(falta > 0) mesesComFaltaDeFatorR.push({ mes: mNome, falta: falta, fator: fatorR });
+                }
+
+                let dadosMes = { fatMes: fatTotalMes, folhaMes: folhaMes, total: 0 };
+                let subRowHtml = '';
+
+                anexos.forEach(a => {
+                    let fat = faturamentosAnexo[a];
+                    if (fat <= 0) return;
+
+                    let anexoReal = a;
+                    if (a === 'anexoV' && fatorR >= 0.28) anexoReal = 'anexoIII';
+
+                    let tDados = tabelasSimples[anexoReal];
+                    
+                    // Busca a alíquota baseado no RBT12 Proporcionalizado!
+                    let faixa = getFaixa(rbt12p, tDados);
+                    let aliqEfetiva = rbt12p > 0 ? ((rbt12p * faixa[0]) - faixa[1]) / rbt12p : faixa[0];
+                    if (aliqEfetiva < 0) aliqEfetiva = 0;
+
+                    let p = tDados.rep;
+                    let pCofins = isExp ? 0 : p.cofins;
+                    let pPis = isExp ? 0 : p.pis;
+                    let pIcms = isExp ? 0 : (p.icms || 0); 
+                    let pIss = (isExp || isIssFixo) ? 0 : (p.iss || 0);
+                    
+                    let somaPercentuais = p.irpj + p.csll + pCofins + pPis + p.cpp + pIcms + pIss + (p.ipi||0);
+                    let aliqFinalAnexo = aliqEfetiva * somaPercentuais;
+                    let dasAnexo = fat * aliqFinalAnexo;
+
+                    let vIrpj = fat * aliqEfetiva * p.irpj;
+                    let vCsll = fat * aliqEfetiva * p.csll;
+                    let vPis = fat * aliqEfetiva * pPis;
+                    let vCofins = fat * aliqEfetiva * pCofins;
+                    let vCpp = fat * aliqEfetiva * p.cpp;
+                    let vIcmsIss = fat * aliqEfetiva * (pIcms + pIss + (p.ipi||0));
+                    
+                    let percIrpj = (aliqEfetiva * p.irpj * 100).toFixed(2).replace('.', ',');
+                    let percCsll = (aliqEfetiva * p.csll * 100).toFixed(2).replace('.', ',');
+                    let percPis = (aliqEfetiva * pPis * 100).toFixed(2).replace('.', ',');
+                    let percCofins = (aliqEfetiva * pCofins * 100).toFixed(2).replace('.', ',');
+                    let percCpp = (aliqEfetiva * p.cpp * 100).toFixed(2).replace('.', ',');
+                    let percIcmsIss = (aliqEfetiva * (pIcms + pIss + (p.ipi||0)) * 100).toFixed(2).replace('.', ',');
+
+                    dadosMes.total += dasAnexo;
+                    sumDasGlob[a] += dasAnexo;
+
+                    document.getElementById(`aliqEfetiva-${i}-${a}`).innerText = (aliqEfetiva * 100).toFixed(2).replace('.', ',') + '%';
+                    document.getElementById(`dasValor-${i}-${a}`).innerText = formataMoedaBR(dasAnexo);
+
+                    // Criação da linha de olho (Detalhamento com Percentuais e Valor)
+                    subRowHtml += `
+                    <div class="flex items-center gap-4 bg-[#111] p-3 rounded-lg border border-neutral-800 w-full justify-center">
+                        <div class="text-orange-500 font-black text-xs w-28 text-center uppercase border-r border-neutral-700 pr-2">${getNomeAbreviado(a)}</div>
+                        <div class="grid grid-cols-7 gap-4 text-center">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">IRPJ <span class="text-[8px] text-orange-400/80 ml-1">(${percIrpj}%)</span></span>
+                                <span class="text-[11px] font-bold ${vIrpj===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vIrpj)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">CSLL <span class="text-[8px] text-orange-400/80 ml-1">(${percCsll}%)</span></span>
+                                <span class="text-[11px] font-bold ${vCsll===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vCsll)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">PIS <span class="text-[8px] text-orange-400/80 ml-1">(${percPis}%)</span></span>
+                                <span class="text-[11px] font-bold ${vPis===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vPis)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">COFINS <span class="text-[8px] text-orange-400/80 ml-1">(${percCofins}%)</span></span>
+                                <span class="text-[11px] font-bold ${vCofins===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vCofins)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">CPP <span class="text-[8px] text-orange-400/80 ml-1">(${percCpp}%)</span></span>
+                                <span class="text-[11px] font-bold ${vCpp===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vCpp)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-neutral-500 font-bold">ICMS/ISS <span class="text-[8px] text-orange-400/80 ml-1">(${percIcmsIss}%)</span></span>
+                                <span class="text-[11px] font-bold ${vIcmsIss===0?'text-neutral-600':'text-white'} mt-1">${formataMoedaBR(vIcmsIss)}</span>
+                            </div>
+                            
+                            <div class="flex flex-col border-l border-neutral-700 pl-4">
+                                <span class="text-[9px] text-orange-500 font-black uppercase">TOTAL DAS</span>
+                                <span class="text-[12px] font-black text-[#00ff88] mt-1">${formataMoedaBR(dasAnexo)}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                document.getElementById(`bd-container-${i}`).innerHTML = fatTotalMes > 0 ? subRowHtml : '<span class="text-neutral-600 font-bold text-xs uppercase p-4 block text-center">Nenhum faturamento neste mês</span>';
+
+                document.getElementById(`dasTotal-${i}`).innerText = formataMoedaBR(dadosMes.total);
+                sumDasTotal += dadosMes.total;
+                window.simulacaoData.push(dadosMes);
+
+                // ATUALIZA A JANELA DESLIZANTE DE HISTÓRICO
+                histRec.push(fatTotalMes);
+                histRec.shift(); 
+                histFol.push(folhaMes);
+                histFol.shift();
+            });
+            
+            // PREENCHE OS TOTAIS NA TABELA
+            anexos.forEach(a => {
+                if(document.getElementById(`tot-fat-${a}`)) document.getElementById(`tot-fat-${a}`).innerText = formataMoedaBR(sumFatGlob[a]);
+                if(document.getElementById(`tot-das-${a}`)) document.getElementById(`tot-das-${a}`).innerText = formataMoedaBR(sumDasGlob[a]);
+            });
+            if(document.getElementById('tot-folha')) document.getElementById('tot-folha').innerText = formataMoedaBR(sumFolGlob);
+            if(document.getElementById('tot-das-geral')) document.getElementById('tot-das-geral').innerText = formataMoedaBR(sumDasTotal);
+
+            // INTELIGÊNCIA FISCAL GLOBAL (Dica Contínua de TODOS os meses)
+            const boxDica = document.getElementById('boxDicaFatorR');
+            if (hasAnexoV && faturamentoGlobal > 0) {
+                if(mesesComFaltaDeFatorR.length === 0) {
+                    boxDica.innerHTML = `✅ <strong>Dica: Fator R Seguro!</strong> Todos os meses projetados estão acima de 28%. O benefício do Anexo III está garantido.`;
+                    boxDica.className = "p-3 rounded-lg border border-green-500/50 bg-green-500/10 text-[11px] font-bold text-green-500 z-10 relative block tracking-wide";
+                } else {
+                    let listaFalhas = mesesComFaltaDeFatorR.map(m => `<li><strong>${m.mes}:</strong> Fator ${(m.fator*100).toFixed(2).replace('.', ',')}%. Injetar aprox. + R$ ${formataMoedaBR(m.falta)} folha acum.</li>`).join('');
+                    boxDica.innerHTML = `⚠️ <strong>Alerta: Fator R abaixo de 28% detectado!</strong><br>Para evitar a carga pesada do Anexo V, ajuste a folha nestes meses:<ul class="list-disc pl-4 mt-2 text-[10px] space-y-1">${listaFalhas}</ul>`;
+                    boxDica.className = "p-3 rounded-lg border border-red-500/50 bg-red-500/10 text-[11px] text-red-500 z-10 relative block";
+                }
+            } else {
+                boxDica.classList.add('hidden');
+            }
+        }
+
+        function toggleComposicaoInline(idx) {
+            const row = document.getElementById(`subrow-${idx}`);
+            row.classList.toggle('hidden');
+        }
+
+        // IMPORTAÇÃO PGDAS VIA PDF DIRECTO
+        async function processarPDF(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const btn = document.getElementById('btnImportar');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lendo PDF...';
+            lucide.createIcons();
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let fullText = '';
+                
+                for(let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(s => s.str).join(' ') + ' ';
+                }
+
+                const textNorm = fullText.replace(/\s+/g, ' ');
+
+                // 1. Extração Inteligente do Nome e Data de Abertura
+                let matchNameDate1 = textNorm.match(/Nome empresarial:\s*(.*?)\s*Data de abertura no CNPJ:\s*(\d{2}\/\d{2}\/\d{4})/i);
+                let matchNameDate2 = textNorm.match(/Optante pelo Simples Nacional:\s*(?:Sim|Não)\s+(.*?)\s+(\d{2}\/\d{2}\/\d{4})/i);
+
+                let extNome = '';
+                let extData = '';
+
+                if (matchNameDate1 && matchNameDate1[1].trim() !== '') {
+                    extNome = matchNameDate1[1].trim();
+                    extData = matchNameDate1[2].trim();
+                } else if (matchNameDate2) {
+                    extNome = matchNameDate2[1].trim();
+                    extData = matchNameDate2[2].trim();
+                }
+
+                if (extNome) document.getElementById('nomeEmpresa').value = extNome;
+                if (extData) {
+                    const parts = extData.split('/');
+                    if(parts.length === 3) {
+                        document.getElementById('mesAbertura').value = parseInt(parts[1], 10);
+                        document.getElementById('anoAbertura').value = parseInt(parts[2], 10);
+                    }
+                }
+
+                // 2. Extração dos Faturamentos retroativos
+                const regexValores = /(0[1-9]|1[0-2])\/(20\d{2})\D+([\d\.]*,\d{2})/g;
+                let match;
+                let mesesEncontrados = {};
+
+                while ((match = regexValores.exec(fullText)) !== null) {
+                    let mesAno = match[1] + '/' + match[2];
+                    let valor = limpaMoeda(match[3]);
+                    if(!mesesEncontrados[mesAno]) mesesEncontrados[mesAno] = 0;
+                    mesesEncontrados[mesAno] += valor;
+                }
+
+                let chaves = Object.keys(mesesEncontrados).sort((a,b) => {
+                    let [ma,ya] = a.split('/');
+                    let [mb,yb] = b.split('/');
+                    return new Date(ya, ma-1) - new Date(yb, mb-1);
+                });
+
+                let ultimos12 = chaves.slice(-12).reverse();
+
+                if(ultimos12.length > 0) {
+                    ultimos12.forEach((chave, index) => {
+                        const realIndex = index + 1; // 1 to 12
+                        const input = document.querySelector(`.rbt12-receita[data-idx="${realIndex}"]`);
+                        if(input) {
+                            input.value = formataMoedaBR(mesesEncontrados[chave]);
+                            window.cacheRBT12[`rec-${realIndex}`] = mesesEncontrados[chave];
+                        }
+                    });
+                }
+
+                iniciarSimulacao();
+                alert(`Declaração processada com sucesso! \nForam identificados e preenchidos dados da empresa e de ${ultimos12.length} meses de faturamento.`);
+
+            } catch (e) {
+                console.error(e);
+                alert("Erro ao tentar ler o arquivo PDF. Certifique-se que é o recibo do PGDAS.");
+            } finally {
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+                event.target.value = ''; 
+            }
+        }
+
+        // SALVAR E HISTÓRICO
+        function salvarSimulacao() {
+            const nome = document.getElementById('nomeEmpresa').value || 'SIMULAÇÃO SEM NOME';
+            const dataStr = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            const sumFaturamento = window.simulacaoData.reduce((acc, curr) => acc + curr.fatMes, 0);
+            const sumDas = window.simulacaoData.reduce((acc, curr) => acc + curr.total, 0);
+
+            let inputsSalvos = {};
+            document.querySelectorAll('.input-tabela.faturamento-inp, .input-tabela.folha-inp').forEach(inp => {
+                inputsSalvos[`${inp.dataset.row}-${inp.dataset.col}`] = limpaMoeda(inp.value);
+            });
+
+            let config = {
+                tipoEmpresa: document.getElementById('tipoEmpresa').value,
+                mesAbertura: document.getElementById('mesAbertura').value,
+                anoAbertura: document.getElementById('anoAbertura').value,
+                mesApuracao: document.getElementById('mesApuracao').value,
+                anoApuracao: document.getElementById('anoApuracao').value,
+                anexos: Array.from(document.querySelectorAll('input[name="anexo"]:checked')).map(cb => cb.value),
+                isExp: document.getElementById('chkExportacao').checked,
+                isIssFixo: document.getElementById('chkIssFixo').checked,
+                cacheRBT12: window.cacheRBT12,
+                inputsSalvos: inputsSalvos,
+                nomeEmpresa: nome
+            };
+
+            let historico = JSON.parse(localStorage.getItem('das_history') || '[]');
+            historico.unshift({ id: Date.now(), nome: nome, data: dataStr, resumo: `Fat: ${formataMoedaBR(sumFaturamento)} | DAS: ${formataMoedaBR(sumDas)}`, config: config });
+            localStorage.setItem('das_history', JSON.stringify(historico));
+            
+            renderSidebarHistory();
+            alert("Simulação Salva com sucesso!");
+        }
+
+        function excluirHistorico(id) {
+            if(!confirm("Tem certeza que deseja excluir esta simulação do histórico?")) return;
+            let historico = JSON.parse(localStorage.getItem('das_history') || '[]');
+            historico = historico.filter(h => h.id !== id);
+            localStorage.setItem('das_history', JSON.stringify(historico));
+            renderSidebarHistory();
+        }
+
+        function editarNomeHistorico(id) {
+            let historico = JSON.parse(localStorage.getItem('das_history') || '[]');
+            let item = historico.find(h => h.id === id);
+            if(!item) return;
+            let novoNome = prompt("Editar nome da simulação:", item.nome);
+            if(novoNome && novoNome.trim() !== '') {
+                item.nome = novoNome.trim();
+                localStorage.setItem('das_history', JSON.stringify(historico));
+                renderSidebarHistory();
+            }
+        }
+
+        function renderSidebarHistory() {
+            let historico = JSON.parse(localStorage.getItem('das_history') || '[]');
+            const container = document.getElementById('listaHistorico');
+            
+            if(historico.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-neutral-600 block mt-2 text-center">Nenhuma projeção.</span>';
+                return;
+            }
+
+            container.innerHTML = historico.map(h => `
+                <div class="bg-[#111] border border-neutral-800 p-3 rounded-xl hover:border-orange-500/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[11px] font-bold text-white uppercase truncate pr-2">${h.nome}</span>
+                        <span class="text-[9px] text-neutral-500 font-mono">${h.data.split(' ')[0]}</span>
+                    </div>
+                    <div class="text-[9px] text-orange-500 font-black mt-1 tracking-widest uppercase">${h.resumo}</div>
+                    
+                    <div class="flex gap-1 mt-3">
+                        <button onclick="carregarSimulacao(${h.id})" class="flex-1 text-[10px] py-1.5 bg-black text-neutral-400 group-hover:text-white rounded border border-neutral-800 hover:border-orange-500 uppercase font-bold flex justify-center gap-1 transition-all" title="Abrir"><i data-lucide="eye" class="w-3 h-3"></i></button>
+                        <button onclick="editarNomeHistorico(${h.id})" class="px-2 bg-black text-neutral-500 hover:text-blue-400 rounded border border-neutral-800 transition-all" title="Editar Nome"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
+                        <button onclick="excluirHistorico(${h.id})" class="px-2 bg-black text-neutral-500 hover:text-red-500 rounded border border-neutral-800 transition-all" title="Excluir"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function carregarSimulacao(id) {
+            let historico = JSON.parse(localStorage.getItem('das_history') || '[]');
+            let sim = historico.find(h => h.id === id);
+            if(!sim) return;
+
+            document.getElementById('nomeEmpresa').value = sim.config.nomeEmpresa || '';
+            document.getElementById('tipoEmpresa').value = sim.config.tipoEmpresa;
+            
+            document.getElementById('mesAbertura').value = sim.config.mesAbertura;
+            document.getElementById('anoAbertura').value = sim.config.anoAbertura;
+            document.getElementById('mesApuracao').value = sim.config.mesApuracao;
+            document.getElementById('anoApuracao').value = sim.config.anoApuracao;
+
+            document.querySelectorAll('input[name="anexo"]').forEach(cb => {
+                cb.checked = sim.config.anexos.includes(cb.value);
+            });
+
+            document.getElementById('chkExportacao').checked = sim.config.isExp;
+            document.getElementById('chkIssFixo').checked = sim.config.isIssFixo;
+
+            window.cacheRBT12 = sim.config.cacheRBT12 || {};
+            window.restoringInputs = sim.config.inputsSalvos || {};
+            
+            toggleDatas();
+            atualizaGridRbt12();
+            iniciarSimulacao();
+            
+            window.restoringInputs = null;
+        }
+
+        function exportarExcel() {
+            let relHeader = document.querySelector("#relatorioHeader").cloneNode(true);
+            relHeader.style.display = 'block';
+            
+            let table = document.querySelector("#tblSimulacao").cloneNode(true);
+            
+            table.querySelectorAll('button').forEach(btn => btn.remove());
+            table.querySelectorAll('tr.hidden').forEach(tr => tr.remove());
+            table.querySelectorAll('.no-print').forEach(el => el.remove());
+            table.querySelectorAll('svg').forEach(el => el.remove());
+
+            table.querySelectorAll('input').forEach(inp => {
+                let span = document.createElement('span');
+                span.innerText = inp.value;
+                inp.replaceWith(span);
+            });
+
+            let html = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8"></head>
+                <body>
+                    ${relHeader.outerHTML}
+                    <br>
+                    ${table.outerHTML}
+                </body>
+                </html>
+            `;
+            let url = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(html)));
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Projecao_Tributaria.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>
