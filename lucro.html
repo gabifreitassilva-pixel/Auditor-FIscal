@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeção Lucro Presumido - GFS Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Scrollbar Premium */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #ff7300; border-radius: 4px; }
+
+        body { background-color: #0a0a0a !important; color: #ffffff !important; }
+
+        /* Estilização dos Inputs Premium */
+        input[type="text"], input[type="number"], select, textarea { 
+            background-color: #000000 !important; 
+            color: #ffffff !important; 
+            border: 1px solid #333 !important;
+            padding: 10px 14px;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus { 
+            border-color: #ff7300 !important; 
+            box-shadow: 0 0 10px rgba(255, 115, 0, 0.2) !important; 
+        }
+
+        .module-card { 
+            background-color: #111111 !important; 
+            border: 1px solid #222 !important;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        label.title-label { 
+            display: block; font-size: 10px; font-weight: 900; color: #ff7300;
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
+        }
+
+        /* Checkbox Customizado */
+        .check-label {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            color: #ffffff; transition: color 0.3s ease; font-weight: bold; font-size: 11px;
+        }
+        .check-label:has(input:checked) { color: #ff7300; }
+        input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ff7300; cursor: pointer; }
+
+        /* TABELA PREMIUM AJUSTÁVEL */
+        .table-wrapper { width: 100%; overflow-x: auto; background: #000; border: 1px solid #333; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; white-space: nowrap; table-layout: auto; }
+        th { background-color: #ff7300; color: #000; font-weight: 900; padding: 8px 4px; text-transform: uppercase; border-bottom: 2px solid #cc5c00; }
+        td { padding: 6px 4px; border-bottom: 1px solid #222; border-right: 1px solid #222; vertical-align: middle; }
+        tbody tr.main-row:nth-child(4n-3) { background-color: #080808; }
+        tbody tr.main-row:nth-child(4n-1) { background-color: #111; }
+        tbody tr.main-row:hover { background-color: #1a1a1a; }
+        .td-highlight { font-weight: bold; color: #00ff88; font-size: 12px; }
+        .th-group { background-color: #cc5c00; color: white; border-right: 1px solid #aa4d00; }
+
+        /* TFOOT DE TOTAIS */
+        tfoot tr { background-color: #0a0a0a; border-top: 2px solid #ff7300; font-weight: 900; color: #fff; font-size: 11px; }
+
+        /* Input DENTRO da tabela */
+        .input-tabela { 
+            background-color: #1a1a1a !important; color: #fff !important; 
+            border: 1px solid #444 !important; text-align: center; font-weight: bold; 
+            padding: 4px !important; border-radius: 4px !important; font-size: 10px !important; 
+            width: 100%; min-width: 80px; max-width: 100px; margin: 0 auto;
+        }
+        .input-tabela.input-exclusion { border-color: #aa4d00 !important; color: #ffcc00 !important; }
+        .input-tabela:focus { border-color: #ff7300 !important; background-color: #000 !important; }
+
+        /* Estilos do Sub-row (OLHO INLINE) */
+        .subrow-td { padding: 0 !important; border: none !important; }
+        .breakdown-box { background: #050505; border-bottom: 2px solid #ff7300; padding: 15px; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); }
+
+        /* HEADER DE RELATÓRIO (Excel e Impressão) */
+        #relatorioHeader { display: none; }
+
+        /* Para impressão */
+        @media print {
+            body { background-color: #fff !important; color: #000 !important; }
+            aside, .no-print, button, .module-card:not(.table-module), .breakdown-box { display: none !important; }
+            .table-module { box-shadow: none !important; border: none !important; width: 100% !important; padding: 0 !important; margin: 0 !important;}
+            .input-tabela { border: none !important; background: transparent !important; color: #000 !important; padding: 0 !important; font-size: 11px !important; }
+            th { background-color: #eee !important; color: #000 !important; border-color: #000 !important; -webkit-print-color-adjust: exact; }
+            td { border-color: #000 !important; color: #000 !important; }
+            tfoot tr { background-color: #ddd !important; border-top: 2px solid #000 !important; color: #000 !important; }
+            #relatorioHeader { display: block !important; margin-bottom: 20px; padding: 15px; border: 1px solid #000; page-break-after: avoid; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans antialiased bg-black">
+
+    <!-- Sidebar Lateral Exclusiva para Histórico -->
+    <aside class="w-80 bg-black border-r border-neutral-800 flex flex-col h-full z-40 no-print">
+        <div class="p-6 border-b border-neutral-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="trending-up" class="text-orange-500"></i>
+                <span class="text-orange-500">Projeção</span><span class="text-white text-lg">LP</span>
+            </h1>
+        </div>
+        
+        <div class="p-4 flex-1 flex flex-col gap-4 overflow-hidden">
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <span class="text-[10px] text-neutral-500 font-black uppercase tracking-widest border-b border-neutral-800 pb-2 block w-full shrink-0">Histórico de Simulações LP</span>
+                <div id="listaHistorico" class="mt-2 space-y-2 overflow-y-auto flex-1 custom-scrollbar pr-2">
+                    <!-- Lista injetada via JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-neutral-800 text-[9px] text-neutral-600 uppercase font-black tracking-widest text-center">
+            GFS Intelligence © 2026
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <main class="flex-1 overflow-y-auto bg-[#050505] p-6 md:p-8" id="mainArea">
+        <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
+            
+            <div class="border-l-4 border-orange-500 pl-6 mb-6 no-print">
+                <h2 class="text-3xl font-black text-white uppercase tracking-tight">Projeção Tributária Inteligente</h2>
+                <p class="text-neutral-500 text-sm uppercase font-bold tracking-tighter mt-1">Regime: Lucro Presumido Mensal/Trimestral</p>
+            </div>
+
+            <!-- PAINEL SUPERIOR: CONFIGURAÇÕES -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 no-print">
+                
+                <!-- 1. IDENTIFICAÇÃO -->
+                <div class="module-card">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-3">
+                        <i data-lucide="building" class="text-orange-500 w-5 h-5"></i> Empresa & Período
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="title-label">Nome do Cliente / Empresa</label>
+                            <input type="text" id="nomeEmpresa" placeholder="Razão Social" onchange="atualizarCabecalhoRelatorio()">
+                        </div>
+
+                        <div id="mesApuracaoDiv">
+                            <label class="title-label">Início da Projeção (12 Meses):</label>
+                            <div class="flex gap-2">
+                                <select id="mesApuracao" onchange="iniciarSimulacao()" class="flex-1"></select>
+                                <select id="anoApuracao" onchange="iniciarSimulacao()" class="flex-1"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ATIVIDADES DE PRESUNÇÃO -->
+                <div class="module-card">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-3">
+                        <i data-lucide="briefcase" class="text-orange-500 w-5 h-5"></i> Atividades (Bases)
+                    </h3>
+                    <label class="title-label">Selecione as Operações de Venda/Serviço</label>
+                    <div class="grid grid-cols-1 gap-2 mt-3" onchange="iniciarSimulacao()">
+                        <label class="check-label" title="Presunção: 8% IR / 12% CSLL">
+                            <input type="checkbox" name="atividade" value="comercio"> 
+                            Comércio (8% | 12%)
+                        </label>
+                        <label class="check-label" title="Presunção: 8% IR / 12% CSLL + IPI">
+                            <input type="checkbox" name="atividade" value="industria"> 
+                            Indústria (8% | 12% + IPI)
+                        </label>
+                        <label class="check-label" title="Presunção: 32% IR / 32% CSLL">
+                            <input type="checkbox" name="atividade" value="servicos"> 
+                            Serviços em Geral (32% | 32%)
+                        </label>
+                        <label class="check-label" title="Presunção: 1,6% IR / 12% CSLL">
+                            <input type="checkbox" name="atividade" value="combustivel"> 
+                            Rev. Combustíveis (1,6% | 12%)
+                        </label>
+                        <label class="check-label" title="Presunção: 8% IR / 12% CSLL">
+                            <input type="checkbox" name="atividade" value="transp_carga"> 
+                            Transp. Cargas / Hosp. (8% | 12%)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. EXCLUSÕES E DEDUÇÕES -->
+                <div class="module-card border-orange-500/30">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-3">
+                        <i data-lucide="minus-circle" class="text-orange-500 w-5 h-5"></i> Exclusões da Base
+                    </h3>
+                    <label class="title-label">Ative colunas de deduções na tabela</label>
+                    <div class="grid grid-cols-1 gap-2 mt-3" onchange="iniciarSimulacao()">
+                        <label class="check-label" title="Exclusão do ICMS destacado da base do PIS e COFINS (Tese do Século)">
+                            <input type="checkbox" name="exclusao_tipo" value="exc_icms_piscof"> 
+                            (-) ICMS da Base PIS/COFINS
+                        </label>
+                        <label class="check-label" title="Abate da base de cálculo do PIS e COFINS">
+                            <input type="checkbox" name="exclusao_tipo" value="exc_mono"> 
+                            (-) PIS/COF Monofásico
+                        </label>
+                        <label class="check-label" title="Vendas para Suframa/Exportação (Abate PIS/COF)">
+                            <input type="checkbox" name="exclusao_tipo" value="exc_isenta"> 
+                            (-) Vendas Isentas/Aliq. Zero
+                        </label>
+                        <label class="check-label" title="IPI faturado que não entra nas bases do LP">
+                            <input type="checkbox" name="exclusao_tipo" value="exc_ipi"> 
+                            (-) Dedução de IPI faturado
+                        </label>
+                        <label class="check-label" title="Mercadorias com ST onde o ICMS já foi retido">
+                            <input type="checkbox" name="exclusao_tipo" value="exc_icms_st"> 
+                            (-) ICMS ST (Retido Fonte)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 4. PARÂMETROS LOCAIS E IPI -->
+                <div class="module-card bg-[#150a00] border-orange-500/30 relative overflow-hidden">
+                    <h3 class="text-orange-500 font-black mb-4 flex items-center gap-2 border-b border-orange-500/20 pb-3 z-10 relative">
+                        <i data-lucide="sliders" class="w-5 h-5"></i> Alíquotas Locais
+                    </h3>
+                    
+                    <div class="space-y-4 z-10 relative">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="title-label">ISS (%)</label>
+                                <input type="number" id="aliqIss" value="5.0" step="0.1" onchange="iniciarSimulacao()" class="text-center bg-[#000] border border-orange-500/50 px-2">
+                            </div>
+                            <div>
+                                <label class="title-label">ICMS (%)</label>
+                                <input type="number" id="aliqIcms" value="18.0" step="0.1" onchange="iniciarSimulacao()" class="text-center bg-[#000] border border-orange-500/50 px-2">
+                            </div>
+                            <div>
+                                <label class="title-label">IPI (%)</label>
+                                <input type="number" id="aliqIpi" value="5.0" step="0.1" onchange="iniciarSimulacao()" class="text-center bg-[#000] border border-orange-500/50 px-2">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-[10px] text-orange-400/80 leading-tight font-bold">
+                            <ul class="list-disc pl-4 space-y-1">
+                                <li>PIS e COFINS: 0,65% e 3,00%.</li>
+                                <li>Adic. IRPJ: 10% sobre base IR que excede 20 mil/mês.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <i data-lucide="calculator" class="absolute -right-4 -bottom-4 w-32 h-32 text-orange-500 opacity-10 z-0"></i>
+                </div>
+
+            </div>
+
+            <!-- CABEÇALHO INVISIVEL PARA RELATÓRIO EXCEL/PDF -->
+            <div id="relatorioHeader">
+                <h2 style="font-weight:bold; font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px;">RELATÓRIO DE PROJEÇÃO TRIBUTÁRIA (LUCRO PRESUMIDO)</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 15px;">
+                    <div><strong>Empresa:</strong> <span id="relNome">-</span></div>
+                    <div><strong>Data Simulação:</strong> <span id="relData">-</span></div>
+                    <div><strong>Início Projeção:</strong> <span id="relProjecao">-</span></div>
+                    <div><strong>Alíquotas Locais:</strong> <span id="relAliquotas">-</span></div>
+                    <div style="grid-column: span 2;"><strong>Atividades Selecionadas:</strong> <span id="relAtividades">-</span></div>
+                    <div style="grid-column: span 2;"><strong>Exclusões Ativas:</strong> <span id="relExclusoes">-</span></div>
+                </div>
+            </div>
+
+            <!-- TABELA DE PROJEÇÃO LP -->
+            <div class="module-card !p-0 overflow-hidden border border-orange-500/30 table-module">
+                <div class="bg-[#150a00] p-4 border-b border-orange-500/30 flex justify-between items-center no-print">
+                    <h3 class="text-white font-black flex items-center gap-2 uppercase tracking-widest text-sm"><i data-lucide="table" class="text-orange-500 w-4 h-4"></i> Projeção Faturamento e Tributos</h3>
+                </div>
+                <div class="table-wrapper custom-scrollbar">
+                    <div id="resultadoSimulacao"></div>
+                </div>
+                
+                <!-- BOTÕES DE AÇÃO NO FINAL DA TABELA -->
+                <div class="p-4 bg-black border-t border-orange-500/30 flex flex-col md:flex-row justify-end gap-3 no-print">
+                    <button onclick="location.reload()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-neutral-900 text-neutral-400 font-bold text-xs hover:bg-neutral-800 hover:text-white transition-all border border-neutral-800">
+                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpar Tudo
+                    </button>
+                    <button onclick="exportarExcel()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-green-700/20 text-green-500 border border-green-700/50 hover:bg-green-700/40 hover:text-green-400 font-bold text-xs transition-all uppercase tracking-widest">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel
+                    </button>
+                    <button onclick="window.print()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-blue-700/20 text-blue-500 border border-blue-700/50 hover:bg-blue-700/40 hover:text-blue-400 font-bold text-xs transition-all uppercase tracking-widest">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                    </button>
+                    <button onclick="salvarSimulacao()" class="flex items-center justify-center gap-2 px-8 py-2 rounded-lg bg-orange-600 text-white font-black text-xs shadow-lg hover:bg-orange-500 transition-all uppercase tracking-widest">
+                        <i data-lucide="save" class="w-4 h-4"></i> Salvar Simulação
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ESTADO GLOBAL
+        window.simulacaoData = []; 
+        window.mesesProjetados = [];
+        window.atividadesAtivas = [];
+        window.exclusoesAtivas = [];
+
+        const mesesOptions = [
+            { v: 1, n: "Jan" }, { v: 2, n: "Fev" }, { v: 3, n: "Mar" }, { v: 4, n: "Abr" }, 
+            { v: 5, n: "Mai" }, { v: 6, n: "Jun" }, { v: 7, n: "Jul" }, { v: 8, n: "Ago" }, 
+            { v: 9, n: "Set" }, { v: 10, n: "Out" }, { v: 11, n: "Nov" }, { v: 12, n: "Dez" }
+        ];
+
+        // Mapeamento visual das colunas
+        const labelsAtividades = {
+            'comercio': 'FAT. COMÉRCIO',
+            'industria': 'FAT. INDÚSTRIA',
+            'combustivel': 'FAT. COMBUSTÍVEL',
+            'transp_carga': 'TR. CARGA/HOSP',
+            'transp_passag': 'TR. PASSAGEIROS',
+            'servicos': 'FAT. SERVIÇOS'
+        };
+
+        const labelsExclusoes = {
+            'exc_icms_piscof': '(-) ICMS BASE P/C',
+            'exc_mono': '(-) PIS/COF MONO.',
+            'exc_isenta': '(-) ISENTAS/ZERO',
+            'exc_icms_st': '(-) ICMS ST',
+            'exc_ipi': '(-) DED. IPI'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            populaDatas();
+            renderSidebarHistory();
+            iniciarSimulacao(); 
+        });
+
+        function formataMoedaBR(valor) {
+            if (isNaN(valor) || valor === null) return '0,00';
+            return parseFloat(valor).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function limpaMoeda(str) {
+            if (typeof str !== 'string') return parseFloat(str) || 0;
+            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+        }
+
+        function formataInput(e) {
+            const val = limpaMoeda(e.target.value);
+            e.target.value = formataMoedaBR(val);
+            executarCalculoMatematico(window.mesesProjetados, window.atividadesAtivas, window.exclusoesAtivas);
+        }
+
+        function replicarValor(btn, col) {
+            const inputOrigem = btn.previousElementSibling;
+            const valorStr = inputOrigem.value;
+            const startRow = parseInt(inputOrigem.dataset.row);
+            
+            const table = document.getElementById('tblSimulacao');
+            const inputs = table.querySelectorAll(`.input-tabela[data-col="${col}"]`);
+            inputs.forEach(inp => {
+                if (parseInt(inp.dataset.row) > startRow) {
+                    inp.value = valorStr;
+                }
+            });
+            executarCalculoMatematico(window.mesesProjetados, window.atividadesAtivas, window.exclusoesAtivas);
+        }
+
+        function populaDatas() {
+            const anoAtual = new Date().getFullYear();
+            const mesAtual = new Date().getMonth() + 1;
+            
+            document.getElementById('mesApuracao').innerHTML = mesesOptions.map(m => `<option value="${m.v}" ${m.v === mesAtual ? 'selected' : ''}>${m.n}</option>`).join('');
+
+            let anos = '';
+            for(let i = anoAtual - 3; i <= anoAtual + 2; i++) anos += `<option value="${i}" ${i === anoAtual ? 'selected' : ''}>${i}</option>`;
+            document.getElementById('anoApuracao').innerHTML = anos;
+        }
+
+        function atualizarCabecalhoRelatorio() {
+            document.getElementById('relNome').innerText = document.getElementById('nomeEmpresa').value || 'Não informado';
+            document.getElementById('relData').innerText = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            const selMesProj = document.getElementById('mesApuracao');
+            document.getElementById('relProjecao').innerText = selMesProj.options[selMesProj.selectedIndex].text + '/' + document.getElementById('anoApuracao').value;
+
+            // Puxa Atividades Selecionadas (texto limpo da label)
+            const ativSel = Array.from(document.querySelectorAll('input[name="atividade"]:checked'))
+                                 .map(cb => cb.parentNode.textContent.trim().split('(')[0].trim())
+                                 .join(', ');
+            document.getElementById('relAtividades').innerText = ativSel || 'Nenhuma';
+
+            // Puxa Exclusões Selecionadas (texto limpo da label)
+            const excSel = Array.from(document.querySelectorAll('input[name="exclusao_tipo"]:checked'))
+                                .map(cb => cb.parentNode.textContent.trim())
+                                .join(' | ');
+            document.getElementById('relExclusoes').innerText = excSel || 'Nenhuma';
+
+            // Puxa Alíquotas Locais informadas
+            const aliqIss = document.getElementById('aliqIss').value || '0';
+            const aliqIcms = document.getElementById('aliqIcms').value || '0';
+            const aliqIpi = document.getElementById('aliqIpi').value || '0';
+            document.getElementById('relAliquotas').innerText = `ISS: ${aliqIss}% | ICMS: ${aliqIcms}% | IPI: ${aliqIpi}%`;
+        }
+
+        function iniciarSimulacao() {
+            atualizarCabecalhoRelatorio();
+
+            const atividades = Array.from(document.querySelectorAll('input[name="atividade"]:checked')).map(cb => cb.value);
+            const exclusoes = Array.from(document.querySelectorAll('input[name="exclusao_tipo"]:checked')).map(cb => cb.value);
+            
+            if(atividades.length === 0) {
+                document.getElementById('resultadoSimulacao').innerHTML = '<div class="text-center text-orange-500 font-bold p-10 uppercase text-xs tracking-widest">⚠️ Selecione pelo menos 1 atividade de faturamento no passo 2.</div>';
+                return;
+            }
+
+            const ano = parseInt(document.getElementById('anoApuracao').value);
+            const mes = parseInt(document.getElementById('mesApuracao').value);
+            
+            let dataAtual = new Date(ano, mes - 1, 1);
+            let mesesProjetados = [];
+            for (let i = 0; i < 12; i++) {
+                mesesProjetados.push(new Date(dataAtual.getFullYear(), dataAtual.getMonth() + i, 1));
+            }
+            
+            window.mesesProjetados = mesesProjetados;
+            window.atividadesAtivas = atividades;
+            window.exclusoesAtivas = exclusoes;
+
+            let inputsSalvos = window.restoringInputs || {};
+            if(!window.restoringInputs) {
+                document.querySelectorAll('.input-tabela').forEach(inp => {
+                    inputsSalvos[`${inp.dataset.row}-${inp.dataset.col}`] = limpaMoeda(inp.value);
+                });
+            }
+
+            montarHTMLTabela(mesesProjetados, atividades, exclusoes, inputsSalvos);
+            executarCalculoMatematico(mesesProjetados, atividades, exclusoes);
+        }
+
+        function montarHTMLTabela(meses, atividades, exclusoes, inputsSalvos) {
+            let html = `
+                <table id="tblSimulacao">
+                    <thead>
+                        <tr>
+                            <th class="th-group" style="width: 60px;">Mês</th>
+                            ${atividades.map(a => `<th class="th-group bg-[#aa4d00]">${labelsAtividades[a]}</th>`).join('')}
+                            ${exclusoes.map(e => `<th class="th-group bg-[#803a00]" title="Dedução Específica">${labelsExclusoes[e]}</th>`).join('')}
+                            <th class="th-group bg-[#592900]">PIS/COFINS</th>
+                            <th class="th-group bg-[#592900]">IRPJ/CSLL</th>
+                            <th class="th-group bg-[#592900]">ICMS/ISS/IPI</th>
+                            <th class="th-group bg-orange-600 text-black">TOTAL TRIBUTOS</th>
+                            <th class="th-group no-print" style="width: 40px;">Raio-X</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            meses.forEach((data, i) => {
+                let mNome = mesesOptions[data.getMonth()].n + '/' + data.getFullYear().toString().substr(-2);
+
+                html += `<tr class="main-row" id="row-${i}">
+                    <td class="text-center font-black text-orange-500 uppercase tracking-widest">${mNome}</td>
+                    `;
+                
+                atividades.forEach(a => {
+                    let vAtiv = inputsSalvos[`${i}-${a}`] || 0;
+                    html += `<td>
+                        <div class="flex items-center gap-1 justify-center">
+                            <input type="text" class="input-tabela faturamento-inp" data-row="${i}" data-col="${a}" value="${formataMoedaBR(vAtiv)}" onblur="formataInput(event)">
+                            <button tabindex="-1" onclick="replicarValor(this, '${a}')" class="text-neutral-500 hover:text-orange-500 no-print" title="Replicar p/ baixo"><i data-lucide="chevrons-down" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>`;
+                });
+
+                exclusoes.forEach(e => {
+                    let vExc = inputsSalvos[`${i}-${e}`] || 0;
+                    html += `<td>
+                        <div class="flex items-center gap-1 justify-center">
+                            <input type="text" class="input-tabela input-exclusion" data-row="${i}" data-col="${e}" value="${formataMoedaBR(vExc)}" onblur="formataInput(event)">
+                            <button tabindex="-1" onclick="replicarValor(this, '${e}')" class="text-neutral-500 hover:text-orange-500 no-print" title="Replicar p/ baixo"><i data-lucide="chevrons-down" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>`;
+                });
+
+                html += `<td id="out-piscof-${i}" class="text-center font-bold text-neutral-300">0,00</td>`;
+                html += `<td id="out-irpjcsll-${i}" class="text-center font-bold text-neutral-300">0,00</td>`;
+                html += `<td id="out-locaisipi-${i}" class="text-center font-bold text-neutral-300">0,00</td>`;
+                html += `<td id="totalImpostos-${i}" class="text-center font-black text-[#00ff88] text-[14px]">0,00</td>`;
+                
+                html += `
+                    <td class="text-center no-print">
+                        <button tabindex="-1" onclick="toggleComposicaoInline(${i})" class="bg-neutral-800 p-1.5 rounded hover:bg-orange-600 text-orange-500 hover:text-white transition-all shadow-md" title="Ver Memória de Cálculo Completa">
+                            <i data-lucide="eye" class="w-3 h-3"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+                // SUB ROW (Raio-X de Apuração)
+                html += `
+                <tr id="subrow-${i}" class="hidden bg-[#150a00] no-print">
+                    <td colspan="100%" class="subrow-td">
+                        <div class="breakdown-box flex-col gap-4" id="bd-container-${i}">
+                            <!-- Detalhes Injetados Aqui -->
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            // LINHA DE TOTAIS
+            html += `
+                </tbody>
+                <tfoot>
+                    <tr class="bg-neutral-900 border-t-2 border-orange-500 font-bold text-white">
+                        <td class="text-right uppercase p-3 pr-4">TOTAIS (Ano):</td>
+                        ${atividades.map(a => `<td id="tot-${a}" class="text-center text-orange-400">0,00</td>`).join('')}
+                        ${exclusoes.map(e => `<td id="tot-${e}" class="text-center text-[#ffcc00]">0,00</td>`).join('')}
+                        <td id="tot-piscof" class="text-center text-neutral-400">0,00</td>
+                        <td id="tot-irpjcsll" class="text-center text-neutral-400">0,00</td>
+                        <td id="tot-locaisipi" class="text-center text-neutral-400">0,00</td>
+                        <td id="tot-geral-impostos" class="text-center text-[#00ff88] text-[14px]">0,00</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tfoot>
+            </table>`;
+            
+            document.getElementById('resultadoSimulacao').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function executarCalculoMatematico(meses, atividades, exclusoes) {
+            const paramIss = parseFloat(document.getElementById('aliqIss').value) / 100 || 0.05;
+            const paramIcms = parseFloat(document.getElementById('aliqIcms').value) / 100 || 0.18;
+            const paramIpi = parseFloat(document.getElementById('aliqIpi').value) / 100 || 0.05;
+
+            window.simulacaoData = [];
+
+            // Acumuladores
+            let sumFaturamentos = {};
+            atividades.forEach(a => sumFaturamentos[a] = 0);
+            let sumExclusoes = {};
+            exclusoes.forEach(e => sumExclusoes[e] = 0);
+            
+            let sumPisCofGlob = 0, sumIrCsGlob = 0, sumLocaisIpiGlob = 0, sumImpostosGlobais = 0;
+
+            meses.forEach((data, i) => {
+                let vFat = {};
+                let fatTotalMes = 0;
+                atividades.forEach(a => {
+                    vFat[a] = limpaMoeda(document.querySelector(`.input-tabela[data-row="${i}"][data-col="${a}"]`)?.value || "0");
+                    fatTotalMes += vFat[a];
+                    sumFaturamentos[a] += vFat[a];
+                });
+
+                let vExc = {};
+                exclusoes.forEach(e => {
+                    vExc[e] = limpaMoeda(document.querySelector(`.input-tabela[data-row="${i}"][data-col="${e}"]`)?.value || "0");
+                    sumExclusoes[e] += vExc[e];
+                });
+
+                let valIcmsPisCof = vExc['exc_icms_piscof'] || 0;
+                let valMono = vExc['exc_mono'] || 0;
+                let valIsenta = vExc['exc_isenta'] || 0;
+                let valIcmsSt = vExc['exc_icms_st'] || 0;
+                let valIpi = vExc['exc_ipi'] || 0;
+                let totalExclusoesExib = valIcmsPisCof + valMono + valIsenta + valIcmsSt + valIpi;
+
+                // --- LÓGICA DE DEDUÇÕES E BASES ---
+                
+                // Segregação entre Comércio/Indústria e Serviços
+                let fatComercioBruto = (vFat['comercio'] || 0) + (vFat['combustivel'] || 0);
+                let fatIndustriaBruto = (vFat['industria'] || 0);
+                let fatComercioIndTotal = fatComercioBruto + fatIndustriaBruto;
+                
+                let fatServicoBruto = (vFat['servicos'] || 0) + (vFat['transp_carga'] || 0) + (vFat['transp_passag'] || 0);
+
+                // O IPI faturado abate da Receita Bruta do Comércio/Indústria para formar a Receita Líquida Base
+                let fatComIndLiquido = Math.max(0, fatComercioIndTotal - valIpi);
+                let fatServicoLiquido = fatServicoBruto;
+
+                // 1. PIS/COFINS (Abate ICMS da Tese do Século, Monofásico e Isentas do Comércio/Ind Líquido)
+                let basePisCofinsComercio = Math.max(0, fatComIndLiquido - valMono - valIsenta - valIcmsPisCof);
+                let basePisCofinsServico = fatServicoLiquido;
+                
+                let vPisComercio = basePisCofinsComercio * 0.0065;
+                let vCofinsComercio = basePisCofinsComercio * 0.03;
+                let vPisServico = basePisCofinsServico * 0.0065;
+                let vCofinsServico = basePisCofinsServico * 0.03;
+
+                let vPisTotal = vPisComercio + vPisServico;
+                let vCofinsTotal = vCofinsComercio + vCofinsServico;
+
+                // 2. IRPJ e CSLL (Presunções Conforme Atividade sobre a Receita Líquida - Sem IPI)
+                // Ratio para manter proporção caso deduza IPI da base combinada
+                let ratioIpiComInd = fatComercioIndTotal > 0 ? (fatComIndLiquido / fatComercioIndTotal) : 0;
+                
+                let basePresuncaoIrpjCom = ((vFat['comercio'] || 0) * 0.08 + (vFat['industria'] || 0) * 0.08 + (vFat['combustivel'] || 0) * 0.016) * ratioIpiComInd;
+                let basePresuncaoCsllCom = ((vFat['comercio'] || 0) * 0.12 + (vFat['industria'] || 0) * 0.12 + (vFat['combustivel'] || 0) * 0.12) * ratioIpiComInd;
+
+                let basePresuncaoIrpjServ = (vFat['servicos'] || 0) * 0.32 + (vFat['transp_carga'] || 0) * 0.08 + (vFat['transp_passag'] || 0) * 0.16;
+                let basePresuncaoCsllServ = (vFat['servicos'] || 0) * 0.32 + (vFat['transp_carga'] || 0) * 0.12 + (vFat['transp_passag'] || 0) * 0.12;
+
+                let vIrpjCom = basePresuncaoIrpjCom * 0.15;
+                let vCsllCom = basePresuncaoCsllCom * 0.09;
+                let vIrpjServ = basePresuncaoIrpjServ * 0.15;
+                let vCsllServ = basePresuncaoCsllServ * 0.09;
+
+                let baseIrpjTotal = basePresuncaoIrpjCom + basePresuncaoIrpjServ;
+                let vAdicionalIrpj = baseIrpjTotal > 20000 ? (baseIrpjTotal - 20000) * 0.10 : 0;
+
+                let vIrpjTotal = vIrpjCom + vIrpjServ + vAdicionalIrpj;
+                let vCsllTotal = vCsllCom + vCsllServ;
+
+                // 3. ICMS, ISS e IPI (Estaduais, Municipais e Específico)
+                // ICMS abate o ICMS-ST da base
+                let baseIcms = Math.max(0, fatComIndLiquido - valIcmsSt);
+                let baseIss = fatServicoLiquido;
+                let baseIpi = fatIndustriaBruto;
+                
+                let vIcms = baseIcms * paramIcms;
+                let vIss = baseIss * paramIss;
+                let vIpiCalc = baseIpi * paramIpi;
+                let totalLocaisIpi = vIcms + vIss + vIpiCalc;
+
+                let totalImpostos = vPisTotal + vCofinsTotal + vIrpjTotal + vCsllTotal + totalLocaisIpi;
+
+                // Preenchimento Colunas Output
+                document.getElementById(`out-piscof-${i}`).innerText = formataMoedaBR(vPisTotal + vCofinsTotal);
+                document.getElementById(`out-irpjcsll-${i}`).innerText = formataMoedaBR(vIrpjTotal + vCsllTotal);
+                document.getElementById(`out-locaisipi-${i}`).innerText = formataMoedaBR(totalLocaisIpi);
+                document.getElementById(`totalImpostos-${i}`).innerText = formataMoedaBR(totalImpostos);
+
+                sumPisCofGlob += (vPisTotal + vCofinsTotal);
+                sumIrCsGlob += (vIrpjTotal + vCsllTotal);
+                sumLocaisIpiGlob += totalLocaisIpi;
+                sumImpostosGlobais += totalImpostos;
+
+                // Painel de Raio X (Olho) - ESPELHO EXATO DA PLANILHA EXCEL
+                let subRowHtml = `
+                    <div class="w-full text-left text-xs bg-black rounded-lg border border-neutral-700 overflow-hidden shadow-lg font-mono">
+                        <div class="bg-[#cc5c00] text-white font-black text-center py-2 text-sm uppercase tracking-widest border-b border-orange-900">
+                            APURAÇÃO IMPOSTOS - MEMORIAL DE CÁLCULO
+                        </div>
+                        
+                        <!-- EXCLUSÕES -->
+                        <div class="bg-[#d96a00] text-white font-bold px-3 py-1 text-[11px] uppercase border-b border-orange-900 flex justify-between">
+                            <span>Exclusões e Deduções</span>
+                        </div>
+                        ${ exclusoes.includes('exc_icms_piscof') ? `<div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300"><span>(-) Exclusão ICMS da base do PIS e COFINS</span> <span class="text-orange-400 font-bold">${formataMoedaBR(valIcmsPisCof)}</span></div>` : '' }
+                        ${ exclusoes.includes('exc_mono') ? `<div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300"><span>(-) Exclusões PIS e COFINS Monofásico</span> <span class="text-orange-400 font-bold">${formataMoedaBR(valMono)}</span></div>` : '' }
+                        ${ exclusoes.includes('exc_isenta') ? `<div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300"><span>(-) Venda Alíquota Zero / Isentas (Suframa)</span> <span class="text-orange-400 font-bold">${formataMoedaBR(valIsenta)}</span></div>` : '' }
+                        ${ exclusoes.includes('exc_ipi') ? `<div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300"><span>(-) Dedução de IPI</span> <span class="text-orange-400 font-bold">${formataMoedaBR(valIpi)}</span></div>` : '' }
+                        ${ exclusoes.includes('exc_icms_st') ? `<div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300"><span>(-) Vendas com ICMS ST</span> <span class="text-orange-400 font-bold">${formataMoedaBR(valIcmsSt)}</span></div>` : '' }
+                        <div class="flex justify-between px-3 py-1.5 border-b border-neutral-800 text-neutral-300 bg-neutral-900/50">
+                            <span class="font-bold">(=) Total das Exclusões</span> <span class="text-orange-500 font-black">${formataMoedaBR(totalExclusoesExib)}</span>
+                        </div>
+
+                        <!-- PIS COFINS -->
+                        <div class="bg-[#d96a00] text-white font-bold px-3 py-1 text-[11px] uppercase border-b border-orange-900 mt-2">1. Apuração do PIS/ COFINS</div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base de Cálculo do PIS/COFINS - Comércio/Ind.</span> <span class="font-bold">${formataMoedaBR(basePisCofinsComercio)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">Débito do PIS - 0,65%</span> <span class="font-bold">${formataMoedaBR(vPisComercio)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">Débito do COFINS - 3,00%</span> <span class="font-bold">${formataMoedaBR(vCofinsComercio)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base de Cálculo do PIS/COFINS - Serviço</span> <span class="font-bold">${formataMoedaBR(basePisCofinsServico)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">Débito do PIS - 0,65%</span> <span class="font-bold">${formataMoedaBR(vPisServico)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">Débito do COFINS - 3,00%</span> <span class="font-bold">${formataMoedaBR(vCofinsServico)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1.5 bg-[#aa4d00]/30 text-white font-bold border-b border-neutral-800">
+                            <span>PIS A PAGAR</span> <span class="text-[#00ff88]">${formataMoedaBR(vPisTotal)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1.5 bg-[#aa4d00]/30 text-white font-bold border-b border-gray-800">
+                            <span>COFINS A PAGAR</span> <span class="text-[#00ff88]">${formataMoedaBR(vCofinsTotal)}</span>
+                        </div>
+
+                        <!-- ICMS ISS IPI -->
+                        <div class="bg-[#d96a00] text-white font-bold px-3 py-1 text-[11px] uppercase border-b border-orange-900 mt-2">2. Apuração de ICMS, ISS e IPI</div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base ICMS</span> <span class="font-bold">${formataMoedaBR(baseIcms)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 bg-[#aa4d00]/30 text-white font-bold border-b border-neutral-800">
+                            <span>ICMS A PAGAR (Estimativa - ${(paramIcms*100).toFixed(2)}%)</span> <span class="text-[#00ff88]">${formataMoedaBR(vIcms)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base IPI (Indústria)</span> <span class="font-bold">${formataMoedaBR(baseIpi)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 bg-[#aa4d00]/30 text-white font-bold border-b border-neutral-800">
+                            <span>IPI A PAGAR (Estimativa - ${(paramIpi*100).toFixed(2)}%)</span> <span class="text-[#00ff88]">${formataMoedaBR(vIpiCalc)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base ISS</span> <span class="font-bold">${formataMoedaBR(baseIss)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 bg-[#aa4d00]/30 text-white font-bold">
+                            <span>ISS A PAGAR (Estimativa - ${(paramIss*100).toFixed(2)}%)</span> <span class="text-[#00ff88]">${formataMoedaBR(vIss)}</span>
+                        </div>
+
+                        <!-- IRPJ CSLL -->
+                        <div class="bg-[#d96a00] text-white font-bold px-3 py-1 text-[11px] uppercase border-b border-orange-900 mt-2">3. Apuração do IRPJ/CSLL (Provisão Mensal)</div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base de Cálculo do IRPJ / CSLL - Comércio/Ind.</span> <span class="font-bold">${formataMoedaBR(basePresuncaoIrpjCom)} / ${formataMoedaBR(basePresuncaoCsllCom)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">IRPJ - Comércio/Ind. (15%)</span> <span class="font-bold">${formataMoedaBR(vIrpjCom)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Base de Cálculo do IRPJ / CSLL - Serviço</span> <span class="font-bold">${formataMoedaBR(basePresuncaoIrpjServ)} / ${formataMoedaBR(basePresuncaoCsllServ)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span class="pl-4">IRPJ - Serviços (15%)</span> <span class="font-bold">${formataMoedaBR(vIrpjServ)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1 border-b border-neutral-800 text-neutral-300">
+                            <span>Débito do IRPJ adicional (10% excedente a 20k)</span> <span class="font-bold text-red-400">${formataMoedaBR(vAdicionalIrpj)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1.5 bg-[#aa4d00]/30 text-white font-bold border-b border-neutral-800">
+                            <span>IRPJ A PAGAR (Provisão)</span> <span class="text-[#00ff88]">${formataMoedaBR(vIrpjTotal)}</span>
+                        </div>
+                        <div class="flex justify-between px-3 py-1.5 bg-[#aa4d00]/30 text-white font-bold">
+                            <span>CSLL A PAGAR (Provisão 9%)</span> <span class="text-[#00ff88]">${formataMoedaBR(vCsllTotal)}</span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById(`bd-container-${i}`).innerHTML = (fatTotalMes > 0) ? subRowHtml : '<span class="text-neutral-600 font-bold text-xs uppercase p-4 block text-center">Mês sem faturamento</span>';
+            });
+            
+            // PREENCHE OS TOTAIS DO TFOOT
+            atividades.forEach(a => {
+                if(document.getElementById(`tot-${a}`)) document.getElementById(`tot-${a}`).innerText = formataMoedaBR(sumFaturamentos[a]);
+            });
+            exclusoes.forEach(e => {
+                if(document.getElementById(`tot-${e}`)) document.getElementById(`tot-${e}`).innerText = formataMoedaBR(sumExclusoes[e]);
+            });
+            
+            document.getElementById('tot-piscof').innerText = formataMoedaBR(sumPisCofGlob);
+            document.getElementById('tot-irpjcsll').innerText = formataMoedaBR(sumIrCsGlob);
+            document.getElementById('tot-locaisipi').innerText = formataMoedaBR(sumLocaisIpiGlob);
+            document.getElementById('tot-geral-impostos').innerText = formataMoedaBR(sumImpostosGlobais);
+        }
+
+        function toggleComposicaoInline(idx) {
+            const row = document.getElementById(`subrow-${idx}`);
+            row.classList.toggle('hidden');
+        }
+
+        function salvarSimulacao() {
+            const nome = document.getElementById('nomeEmpresa').value || 'SIMULAÇÃO LP SEM NOME';
+            const dataStr = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            let sumFatTotal = 0;
+            window.atividadesAtivas.forEach(a => {
+                for(let i=0; i<12; i++) sumFatTotal += limpaMoeda(document.querySelector(`.input-tabela[data-row="${i}"][data-col="${a}"]`)?.value || "0");
+            });
+
+            let sumDas = limpaMoeda(document.getElementById('tot-geral-impostos').innerText);
+
+            let inputsSalvos = {};
+            document.querySelectorAll('.input-tabela').forEach(inp => {
+                inputsSalvos[`${inp.dataset.row}-${inp.dataset.col}`] = limpaMoeda(inp.value);
+            });
+
+            let config = {
+                mesApuracao: document.getElementById('mesApuracao').value,
+                anoApuracao: document.getElementById('anoApuracao').value,
+                atividades: Array.from(document.querySelectorAll('input[name="atividade"]:checked')).map(cb => cb.value),
+                exclusoes: Array.from(document.querySelectorAll('input[name="exclusao_tipo"]:checked')).map(cb => cb.value),
+                aliqIss: document.getElementById('aliqIss').value,
+                aliqIcms: document.getElementById('aliqIcms').value,
+                aliqIpi: document.getElementById('aliqIpi').value,
+                inputsSalvos: inputsSalvos,
+                nomeEmpresa: nome
+            };
+
+            let historico = JSON.parse(localStorage.getItem('lp_history') || '[]');
+            historico.unshift({ id: Date.now(), nome: nome, data: dataStr, resumo: `Fat. Acumulado: ${formataMoedaBR(sumFatTotal)} | Trib. Total: ${formataMoedaBR(sumDas)}`, config: config });
+            localStorage.setItem('lp_history', JSON.stringify(historico));
+            
+            renderSidebarHistory();
+            alert("Simulação LP Salva com sucesso!");
+        }
+
+        function renderSidebarHistory() {
+            let historico = JSON.parse(localStorage.getItem('lp_history') || '[]');
+            const container = document.getElementById('listaHistorico');
+            
+            if(historico.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-neutral-600 block mt-2 text-center">Nenhuma projeção.</span>';
+                return;
+            }
+
+            container.innerHTML = historico.map(h => `
+                <div class="bg-[#111] border border-neutral-800 p-3 rounded-xl hover:border-orange-500/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[11px] font-bold text-white uppercase truncate pr-2">${h.nome}</span>
+                        <span class="text-[9px] text-neutral-500 font-mono">${h.data.split(' ')[0]}</span>
+                    </div>
+                    <div class="text-[9px] text-orange-500 font-black mt-1 tracking-widest uppercase">${h.resumo}</div>
+                    
+                    <div class="flex gap-1 mt-3">
+                        <button onclick="carregarSimulacao(${h.id})" class="flex-1 text-[10px] py-1.5 bg-black text-neutral-400 group-hover:text-white rounded border border-neutral-800 hover:border-orange-500 uppercase font-bold flex justify-center gap-1 transition-all" title="Abrir"><i data-lucide="eye" class="w-3 h-3"></i></button>
+                        <button onclick="excluirHistorico(${h.id})" class="px-2 bg-black text-neutral-500 hover:text-red-500 rounded border border-neutral-800 transition-all" title="Excluir"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function excluirHistorico(id) {
+            if(!confirm("Tem certeza que deseja excluir esta simulação do histórico?")) return;
+            let historico = JSON.parse(localStorage.getItem('lp_history') || '[]');
+            historico = historico.filter(h => h.id !== id);
+            localStorage.setItem('lp_history', JSON.stringify(historico));
+            renderSidebarHistory();
+        }
+
+        function carregarSimulacao(id) {
+            let historico = JSON.parse(localStorage.getItem('lp_history') || '[]');
+            let sim = historico.find(h => h.id === id);
+            if(!sim) return;
+
+            document.getElementById('nomeEmpresa').value = sim.config.nomeEmpresa || '';
+            document.getElementById('mesApuracao').value = sim.config.mesApuracao;
+            document.getElementById('anoApuracao').value = sim.config.anoApuracao;
+            document.getElementById('aliqIss').value = sim.config.aliqIss || 5.0;
+            document.getElementById('aliqIcms').value = sim.config.aliqIcms || 18.0;
+            document.getElementById('aliqIpi').value = sim.config.aliqIpi || 5.0;
+
+            document.querySelectorAll('input[name="atividade"]').forEach(cb => {
+                cb.checked = sim.config.atividades.includes(cb.value);
+            });
+            document.querySelectorAll('input[name="exclusao_tipo"]').forEach(cb => {
+                cb.checked = (sim.config.exclusoes || []).includes(cb.value);
+            });
+
+            window.restoringInputs = sim.config.inputsSalvos || {};
+            iniciarSimulacao();
+            window.restoringInputs = null;
+        }
+
+        function exportarExcel() {
+            let relHeader = document.querySelector("#relatorioHeader").cloneNode(true);
+            relHeader.style.display = 'block';
+            
+            let table = document.querySelector("#tblSimulacao").cloneNode(true);
+            
+            table.querySelectorAll('button').forEach(btn => btn.remove());
+            table.querySelectorAll('tr.hidden').forEach(tr => tr.remove());
+            table.querySelectorAll('.no-print').forEach(el => el.remove());
+            table.querySelectorAll('svg').forEach(el => el.remove());
+
+            table.querySelectorAll('input').forEach(inp => {
+                let span = document.createElement('span');
+                span.innerText = inp.value;
+                inp.replaceWith(span);
+            });
+
+            let html = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8"></head>
+                <body>
+                    ${relHeader.outerHTML}
+                    <br>
+                    ${table.outerHTML}
+                </body>
+                </html>
+            `;
+            let url = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(html)));
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Projecao_Lucro_Presumido.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>
