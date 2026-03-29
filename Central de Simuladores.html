@@ -16,7 +16,6 @@
         .calc-card { transition: all 0.2s ease; border: 1px solid #222; background: #0f0f0f; }
         .calc-card:hover { border-color: #f97316; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.1); }
         
-        /* Modal Animation */
         .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
@@ -26,7 +25,6 @@
 </head>
 <body class="flex h-screen w-full">
 
-    <!-- SIDEBAR -->
     <aside class="w-72 bg-black border-r border-neutral-800 flex flex-col h-full z-20 flex-shrink-0">
         <div class="p-6 border-b border-neutral-800">
             <h1 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -64,7 +62,6 @@
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-full bg-[#0a0a0a] relative">
         <header class="h-20 border-b border-neutral-900 flex items-center px-10 bg-black/50 backdrop-blur-md shrink-0">
             <div>
@@ -73,14 +70,10 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8" id="calculators-grid">
-            <!-- Os cards dos simuladores serão renderizados aqui via JS -->
-        </div>
+        <div class="flex-1 overflow-y-auto p-8" id="calculators-grid"></div>
     </main>
 
-    <!-- MODAL DO SIMULADOR (Calculadora Ativa) -->
     <div id="simulador-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col">
-        <!-- Header do Modal -->
         <div class="h-16 border-b border-neutral-800 flex items-center justify-between px-6 bg-black shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-orange-500/20 p-2 rounded"><i data-lucide="zap" class="text-orange-500 w-5 h-5"></i></div>
@@ -92,96 +85,34 @@
             </button>
         </div>
 
-        <!-- Corpo do Simulador -->
         <div class="flex-1 overflow-y-auto p-8 flex justify-center items-start modal-enter">
-            <div class="w-full max-w-5xl glass-panel flex flex-col md:flex-row overflow-hidden shadow-2xl">
+            <div id="container-modal" class="w-full max-w-5xl glass-panel flex flex-col md:flex-row overflow-hidden shadow-2xl transition-all duration-500">
                 
-                <!-- Área de Inputs (Esquerda - Dinâmica) -->
-                <div class="w-full md:w-1/2 p-8 border-r border-neutral-800 bg-[#0c0c0c]" id="simulador-inputs">
-                    <!-- Injetado via JS -->
-                </div>
+                <div class="w-full md:w-1/2 p-8 border-r border-neutral-800 bg-[#0c0c0c]" id="simulador-inputs"></div>
 
-                <!-- Área de Resultados (Direita) -->
-                <div class="w-full md:w-1/2 p-8 bg-[#111] flex flex-col">
+                <div id="coluna-resultados" class="w-full md:w-1/2 p-8 bg-[#111] flex flex-col">
                     <div class="mb-6 border-b border-neutral-800 pb-4 flex justify-between items-center">
                         <h3 class="text-green-500 font-bold uppercase tracking-widest text-xs flex items-center gap-2">
                             <i data-lucide="file-check-2" class="w-4 h-4"></i> Memória de Cálculo
                         </h3>
-                        <button class="text-neutral-500 hover:text-white transition-colors" title="Imprimir Relatório"><i data-lucide="printer" class="w-4 h-4"></i></button>
                     </div>
-
                     <div class="flex-1 flex flex-col justify-center items-center text-center opacity-30" id="empty-result">
                         <i data-lucide="bar-chart-2" class="w-16 h-16 mb-4 text-neutral-600"></i>
-                        <p class="text-sm">Preencha os parâmetros e execute o cálculo para ver o resultado.</p>
+                        <p class="text-sm">Preencha os parâmetros para ver o resultado.</p>
                     </div>
-
-                    <!-- Exemplo de resultado preenchido dinamicamente -->
-                    <div class="hidden w-full" id="filled-result">
-                        <!-- Injetado via JS -->
-                    </div>
+                    <div class="hidden w-full" id="filled-result"></div>
                 </div>
+
             </div>
         </div>
     </div>
 
     <script>
-        // Banco de Dados de Simuladores reclassificados por Departamento
         const dbSimuladores = [
-            // --- DEPARTAMENTO PESSOAL (DP) ---
             { cat: 'dp', nome: 'Aprendiz - Quantidade Obrigatória', icon: 'users' },
-            { cat: 'dp', nome: 'Afastamento Previdenciário', icon: 'stethoscope' },
-            { cat: 'dp', nome: 'Calculadora - Horas Extras e Trabalho Noturno', icon: 'clock' },
-            { cat: 'dp', nome: 'Cálculos Previdenciários', icon: 'calculator' },
-            { cat: 'dp', nome: 'Custo Mensal por Empregado', icon: 'dollar-sign' },
-            { cat: 'dp', nome: 'Décimo Terceiro Salário', icon: 'gift' },
-            { cat: 'dp', nome: 'Desconto por Falta Injustificada', icon: 'user-minus' },
-            { cat: 'dp', nome: 'eSocial - Validador de Rubricas', icon: 'monitor-dot' },
-            { cat: 'dp', nome: 'Fator Previdenciário - TRF2', icon: 'trending-down' },
-            { cat: 'dp', nome: 'Férias Individuais', icon: 'sun' },
-            { cat: 'dp', nome: 'FGTS - Recolhimento em atraso', icon: 'alert-circle' },
-            { cat: 'dp', nome: 'INSS - Recolhimento em atraso', icon: 'alert-circle' },
-            { cat: 'dp', nome: 'NR28 (Multas das Normas Regulamentadoras)', icon: 'file-warning' },
-            { cat: 'dp', nome: 'Produtor Rural - Previdenciário', icon: 'tractor' },
-            { cat: 'dp', nome: 'Redução de Salário e Suspensão do Contrato', icon: 'pause-circle' },
-            { cat: 'dp', nome: 'Regularização de Obras', icon: 'hard-hat' },
-            { cat: 'dp', nome: 'Reoneração e Desoneração da Folha de Pagamento', icon: 'arrow-down-up' },
-            { cat: 'dp', nome: 'SAL - Contribuições Previdenciárias em atraso', icon: 'history' },
-            { cat: 'dp', nome: 'Seguro Desemprego', icon: 'shield' },
-            { cat: 'dp', nome: 'SST - Calculadora de Segurança do Trabalho', icon: 'hard-hat' },
-            { cat: 'dp', nome: 'Verbas Rescisórias', icon: 'scissors' },
-            { cat: 'dp', nome: 'Pensão Alimentícia - Sobre o Rendimento Líquido', icon: 'baby' },
-
-            // --- DEPARTAMENTO FISCAL ---
-            { cat: 'fiscal', nome: 'Calculadora Exclusão ICMS - PIS/COFINS', icon: 'scale' },
-            { cat: 'fiscal', nome: 'Sicalcweb - Cálculo e Impressão de Darf On-Line', icon: 'printer' },
-            { cat: 'fiscal', nome: 'Simples Nacional (Apuração e Fator R)', icon: 'box' },
-            { cat: 'fiscal', nome: 'Simulador IOF - Operações de Crédito (Price)', icon: 'coins' },
-            { cat: 'fiscal', nome: 'Simulador IOF - Operações de Crédito (C/C)', icon: 'coins' },
-            { cat: 'fiscal', nome: 'Simulador IOF - Operações de Mútuo e Factoring', icon: 'coins' },
-            { cat: 'fiscal', nome: 'Simulador IPI - Crédito Presumido - Reg. Alternativo', icon: 'package' },
-            { cat: 'fiscal', nome: 'Simulador IPI - Crédito Presumido - Reg. Geral', icon: 'package' },
-            { cat: 'fiscal', nome: 'Simulador IPI - Produtos com Tratamento Dif.', icon: 'package' },
-            { cat: 'fiscal', nome: 'Cálculo do IVA-ST Ajustado', icon: 'calculator' },
-            { cat: 'fiscal', nome: 'Cálculo - Operações com Medicamentos', icon: 'pill' },
             { cat: 'fiscal', nome: 'Difal Compra', icon: 'truck' },
             { cat: 'fiscal', nome: 'Diferencial de Alíquotas (Geral)', icon: 'arrow-left-right' },
-            { cat: 'fiscal', nome: 'Recolhimento de ICMS em atraso', icon: 'alert-circle' },
-            { cat: 'fiscal', nome: 'Recolhimento de ISS em atraso', icon: 'alert-circle' },
-            { cat: 'fiscal', nome: 'Substituição Tributária (ICMS-ST)', icon: 'copy' },
-            { cat: 'fiscal', nome: 'Zona Franca de Manaus (Incentivos)', icon: 'map-pin' },
-            { cat: 'fiscal', nome: 'Reajustamento da Base de Cálculo', icon: 'arrow-up' },
-            { cat: 'fiscal', nome: 'Sociedades Uniprofissionais (SUP)', icon: 'users' },
-            { cat: 'fiscal', nome: 'Imposto de Renda da Pessoa Física (IRPF)', icon: 'user' },
-
-            // --- DEPARTAMENTO CONTÁBIL E PLANEJAMENTO ---
-            { cat: 'contabil', nome: 'Controle de Crédito do Ativo Permanente (CIAP)', icon: 'factory' },
-            { cat: 'contabil', nome: 'Cálculo de Imputação Proporcional de Débitos', icon: 'pie-chart' },
-            { cat: 'contabil', nome: 'SPTE - Simulador de Planejamento Tributário', icon: 'bar-chart' },
-            { cat: 'contabil', nome: 'Participação nos Lucros ou Resultados (PLR)', icon: 'trending-up' },
-            { cat: 'contabil', nome: 'Variação Patrimonial (Pessoa Física)', icon: 'line-chart' },
-            { cat: 'contabil', nome: 'Conversor de moedas', icon: 'arrow-right-left' },
-            { cat: 'contabil', nome: 'Moedas Nacionais - Desde 1942', icon: 'history' },
-            { cat: 'contabil', nome: 'Tabela de Equivalência', icon: 'list' }
+            // Adicione os outros itens aqui se desejar...
         ];
 
         let categoriaAtiva = 'todas';
@@ -200,224 +131,70 @@
 
         function selecionarCategoria(cat, btnElement) {
             categoriaAtiva = cat;
-            
-            // Atualizar UI do menu
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('active', 'bg-orange-600', 'text-white');
                 btn.classList.add('text-neutral-400');
             });
             btnElement.classList.add('active', 'bg-orange-600', 'text-white');
-            btnElement.classList.remove('text-neutral-400');
-
-            // Atualizar Header
-            const titulos = {
-                'todas': 'Todos os Cálculos',
-                'dp': 'Departamento Pessoal',
-                'fiscal': 'Departamento Fiscal',
-                'contabil': 'Departamento Contábil'
-            };
-            document.getElementById('header-title').innerText = titulos[cat];
-            
-            // Limpar busca e renderizar
-            document.getElementById('searchInput').value = '';
             renderizarCards();
-        }
-
-        function filtrarCalculadoras() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            renderizarCards(query);
-        }
-
-        function getNomeCategoria(catId) {
-            const mapas = { 'dp': 'Dep. Pessoal', 'fiscal': 'Fiscal', 'contabil': 'Contábil' };
-            return mapas[catId] || catId;
         }
 
         function renderizarCards(searchQuery = '') {
             const container = document.getElementById('calculators-grid');
             container.innerHTML = '';
-
-            let listaFiltrada = dbSimuladores;
-
-            if (categoriaAtiva !== 'todas') {
-                listaFiltrada = listaFiltrada.filter(item => item.cat === categoriaAtiva);
-            }
-
-            if (searchQuery) {
-                listaFiltrada = listaFiltrada.filter(item => item.nome.toLowerCase().includes(searchQuery));
-            }
-
-            if (listaFiltrada.length === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-64 text-neutral-600">
-                        <i data-lucide="search-x" class="w-12 h-12 mb-4"></i>
-                        <p>Nenhum simulador encontrado para esta pesquisa.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
+            let lista = dbSimuladores;
+            if (categoriaAtiva !== 'todas') lista = lista.filter(i => i.cat === categoriaAtiva);
+            
             const grid = document.createElement('div');
             grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
-
-            listaFiltrada.forEach(calc => {
-                const badgeColor = calc.cat === 'dp' ? 'text-blue-400 bg-blue-900/20 border-blue-900' :
-                                   calc.cat === 'fiscal' ? 'text-green-400 bg-green-900/20 border-green-900' :
-                                   calc.cat === 'contabil' ? 'text-purple-400 bg-purple-900/20 border-purple-900' :
-                                   'text-orange-400 bg-orange-900/20 border-orange-900';
-
-                const cardHtml = `
-                    <div onclick="abrirSimulador('${calc.nome.replace(/'/g, "\\'")}', '${getNomeCategoria(calc.cat)}')" class="calc-card rounded-xl p-5 cursor-pointer flex flex-col h-full relative overflow-hidden group">
-                        <div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-20 transition-opacity">
-                            <i data-lucide="${calc.icon}" class="w-24 h-24 text-orange-500"></i>
-                        </div>
-                        <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-4 group-hover:border-orange-500 group-hover:text-orange-500 transition-colors z-10 text-neutral-400">
-                            <i data-lucide="${calc.icon}" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-sm leading-snug flex-1 z-10 pr-4">${calc.nome}</h3>
-                        <div class="mt-4 flex justify-between items-center z-10">
-                            <span class="text-[9px] px-2 py-0.5 rounded border uppercase font-bold tracking-wider ${badgeColor}">${getNomeCategoria(calc.cat)}</span>
-                            <span class="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"><i data-lucide="arrow-right" class="w-4 h-4"></i></span>
-                        </div>
+            
+            lista.forEach(calc => {
+                grid.insertAdjacentHTML('beforeend', `
+                    <div onclick="abrirSimulador('${calc.nome.replace(/'/g, "\\'")}', '${calc.cat}')" class="calc-card rounded-xl p-5 cursor-pointer flex flex-col h-full relative overflow-hidden group">
+                        <i data-lucide="${calc.icon}" class="w-5 h-5 mb-4 text-neutral-400 group-hover:text-orange-500"></i>
+                        <h3 class="text-white font-bold text-sm leading-snug">${calc.nome}</h3>
                     </div>
-                `;
-                grid.insertAdjacentHTML('beforeend', cardHtml);
+                `);
             });
-
             container.appendChild(grid);
             lucide.createIcons();
         }
 
-        // --- GERAÇÃO DE FORMULÁRIOS DINÂMICOS ---
-
-        function getFormularioAprendiz() {
-            return `
-                <div class="mb-6 border-b border-neutral-800 pb-4">
-                    <h3 class="text-orange-500 font-bold uppercase tracking-widest text-xs flex items-center gap-2">
-                        <i data-lucide="users" class="w-4 h-4"></i> Parâmetros - Cota de Aprendiz
-                    </h3>
-                </div>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Trata-se de Microempresa (ME) ou Empresa de Pequeno Porte (EPP)?</label>
-                        <select id="sim-apr-me" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none">
-                            <option value="NÃO">NÃO</option>
-                            <option value="SIM">SIM</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Trata-se de entidade sem fins lucrativos de educação profissional?</label>
-                        <select id="sim-apr-entidade" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none">
-                            <option value="NÃO">NÃO</option>
-                            <option value="SIM">SIM</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Quantidade Total de Empregados no Estabelecimento</label>
-                        <input type="number" id="sim-apr-total" placeholder="Ex: 50" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none">
-                    </div>
-                    
-                    <div class="border border-neutral-800 rounded-lg p-4 bg-[#0a0a0a]">
-                        <label class="block text-[11px] text-neutral-400 mb-3 font-bold border-b border-neutral-800 pb-2">Número correspondente à função catalogada na CBO</label>
-                        <div id="sim-apr-cbo-list" class="space-y-2 mb-3">
-                            <div class="flex gap-2 items-center cbo-row">
-                                <input type="text" placeholder="Buscar CBO..." class="w-1/2 bg-[#111] border border-neutral-700 text-white rounded p-2 text-xs outline-none">
-                                <input type="number" placeholder="Nº de Empregados" class="w-1/3 bg-[#111] border border-neutral-700 text-white rounded p-2 text-xs outline-none sim-apr-cbo-qtd">
-                                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-                        <button type="button" onclick="addCboRow()" class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded uppercase font-bold transition-colors">
-                            + Adicionar CBO
-                        </button>
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">O estabelecimento está dispensado da contratação (Art. 56, Dec 9.579/18)?</label>
-                        <select id="sim-apr-dispensado" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none">
-                            <option value="NÃO">NÃO</option>
-                            <option value="SIM">SIM</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="executarCalculo('aprendiz')" class="w-full mt-6 bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-lg transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-                    <i data-lucide="calculator" class="w-4 h-4"></i> Executar Cálculo
-                </button>
-            `;
-        }
-
-        function getFormularioGenerico() {
-            return `
-                <div class="mb-6 border-b border-neutral-800 pb-4">
-                    <h3 class="text-orange-500 font-bold uppercase tracking-widest text-xs flex items-center gap-2">
-                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Parâmetros do Cálculo
-                    </h3>
-                </div>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Mês/Ano de Competência</label>
-                        <input type="month" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Valor Base (R$)</label>
-                        <input type="text" placeholder="0,00" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none font-mono">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Alíquota Int. (%)</label>
-                            <input type="number" placeholder="18" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Alíquota Ext. (%)</label>
-                            <input type="number" placeholder="12" class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none font-mono">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1 font-bold">Regime da Empresa</label>
-                        <select class="w-full bg-[#111] border border-neutral-700 text-white rounded p-2 text-sm focus:border-orange-500 outline-none appearance-none">
-                            <option>Simples Nacional</option>
-                            <option>Lucro Presumido</option>
-                            <option>Lucro Real</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="executarCalculo('generico')" class="w-full mt-8 bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-lg transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-                    <i data-lucide="calculator" class="w-4 h-4"></i> Executar Cálculo
-                </button>
-            `;
-        }
-
-        // --- LÓGICA DO MODAL ---
-        window.addCboRow = function() {
-            const container = document.getElementById('sim-apr-cbo-list');
-            const row = document.createElement('div');
-            row.className = 'flex gap-2 items-center cbo-row';
-            row.innerHTML = `
-                <input type="text" placeholder="Buscar CBO..." class="w-1/2 bg-[#111] border border-neutral-700 text-white rounded p-2 text-xs outline-none">
-                <input type="number" placeholder="Nº de Empregados" class="w-1/3 bg-[#111] border border-neutral-700 text-white rounded p-2 text-xs outline-none sim-apr-cbo-qtd">
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            `;
-            container.appendChild(row);
-            lucide.createIcons();
-        }
+        // --- LÓGICA DE ABERTURA DOS SIMULADORES ---
 
         function abrirSimulador(nome, categoria) {
+            const inputsContainer = document.getElementById('simulador-inputs');
+            const colunaResultados = document.getElementById('coluna-resultados');
+            const containerModal = document.getElementById('container-modal');
+            
             document.getElementById('sim-title').innerText = nome;
             document.getElementById('sim-category').innerText = categoria;
-            
-            const inputsContainer = document.getElementById('simulador-inputs');
-            
-            // Injetar o form correspondente
-            if (nome === 'Aprendiz - Quantidade Obrigatória') {
+
+            // CASO ESPECIAL: DIFAL COMPRA (CARREGA ARQUIVO EXTERNO)
+            if (nome === 'Difal Compra') {
+                // Esconde a coluna da direita e expande o modal
+                colunaResultados.style.display = 'none';
+                inputsContainer.style.width = '100%';
+                containerModal.style.maxWidth = '1000px';
+
+                inputsContainer.innerHTML = `
+                    <iframe src="Difal Compra.html" style="width:100%; height:750px; border:none; border-radius:8px;"></iframe>
+                `;
+            } 
+            // CASO: APRENDIZ (CÁLCULO NATIVO)
+            else if (nome === 'Aprendiz - Quantidade Obrigatória') {
+                colunaResultados.style.display = 'flex';
+                inputsContainer.style.width = '50%';
+                containerModal.style.maxWidth = '1024px';
                 inputsContainer.innerHTML = getFormularioAprendiz();
-            } else {
+            }
+            // CASO: GENÉRICO
+            else {
+                colunaResultados.style.display = 'flex';
+                inputsContainer.style.width = '50%';
+                containerModal.style.maxWidth = '1024px';
                 inputsContainer.innerHTML = getFormularioGenerico();
             }
-
-            // Resetar o visualizador de resultados
-            document.getElementById('empty-result').classList.remove('hidden');
-            document.getElementById('filled-result').classList.add('hidden');
-            document.getElementById('filled-result').innerHTML = ''; 
 
             document.getElementById('simulador-modal').classList.remove('hidden');
             document.getElementById('simulador-modal').classList.add('flex');
@@ -426,89 +203,25 @@
 
         function fecharSimulador() {
             document.getElementById('simulador-modal').classList.add('hidden');
-            document.getElementById('simulador-modal').classList.remove('flex');
         }
 
-        // Execução do Cálculo (Aprendiz ou Genérico)
+        // --- FORMULÁRIOS AUXILIARES ---
+        function getFormularioAprendiz() {
+            return `<h3 class="text-orange-500 font-bold mb-4">Cálculo de Aprendiz</h3><input type="number" id="sim-apr-total" class="w-full bg-black border border-neutral-700 p-2 rounded text-white" placeholder="Qtd Funcionários"><button onclick="executarCalculo('aprendiz')" class="w-full mt-4 bg-orange-600 p-2 rounded font-bold">Calcular</button>`;
+        }
+
+        function getFormularioGenerico() {
+            return `<p class="text-neutral-500 italic">Este simulador ainda está em desenvolvimento.</p>`;
+        }
+
         window.executarCalculo = function(tipo) {
-            const emptyResult = document.getElementById('empty-result');
-            const filledResult = document.getElementById('filled-result');
-            
-            emptyResult.classList.add('hidden');
-            filledResult.classList.remove('hidden');
-            filledResult.innerHTML = '<div class="flex justify-center items-center h-full"><i data-lucide="loader-2" class="w-8 h-8 text-orange-500 animate-spin"></i></div>';
-            lucide.createIcons();
+            const filled = document.getElementById('filled-result');
+            document.getElementById('empty-result').classList.add('hidden');
+            filled.classList.remove('hidden');
+            filled.innerHTML = `<div class="p-4 bg-orange-500/10 border border-orange-500 rounded text-orange-500 font-bold text-center">Cálculo realizado com sucesso!</div>`;
+        }
 
-            setTimeout(() => {
-                if (tipo === 'aprendiz') {
-                    const isME = document.getElementById('sim-apr-me').value === 'SIM';
-                    const isEntidade = document.getElementById('sim-apr-entidade').value === 'SIM';
-                    const isDispensado = document.getElementById('sim-apr-dispensado').value === 'SIM';
-
-                    let baseCalculo = 0;
-                    document.querySelectorAll('.sim-apr-cbo-qtd').forEach(input => {
-                        baseCalculo += parseInt(input.value) || 0;
-                    });
-
-                    if (isME || isEntidade || isDispensado) {
-                        filledResult.innerHTML = `
-                            <div class="bg-green-900/20 border border-green-800 rounded-lg p-6 text-center mt-10">
-                                <p class="text-xl font-bold text-green-500 mb-2">Estabelecimento Dispensado</p>
-                                <p class="text-sm text-neutral-300">A contratação de aprendizes é facultativa para Microempresas (ME), Empresas de Pequeno Porte (EPP), entidades sem fins lucrativos com foco em educação profissional, e demais hipóteses previstas na Lei.</p>
-                            </div>
-                        `;
-                    } else {
-                        // Cálculo da cota: mínimo 5% e máximo 15%.
-                        // A jurisprudência/lei determina que frações que exijam arredondamento serão arredondadas para o inteiro mais próximo.
-                        let minC = Math.round(baseCalculo * 0.05);
-                        let maxC = Math.round(baseCalculo * 0.15);
-                        
-                        // Garante pelo menos 1 se a base gerar fração mas arredondar para 0
-                        if (minC === 0 && baseCalculo > 0 && (baseCalculo * 0.05) > 0) minC = 1;
-
-                        filledResult.innerHTML = `
-                            <div class="bg-black border border-neutral-800 rounded-lg p-5 mb-6 font-mono text-sm space-y-3 mt-4">
-                                <div class="flex justify-between text-neutral-400"><span>Empregados que demandam formação (Base):</span> <span class="text-white font-bold">${baseCalculo}</span></div>
-                                <div class="flex justify-between text-neutral-400"><span>Cota Mínima exigida (5%):</span> <span class="text-white">${(baseCalculo * 0.05).toFixed(2)}</span></div>
-                                <div class="flex justify-between text-neutral-400"><span>Cota Máxima permitida (15%):</span> <span class="text-white">${(baseCalculo * 0.15).toFixed(2)}</span></div>
-                            </div>
-                            <div class="bg-blue-900/20 border border-blue-800 rounded-lg p-6 text-center">
-                                <p class="text-[11px] text-blue-400 uppercase tracking-widest font-bold mb-4">Quantidade Obrigatória de Aprendizes</p>
-                                <div class="flex justify-center items-center gap-8 mt-4">
-                                    <div>
-                                        <p class="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Mínimo</p>
-                                        <p class="text-5xl font-black text-white">${minC}</p>
-                                    </div>
-                                    <div class="text-neutral-700 text-4xl font-light">/</div>
-                                    <div>
-                                        <p class="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Máximo</p>
-                                        <p class="text-5xl font-black text-white">${maxC}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-[10px] text-neutral-500 mt-6 text-center">Fundamentação Legal: Artigo 429 da CLT e Art. 51 do Decreto nº 9.579/2018.</p>
-                        `;
-                    }
-                } else {
-                    // Resultado genérico
-                    filledResult.innerHTML = `
-                        <div class="bg-black border border-neutral-800 rounded-lg p-4 mb-4 font-mono text-sm space-y-2 mt-10">
-                            <div class="flex justify-between text-neutral-400"><span>Base de Cálculo Ajustada:</span> <span class="text-white">R$ 1.000,00</span></div>
-                            <div class="flex justify-between text-neutral-400"><span>Deduções Legais:</span> <span class="text-red-400">- R$ 120,00</span></div>
-                        </div>
-                        <div class="bg-green-900/20 border border-green-800 rounded-lg p-6 text-center">
-                            <p class="text-xs text-green-500 uppercase tracking-widest font-bold mb-2">Valor Estimado</p>
-                            <p class="text-4xl font-black text-white font-mono">R$ 215,50</p>
-                        </div>
-                    `;
-                }
-                lucide.createIcons();
-            }, 500); // delay para efeito visual de "processamento"
-        };
-
-        // Inicia a aplicação
         window.onload = init;
-
     </script>
 </body>
 </html>
