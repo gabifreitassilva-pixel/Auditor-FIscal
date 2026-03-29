@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de DIFAL (Geral)</title>
+    <!-- Importar Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importar Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Importar PDF.js para leitura de PDFs no cliente -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        // Configurar o worker do PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <style>
+        /* Forçar o modo escuro no navegador inteiro */
+        :root {
+            color-scheme: dark;
+        }
+
+        /* Estilos hiper-rigorosos para os inputs: Fundo Preto, Letra Laranja */
+        .input-field {
+            @apply w-full px-4 py-3 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors outline-none appearance-none;
+            background-color: #000000 !important;
+            color: #f97316 !important;
+            font-weight: 800 !important;
+        }
+
+        /* Formatar o "placeholder" */
+        .input-field::placeholder {
+            color: #9a3412 !important; 
+            opacity: 0.7;
+        }
+
+        /* Bloquear o Autofill branco do navegador */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active,
+        select:-webkit-autofill,
+        select:-webkit-autofill:hover,
+        select:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #000000 inset !important;
+            -webkit-text-fill-color: #f97316 !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        
+        /* Forçar estilo das opções do select */
+        select, select option {
+            background-color: #000000 !important;
+            color: #f97316 !important;
+            font-weight: bold !important;
+        }
+
+        /* Personalização da barra de rolagem */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+    </style>
+</head>
+<body class="bg-zinc-950 min-h-screen p-4 md:p-8 font-sans text-gray-200 selection:bg-orange-500/30">
+
+    <div class="max-w-3xl mx-auto bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 overflow-hidden relative">
+        
+        <!-- Cabeçalho -->
+        <div class="bg-zinc-900 border-b-2 border-orange-500 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <i data-lucide="calculator" class="w-8 h-8 text-orange-500"></i>
+                    <h1 class="text-2xl font-bold text-white">Simulador de DIFAL</h1>
+                </div>
+                <p class="text-gray-400">Cálculo da diferença de ICMS entre Estados</p>
+            </div>
+            
+            <!-- Botão de Importar Nota -->
+            <div>
+                <input type="file" id="fileImport" accept=".xml,.pdf" class="hidden" onchange="importarNota(event)">
+                <label for="fileImport" class="cursor-pointer bg-black hover:bg-zinc-800 text-orange-500 border border-orange-500 font-bold py-2 px-4 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-orange-900/10 active:scale-95">
+                    <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                    Importar Nota (XML/PDF)
+                </label>
+            </div>
+        </div>
+
+        <div class="p-6">
+            
+            <form id="difalForm" class="space-y-6">
+                
+                <!-- Secção 1: Dados Financeiros -->
+                <div class="bg-zinc-800/40 p-4 sm:p-5 rounded-xl border border-zinc-700/50 shadow-sm">
+                    <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2 border-b border-zinc-700 pb-2">
+                        <i data-lucide="circle-dollar-sign" class="w-5 h-5 text-orange-500"></i>
+                        1. Valores da Operação
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="label-field" for="valorProduto">Valor dos Produtos (R$)</label>
+                            <input type="number" id="valorProduto" class="input-field text-xl" placeholder="0.00" step="0.01" required>
+                            <!-- Diquinha de volta -->
+                            <p class="text-xs text-orange-500 mt-2 flex gap-1 bg-black p-2 rounded border border-zinc-800">
+                                <i data-lucide="search" class="w-4 h-4 flex-shrink-0"></i>
+                                <span><strong>💡 No DANFE:</strong> Olhe no quadro "CÁLCULO DO IMPOSTO", no campo V. TOTAL PRODUTOS.</span>
+                            </p>
+                        </div>
+                        <div>
+                            <label class="label-field" for="valorFrete">Frete / Seguros / Despesas (R$)</label>
+                            <input type="number" id="valorFrete" class="input-field text-xl" placeholder="0.00" value="0" step="0.01">
+                            <!-- Diquinha de volta -->
+                            <p class="text-xs text-orange-500 mt-2 flex gap-1 bg-black p-2 rounded border border-zinc-800">
+                                <i data-lucide="search" class="w-4 h-4 flex-shrink-0"></i>
+                                <span><strong>💡 No DANFE:</strong> Olhe no campo VALOR DO FRETE. Deixe 0 se não houver.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secção 2: Perfil Tributário -->
+                <div class="bg-zinc-800/40 p-4 sm:p-5 rounded-xl border border-zinc-700/50 shadow-sm">
+                    <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2 border-b border-zinc-700 pb-2">
+                        <i data-lucide="building-2" class="w-5 h-5 text-orange-500"></i>
+                        2. Regras de Alíquotas e Impostos
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Regime do Vendedor (NOVO) -->
+                        <div>
+                            <label class="label-field font-bold text-orange-400" for="regimeVendedor">Regime do Vendedor (Origem)</label>
+                            <div class="relative">
+                                <select id="regimeVendedor" class="input-field pr-10 text-sm md:text-base border-orange-500/50">
+                                    <option value="simples">Simples Nacional</option>
+                                    <option value="normal">Regime Normal (Lucro Real / Presumido)</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-orange-500">
+                                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perfil do Comprador -->
+                        <div>
+                            <label class="label-field font-bold text-orange-400" for="perfilComprador">O Seu Perfil (Destinatário)</label>
+                            <div class="relative">
+                                <select id="perfilComprador" class="input-field pr-10 text-sm md:text-base border-orange-500/50">
+                                    <option value="simples">Empresa SIMPLES NACIONAL (Base Única)</option>
+                                    <option value="normal">Empresa Lucro Real/Presumido - RPA (Base Dupla)</option>
+                                    <option value="pf">Pessoa Física / Não Contribuinte</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-orange-500">
+                                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                            <!-- Alíquota Origem -->
+                            <div>
+                                <label class="label-field font-bold" for="aliquotaOrigem">Alíquota Interestadual (Origem) %</label>
+                                <input type="number" id="aliquotaOrigem" class="input-field text-xl" value="12" step="0.1">
+                                
+                                <!-- Diquinha de volta -->
+                                <div class="text-xs text-orange-500 mt-2 bg-black p-2 rounded border border-zinc-800 leading-relaxed">
+                                    <p class="mb-1 flex gap-1 font-bold"><i data-lucide="search" class="w-4 h-4 flex-shrink-0"></i>💡 No DANFE (Fornecedor Simples):</p>
+                                    <p>Olhe o 1º número da coluna O/CSOSN nos produtos:</p>
+                                    <ul class="list-disc pl-4 mt-1">
+                                        <li>Começa com 1, 2, 3 ou 8? Digite <strong>4</strong>.</li>
+                                        <li>Começa com 0, 4, 5, 6 ou 7? Digite <strong>12</strong>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Alíquota Destino (Assistente) -->
+                            <div class="bg-black p-4 rounded-xl border border-zinc-700">
+                                <label class="label-field font-bold flex items-center gap-2 text-orange-500 mb-2" for="categoriaProduto">
+                                    <i data-lucide="list-tree" class="w-4 h-4 text-orange-500"></i>
+                                    Assistente Interno (Destino)
+                                </label>
+                                
+                                <div class="relative mb-3">
+                                    <select id="categoriaProduto" class="input-field text-sm pr-10" onchange="atualizarAliquotaInterna()">
+                                        <option value="18">Regra Geral (Maioria dos Produtos) - 18%</option>
+                                        <option value="12">Informática, Peças e Eletrónicos - 12%</option>
+                                        <option value="25">Perfumes e Cosméticos - 25%</option>
+                                        <option value="manual">Outro NCM/Regra - Digitar Manualmente</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-orange-500">
+                                        <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                    </div>
+                                </div>
+
+                                <label class="label-field font-bold" for="aliquotaInterna">Alíquota Interna Final (%)</label>
+                                <input type="number" id="aliquotaInterna" class="input-field text-xl" value="18" step="0.1">
+                                
+                                <div class="text-xs text-orange-500 mt-3 bg-black p-2 rounded border border-zinc-800 leading-relaxed shadow-sm">
+                                    <p class="mb-1 flex gap-1 font-bold"><i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0"></i>💡 Dica Prática:</p>
+                                    <p>A alíquota de destino nunca vem na nota. Consulte o NCM na Econet. Se não for exceção, a regra de SP é 18%.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Botão de Calcular -->
+                <button type="button" onclick="calcularDIFAL()" class="w-full bg-orange-600 hover:bg-orange-500 text-black font-black py-4 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-orange-900/20 active:scale-95 border border-orange-500 text-lg uppercase tracking-wide">
+                    <i data-lucide="play-circle" class="w-6 h-6"></i>
+                    Efetuar Cálculo
+                </button>
+
+            </form>
+
+            <!-- Área de Resultados (Escondida por defeito) -->
+            <div id="resultadoArea" class="hidden mt-8">
+                <div class="border-t border-zinc-800 pt-8">
+                    <h2 class="text-2xl font-bold text-white mb-6 text-center">Resultados da Simulação</h2>
+                    
+                    <!-- Aviso de Zero -->
+                    <div id="alertaZero" class="hidden bg-orange-500/10 border border-orange-500/50 p-4 mb-6 rounded-xl text-center">
+                        <p class="text-sm text-orange-400 font-bold uppercase mb-1">Atenção!</p>
+                        <p class="text-sm text-gray-300">O resultado do diferencial a ser recolhido foi igual ou inferior a zero (as alíquotas empatam). <strong class="text-white">Não será cabível o recolhimento do diferencial</strong>.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <!-- Card Total Operação -->
+                        <div class="bg-black border border-zinc-700 p-4 rounded-xl text-center">
+                            <p class="text-sm text-gray-400 font-medium mb-1">Total da Operação</p>
+                            <p class="text-xl font-bold text-white" id="resTotalOp">R$ 0,00</p>
+                        </div>
+                        <!-- Card Valor DIFAL -->
+                        <div class="bg-black border-2 border-orange-500 p-4 rounded-xl text-center transform scale-105 shadow-lg shadow-orange-900/20 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-orange-500/5 pointer-events-none"></div>
+                            <p class="text-sm text-orange-400 font-medium mb-1">Valor do DIFAL</p>
+                            <p class="text-3xl font-black text-orange-500" id="resDifal">R$ 0,00</p>
+                        </div>
+                        <!-- Card Quem Paga -->
+                        <div class="bg-black border border-zinc-700 p-4 rounded-xl text-center">
+                            <p class="text-sm text-gray-400 font-medium mb-1">Responsabilidade (Paga)</p>
+                            <p class="text-sm font-bold text-orange-400 mt-2 whitespace-pre-line" id="resResponsavel">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Memória de Cálculo (Detalhes) -->
+                    <div class="bg-black rounded-xl p-5 text-gray-400 font-mono text-sm overflow-x-auto border border-zinc-800">
+                        <div class="flex items-center gap-2 mb-3 text-white border-b border-zinc-800 pb-2">
+                            <i data-lucide="terminal" class="w-4 h-4 text-orange-500"></i>
+                            <span class="font-bold">Memória de Cálculo</span>
+                        </div>
+                        <div id="memoriaCalculo" class="space-y-2 whitespace-pre-wrap">
+                            <!-- Inserido via JavaScript -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de Loading -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/90 hidden flex-col justify-center items-center z-50">
+        <i data-lucide="loader-2" class="w-16 h-16 text-orange-500 animate-spin mb-4"></i>
+        <p class="text-orange-500 font-bold text-xl mt-4" id="loadingText">A ler documento...</p>
+    </div>
+
+    <script>
+        // Inicializar os ícones
+        lucide.createIcons();
+
+        // Função para formatar moeda em Reais
+        const formatarMoeda = (valor) => {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        };
+
+        // Função para processar a importação do XML / PDF (Versão Cautelosa)
+        async function importarNota(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const loading = document.getElementById('loadingOverlay');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            try {
+                if (file.name.toLowerCase().endsWith('.xml')) {
+                    await processarXML(file);
+                } else if (file.name.toLowerCase().endsWith('.pdf')) {
+                    await processarPDF(file);
+                }
+            } catch (error) {
+                alert("Ocorreu um erro inesperado ao tentar ler o ficheiro.");
+            } finally {
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+                event.target.value = ''; // Reset input
+            }
+        }
+
+        // Leitura precisa e exata do XML
+        function processarXML(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+
+                        const getTagValue = (tagName) => {
+                            const nodes = xmlDoc.getElementsByTagName(tagName);
+                            return (nodes.length > 0 && nodes[0].textContent) ? parseFloat(nodes[0].textContent) || 0 : 0;
+                        };
+
+                        const vProd = getTagValue("vProd");
+                        const vFrete = getTagValue("vFrete");
+                        const vSeg = getTagValue("vSeg");
+                        const vOutro = getTagValue("vOutro");
+                        const vDesc = getTagValue("vDesc");
+                        const vIPI = getTagValue("vIPI");
+
+                        let infoEncontrada = [];
+                        let infoFaltante = [];
+
+                        if (vProd > 0) {
+                            document.getElementById('valorProduto').value = vProd.toFixed(2);
+                            infoEncontrada.push("Valor dos Produtos (" + formatarMoeda(vProd) + ")");
+                            
+                            const totalDespesas = (vFrete + vSeg + vOutro + vIPI) - vDesc;
+                            document.getElementById('valorFrete').value = totalDespesas.toFixed(2);
+                            if (totalDespesas > 0) infoEncontrada.push("Frete/Despesas (" + formatarMoeda(totalDespesas) + ")");
+
+                            // Ler a tag <orig> para definir se é 4% ou 12%
+                            const origNodes = xmlDoc.getElementsByTagName("orig");
+                            if (origNodes.length > 0 && origNodes[0].textContent.trim() !== "") {
+                                const orig = parseInt(origNodes[0].textContent);
+                                document.getElementById('aliquotaOrigem').value = [1, 2, 3, 8].includes(orig) ? 4 : 12; 
+                                infoEncontrada.push("Alíquota Interestadual de Origem");
+                            } else {
+                                infoFaltante.push("Alíquota Interestadual (Origem)");
+                            }
+
+                            infoFaltante.push("Alíquota Interna Final (Destino)");
+
+                            setTimeout(() => {
+                                let msg = '✅ XML Processado com Sucesso!\n\n';
+                                msg += '📌 PREENCHIDO AUTOMATICAMENTE:\n- ' + infoEncontrada.join('\n- ') + '\n\n';
+                                msg += '⚠️ ATENÇÃO! NÃO ESQUEÇA DE VERIFICAR/PREENCHER:\n- ' + infoFaltante.join('\n- ');
+                                alert(msg);
+                            }, 100);
+                        } else {
+                            alert("❌ Não foi possível encontrar o valor dos produtos neste XML. Por favor, preencha manualmente.");
+                        }
+                    } catch (error) {
+                        alert('❌ Erro ao decifrar o arquivo XML.');
+                    }
+                    resolve();
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // Leitura cautelosa do PDF
+        async function processarPDF(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let textoCompleto = "";
+                
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    textoCompleto += textContent.items.map(item => item.str).join(" ");
+                }
+
+                const textoLimpo = textoCompleto.replace(/\s+/g, ' ');
+                
+                const regexProd = /VALOR TOTAL DOS PRODUTOS\s*([\d\.,]+)/i;
+                const matchProd = textoLimpo.match(regexProd);
+
+                if (matchProd && matchProd[1]) {
+                    let numStr = matchProd[1].replace(/\./g, '').replace(',', '.');
+                    let vProd = parseFloat(numStr);
+                    
+                    if (vProd > 0) {
+                        document.getElementById('valorProduto').value = vProd.toFixed(2);
+                        setTimeout(() => {
+                            let msg = '⚠️ PDF Lido Parcialmente!\n\n';
+                            msg += '📌 CONSEGUIMOS IDENTIFICAR:\n- Valor dos Produtos (' + formatarMoeda(vProd) + ')\n\n';
+                            msg += '⚠️ ATENÇÃO! VOCÊ PRECISA PREENCHER O RESTANTE:\n';
+                            msg += '- Frete / Seguros / Despesas\n';
+                            msg += '- Alíquota Interestadual (Origem)\n';
+                            msg += '- Alíquota Interna Final (Destino)\n\n';
+                            alert(msg);
+                        }, 100);
+                        return;
+                    }
+                }
+                
+                setTimeout(() => {
+                    alert('❌ Não conseguimos extrair as informações automaticamente deste PDF.\n\nPor favor, preencha TODOS os campos manualmente ou utilize o arquivo XML.');
+                }, 100);
+
+            } catch (err) {
+                console.error(err);
+                setTimeout(() => {
+                    alert('❌ Ocorreu um erro ao tentar ler o texto do PDF.');
+                }, 100);
+            }
+        }
+
+        // Função para atualizar o campo de alíquota interna automaticamente
+        function atualizarAliquotaInterna() {
+            const selectCategoria = document.getElementById('categoriaProduto');
+            const inputAliquota = document.getElementById('aliquotaInterna');
+            
+            if (selectCategoria.value === 'manual') {
+                inputAliquota.focus();
+                inputAliquota.value = ""; 
+            } else {
+                inputAliquota.value = selectCategoria.value;
+            }
+        }
+
+        function calcularDIFAL() {
+            // Obter valores
+            const valProduto = parseFloat(document.getElementById('valorProduto').value);
+            const valFrete = parseFloat(document.getElementById('valorFrete').value) || 0;
+            const regimeVendedor = document.getElementById('regimeVendedor').value;
+            const perfilComprador = document.getElementById('perfilComprador').value;
+            const aliqInterestadual = parseFloat(document.getElementById('aliquotaOrigem').value) / 100;
+            const aliqInterna = parseFloat(document.getElementById('aliquotaInterna').value) / 100;
+
+            if (isNaN(valProduto) || valProduto <= 0) {
+                alert("Por favor, insira um valor válido para o produto.");
+                return;
+            }
+
+            const valorOperacao = valProduto + valFrete;
+            let valorDifal = 0;
+            let responsavel = "";
+            let memoria = "";
+
+            // REGRA DE ISENÇÃO DO STF (Simples Nacional vendendo para Consumidor Final PF)
+            if (regimeVendedor === 'simples' && perfilComprador === 'pf') {
+                valorDifal = 0;
+                responsavel = "Isento (Decisão STF)\nVendedor Simples Nacional para Não Contribuinte.";
+                
+                memoria = `> METODOLOGIA: ISENÇÃO STF (ADI 5469)
+> Vendedor: Simples Nacional
+> Comprador: Pessoa Física / Não Contribuinte
+
+Cálculo:
+O Supremo Tribunal Federal (STF) definiu que empresas optantes pelo Simples Nacional estão isentas do recolhimento do DIFAL em operações interestaduais destinadas a consumidor final não contribuinte.
+DIFAL = R$ 0,00`;
+
+            } else if (perfilComprador === 'simples' || perfilComprador === 'pf') {
+                // Cálculo Base Única
+                const percentualDiferenca = aliqInterna - aliqInterestadual;
+                valorDifal = valorOperacao * percentualDiferenca;
+                
+                if (perfilComprador === 'simples') {
+                    responsavel = "A Sua Empresa (SP)\nObrigatoriedade por ser Simples Nacional";
+                } else {
+                    responsavel = "Vendedor / Remetente\n(Gera e paga a GNRE para o Estado de Destino)";
+                }
+                
+                memoria = `> METODOLOGIA: BASE ÚNICA
+> Valor da Operação (Produto + Frete): ${formatarMoeda(valorOperacao)}
+> Alíquota Interestadual (Origem): ${(aliqInterestadual * 100).toFixed(2)}%
+> Alíquota Interna (Destino): ${(aliqInterna * 100).toFixed(2)}%
+> Diferença de Alíquotas: ${(percentualDiferenca * 100).toFixed(2)}%
+
+Cálculo:
+DIFAL = Valor da Operação × Diferença de Alíquotas
+DIFAL = ${formatarMoeda(valorOperacao)} × ${(percentualDiferenca * 100).toFixed(2)}%
+DIFAL = ${formatarMoeda(valorDifal)}`;
+
+            } else {
+                // Cálculo Base Dupla (Cálculo por Dentro para Lucro Real/Presumido)
+                const icmsOrigem = valorOperacao * aliqInterestadual;
+                const valorSemIcms = valorOperacao - icmsOrigem;
+                const baseDestino = valorSemIcms / (1 - aliqInterna);
+                const icmsDestino = baseDestino * aliqInterna;
+                valorDifal = icmsDestino - icmsOrigem;
+                
+                responsavel = "A Sua Empresa (SP)\nRecolhe a guia a favor do próprio Estado";
+                
+                memoria = `> METODOLOGIA: BASE DUPLA / POR DENTRO (Empresa Lucro Real/Presumido - RPA)
+> Valor da Operação Original: ${formatarMoeda(valorOperacao)}
+> Alíquota Origem: ${(aliqInterestadual * 100).toFixed(2)}% | Alíquota Destino: ${(aliqInterna * 100).toFixed(2)}%
+
+Passo 1: Encontrar ICMS Origem
+ICMS Origem = ${formatarMoeda(valorOperacao)} × ${(aliqInterestadual * 100).toFixed(2)}% = ${formatarMoeda(icmsOrigem)}
+
+Passo 2: Encontrar Base de Cálculo do Destino (Excluindo ICMS Origem e embutindo ICMS Destino)
+Valor sem ICMS = ${formatarMoeda(valorOperacao)} - ${formatarMoeda(icmsOrigem)} = ${formatarMoeda(valorSemIcms)}
+Base Destino = ${formatarMoeda(valorSemIcms)} ÷ (1 - ${(aliqInterna).toFixed(2)}) = ${formatarMoeda(baseDestino)}
+
+Passo 3: Encontrar ICMS Destino
+ICMS Destino = ${formatarMoeda(baseDestino)} × ${(aliqInterna * 100).toFixed(2)}% = ${formatarMoeda(icmsDestino)}
+
+Passo 4: Calcular o DIFAL
+DIFAL = ICMS Destino - ICMS Origem
+DIFAL = ${formatarMoeda(icmsDestino)} - ${formatarMoeda(icmsOrigem)}
+DIFAL = ${formatarMoeda(valorDifal)}`;
+            }
+
+            if (valorDifal <= 0) {
+                valorDifal = 0;
+                document.getElementById('alertaZero').classList.remove('hidden');
+                responsavel = "Isento / Diferencial Nulo";
+            } else {
+                document.getElementById('alertaZero').classList.add('hidden');
+            }
+
+            document.getElementById('resTotalOp').innerText = formatarMoeda(valorOperacao);
+            document.getElementById('resDifal').innerText = formatarMoeda(valorDifal);
+            document.getElementById('resResponsavel').innerText = responsavel;
+            document.getElementById('memoriaCalculo').innerText = memoria;
+
+            const resultadoArea = document.getElementById('resultadoArea');
+            resultadoArea.classList.remove('hidden');
+            resultadoArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
