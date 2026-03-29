@@ -31,7 +31,7 @@
                 <i data-lucide="calculator" class="text-orange-500"></i>
                 <span class="text-orange-500">Simulador</span><span class="text-white text-lg">PRO</span>
             </h1>
-            <p class="text-xs text-neutral-400 mt-2 tracking-widest uppercase">Catálogo de Cálculos</p>
+            <p class="text-xs text-neutral-400 mt-2 tracking-widest uppercase font-bold">GFS Intelligence</p>
         </div>
 
         <div class="p-4">
@@ -43,11 +43,12 @@
 
         <nav class="flex-1 overflow-y-auto px-3 space-y-1 pb-6" id="category-nav">
             <div class="pt-2 pb-2 px-3 text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Departamentos</div>
+            
             <button onclick="selecionarCategoria('todas', this)" class="cat-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-orange-600 text-white transition-colors">
                 <i data-lucide="layout-grid" class="w-4 h-4"></i> Todos os Cálculos
             </button>
             <button onclick="selecionarCategoria('dp', this)" class="cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-400 hover:bg-neutral-900 transition-colors">
-                <div class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4"></i> Depto. Pessoal</div>
+                <div class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4"></i> Depto. Pessoal (DP)</div>
                 <span class="bg-neutral-800 text-[10px] px-2 py-0.5 rounded-full" id="count-dp">0</span>
             </button>
             <button onclick="selecionarCategoria('fiscal', this)" class="cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-400 hover:bg-neutral-900 transition-colors">
@@ -63,8 +64,12 @@
 
     <main class="flex-1 flex flex-col h-full bg-[#0a0a0a] relative">
         <header class="h-20 border-b border-neutral-900 flex items-center px-10 bg-black/50 backdrop-blur-md shrink-0">
-            <h2 class="text-xl font-bold text-white uppercase tracking-widest" id="header-title">Todos os Cálculos</h2>
+            <div>
+                <h2 class="text-xl font-bold text-white uppercase tracking-widest" id="header-title">Todos os Cálculos</h2>
+                <p class="text-xs text-neutral-500" id="header-subtitle">Selecione uma ferramenta para iniciar</p>
+            </div>
         </header>
+
         <div class="flex-1 overflow-y-auto p-8" id="calculators-grid"></div>
     </main>
 
@@ -72,67 +77,86 @@
         <div class="h-16 border-b border-neutral-800 flex items-center justify-between px-6 bg-black shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-orange-500/20 p-2 rounded"><i data-lucide="zap" class="text-orange-500 w-5 h-5"></i></div>
-                <h2 class="text-white font-bold text-lg" id="sim-title">Nome</h2>
+                <h2 class="text-white font-bold text-lg" id="sim-title">Nome do Simulador</h2>
+                <span class="bg-neutral-800 text-neutral-400 text-[10px] px-2 py-1 rounded font-mono uppercase tracking-widest ml-4" id="sim-category">Categoria</span>
             </div>
-            <button onclick="fecharSimulador()" class="text-neutral-500 hover:text-white transition-colors bg-neutral-900 px-4 py-2 rounded-lg border border-neutral-800 flex items-center gap-2">
-                <i data-lucide="x" class="w-4 h-4"></i> Fechar
+            <button onclick="fecharSimulador()" class="text-neutral-500 hover:text-white transition-colors flex items-center gap-2 text-sm bg-neutral-900 px-4 py-2 rounded-lg hover:bg-red-500/20 hover:text-red-400 border border-neutral-800">
+                <i data-lucide="x" class="w-4 h-4"></i> Fechar Ferramenta
             </button>
         </div>
+
         <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start modal-enter">
-            <div id="container-modal" class="w-full max-w-6xl glass-panel overflow-hidden shadow-2xl bg-[#0c0c0c]">
-                <div id="simulador-content" class="w-full"></div>
+            <div id="container-modal" class="w-full max-w-5xl glass-panel flex flex-col md:flex-row overflow-hidden shadow-2xl transition-all duration-300">
+                
+                <div class="w-full md:w-1/2 p-8 border-neutral-800 bg-[#0c0c0c]" id="simulador-inputs"></div>
+
+                <div id="coluna-resultados" class="w-full md:w-1/2 p-8 bg-[#111] border-l border-neutral-800 flex flex-col">
+                    <div class="mb-6 border-b border-neutral-800 pb-4 flex justify-between items-center">
+                        <h3 class="text-green-500 font-bold uppercase tracking-widest text-xs">Memória de Cálculo</h3>
+                    </div>
+                    <div id="empty-result" class="flex-1 flex flex-col justify-center items-center text-center opacity-30">
+                        <i data-lucide="bar-chart-2" class="w-12 h-12 mb-4"></i>
+                        <p class="text-sm">Preencha os dados ao lado para calcular.</p>
+                    </div>
+                    <div id="filled-result" class="hidden w-full"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // BANCO DE DADOS COMPLETO COM TODOS OS SEUS CARDS ORIGINAIS
         const dbSimuladores = [
-            // DP
-            { cat: 'dp', nome: 'Aprendiz - Quantidade Obrigatória', icon: 'users', file: null },
-            { cat: 'dp', nome: 'Afastamento Previdenciário', icon: 'stethoscope', file: null },
-            { cat: 'dp', nome: 'Calculadora - Horas Extras e Trabalho Noturno', icon: 'clock', file: null },
-            { cat: 'dp', nome: 'Cálculos Previdenciários', icon: 'calculator', file: null },
-            { cat: 'dp', nome: 'Custo Mensal por Empregado', icon: 'dollar-sign', file: null },
-            { cat: 'dp', nome: 'Décimo Terceiro Salário', icon: 'gift', file: null },
-            { cat: 'dp', nome: 'Desconto por Falta Injustificada', icon: 'user-minus', file: null },
-            { cat: 'dp', nome: 'eSocial - Validador de Rubricas', icon: 'monitor-dot', file: null },
-            { cat: 'dp', nome: 'Fator Previdenciário - TRF2', icon: 'trending-down', file: null },
-            { cat: 'dp', nome: 'Férias Individuais', icon: 'sun', file: null },
-            { cat: 'dp', nome: 'FGTS - Recolhimento em atraso', icon: 'alert-circle', file: null },
-            { cat: 'dp', nome: 'INSS - Recolhimento em atraso', icon: 'alert-circle', file: null },
-            { cat: 'dp', nome: 'NR28 (Multas das Normas Regulamentadoras)', icon: 'file-warning', file: null },
-            { cat: 'dp', nome: 'Produtor Rural - Previdenciário', icon: 'tractor', file: null },
-            { cat: 'dp', nome: 'Redução de Salário e Suspensão do Contrato', icon: 'pause-circle', file: null },
-            { cat: 'dp', nome: 'Regularização de Obras', icon: 'hard-hat', file: null },
-            { cat: 'dp', nome: 'Reoneração e Desoneração da Folha de Pagamento', icon: 'arrow-down-up', file: null },
-            { cat: 'dp', nome: 'Seguro Desemprego', icon: 'shield', file: null },
-            { cat: 'dp', nome: 'Verbas Rescisórias', icon: 'scissors', file: null },
+            // DEPARTAMENTO PESSOAL
+            { cat: 'dp', nome: 'Aprendiz - Quantidade Obrigatória', icon: 'users' },
+            { cat: 'dp', nome: 'Afastamento Previdenciário', icon: 'stethoscope' },
+            { cat: 'dp', nome: 'Calculadora - Horas Extras e Trabalho Noturno', icon: 'clock' },
+            { cat: 'dp', nome: 'Cálculos Previdenciários', icon: 'calculator' },
+            { cat: 'dp', nome: 'Custo Mensal por Empregado', icon: 'dollar-sign' },
+            { cat: 'dp', nome: 'Décimo Terceiro Salário', icon: 'gift' },
+            { cat: 'dp', nome: 'Verbas Rescisórias', icon: 'scissors' },
 
             // FISCAL
-            { cat: 'fiscal', nome: 'Difal Compra', icon: 'truck', file: 'Difal Compra.html' },
-            { cat: 'fiscal', nome: 'Calculadora Exclusão ICMS - PIS/COFINS', icon: 'scale', file: null },
-            { cat: 'fiscal', nome: 'Simples Nacional (Apuração e Fator R)', icon: 'box', file: null },
-            { cat: 'fiscal', nome: 'Cálculo do IVA-ST Ajustado', icon: 'calculator', file: null },
-            { cat: 'fiscal', nome: 'Diferencial de Alíquotas (Geral)', icon: 'arrow-left-right', file: null },
-            { cat: 'fiscal', nome: 'Substituição Tributária (ICMS-ST)', icon: 'copy', file: null },
-            { cat: 'fiscal', nome: 'Imposto de Renda da Pessoa Física (IRPF)', icon: 'user', file: null },
+            { cat: 'fiscal', nome: 'Difal Compra', icon: 'truck' },
+            { cat: 'fiscal', nome: 'Calculadora Exclusão ICMS - PIS/COFINS', icon: 'scale' },
+            { cat: 'fiscal', nome: 'Simples Nacional (Apuração e Fator R)', icon: 'box' },
+            { cat: 'fiscal', nome: 'Diferencial de Alíquotas (Geral)', icon: 'arrow-left-right' },
+            { cat: 'fiscal', nome: 'Substituição Tributária (ICMS-ST)', icon: 'copy' },
+            { cat: 'fiscal', nome: 'Imposto de Renda da Pessoa Física (IRPF)', icon: 'user' },
 
             // CONTÁBIL
-            { cat: 'contabil', nome: 'Controle de Crédito (CIAP)', icon: 'factory', file: null },
-            { cat: 'contabil', nome: 'SPTE - Simulador de Planejamento', icon: 'bar-chart', file: null },
-            { cat: 'contabil', nome: 'Participação nos Lucros (PLR)', icon: 'trending-up', file: null },
-            { cat: 'contabil', nome: 'Conversor de moedas', icon: 'arrow-right-left', file: null }
+            { cat: 'contabil', nome: 'Controle de Crédito do Ativo Permanente (CIAP)', icon: 'factory' },
+            { cat: 'contabil', nome: 'SPTE - Simulador de Planejamento Tributário', icon: 'bar-chart' },
+            { cat: 'contabil', nome: 'Participação nos Lucros ou Resultados (PLR)', icon: 'trending-up' },
+            { cat: 'contabil', nome: 'Conversor de moedas', icon: 'arrow-right-left' }
         ];
 
         let categoriaAtiva = 'todas';
 
         function init() {
             lucide.createIcons();
+            atualizarContadores();
+            renderizarCards();
+        }
+
+        function atualizarContadores() {
             document.getElementById('count-dp').innerText = dbSimuladores.filter(c => c.cat === 'dp').length;
             document.getElementById('count-fiscal').innerText = dbSimuladores.filter(c => c.cat === 'fiscal').length;
             document.getElementById('count-contabil').innerText = dbSimuladores.filter(c => c.cat === 'contabil').length;
+        }
+
+        function selecionarCategoria(cat, btn) {
+            categoriaAtiva = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.remove('active', 'bg-orange-600', 'text-white');
+                b.classList.add('text-neutral-400');
+            });
+            btn.classList.add('active', 'bg-orange-600', 'text-white');
+            document.getElementById('header-title').innerText = cat === 'todas' ? 'Todos os Cálculos' : 'Depto ' + cat.toUpperCase();
             renderizarCards();
+        }
+
+        function filtrarCalculadoras() {
+            renderizarCards(document.getElementById('searchInput').value);
         }
 
         function renderizarCards(query = '') {
@@ -144,12 +168,12 @@
 
             const grid = document.createElement('div');
             grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
-            lista.forEach(sim => {
+            lista.forEach(calc => {
                 grid.insertAdjacentHTML('beforeend', `
-                    <div onclick="abrirSimulador('${sim.nome}', '${sim.file}')" class="calc-card rounded-xl p-5 group">
-                        <i data-lucide="${sim.icon}" class="w-5 h-5 mb-4 text-neutral-500 group-hover:text-orange-500 transition-colors"></i>
-                        <h3 class="text-white font-bold text-sm leading-snug">${sim.nome}</h3>
-                        <p class="text-[9px] mt-3 uppercase text-neutral-600 font-bold tracking-widest">${sim.cat}</p>
+                    <div onclick="abrirSimulador('${calc.nome.replace(/'/g, "\\'")}', '${calc.cat}')" class="calc-card rounded-xl p-5 group">
+                        <i data-lucide="${calc.icon}" class="w-5 h-5 mb-4 text-neutral-400 group-hover:text-orange-500 transition-colors"></i>
+                        <h3 class="text-white font-bold text-sm leading-snug">${calc.nome}</h3>
+                        <p class="text-[10px] mt-4 uppercase text-neutral-600 font-bold tracking-widest">${calc.cat}</p>
                     </div>
                 `);
             });
@@ -157,20 +181,34 @@
             lucide.createIcons();
         }
 
-        function abrirSimulador(nome, arquivo) {
-            document.getElementById('sim-title').innerText = nome;
-            const content = document.getElementById('simulador-content');
+        function abrirSimulador(nome, categoria) {
+            const inputs = document.getElementById('simulador-inputs');
+            const colRes = document.getElementById('coluna-resultados');
+            const container = document.getElementById('container-modal');
             
-            if (arquivo && arquivo !== 'null') {
-                content.innerHTML = `<iframe src="${arquivo}" style="width:100%; height:85vh; border:none; background:transparent;"></iframe>`;
+            document.getElementById('sim-title').innerText = nome;
+            document.getElementById('sim-category').innerText = categoria;
+
+            if (nome === 'Difal Compra') {
+                // MODO IFRAME (TELA CHEIA)
+                colRes.style.display = 'none';
+                inputs.classList.replace('md:w-1/2', 'md:w-full');
+                container.style.maxWidth = '1100px';
+                inputs.innerHTML = `<iframe src="Difal Compra.html" style="width:100%; height:80vh; border:none; background:transparent;"></iframe>`;
+            } else if (nome === 'Aprendiz - Quantidade Obrigatória') {
+                // MODO NATIVO (DIVIDIDO)
+                colRes.style.display = 'flex';
+                inputs.classList.replace('md:w-full', 'md:w-1/2');
+                container.style.maxWidth = '1024px';
+                inputs.innerHTML = `<h3 class="text-orange-500 font-bold mb-4 uppercase text-xs">Cálculo Aprendiz</h3><input type="number" id="sim-apr-total" class="w-full bg-black border border-neutral-700 p-3 rounded text-white" placeholder="Qtd Funcionários"><button onclick="executarSimulacao()" class="w-full mt-4 bg-orange-600 p-3 rounded font-bold uppercase text-xs">Calcular</button>`;
             } else {
-                content.innerHTML = `
-                    <div class="p-20 text-center">
-                        <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 text-neutral-800"></i>
-                        <p class="text-neutral-500 uppercase text-xs font-bold tracking-widest">Calculadora em desenvolvimento</p>
-                    </div>
-                `;
+                // MODO GENERICO
+                colRes.style.display = 'flex';
+                inputs.classList.replace('md:w-full', 'md:w-1/2');
+                container.style.maxWidth = '1024px';
+                inputs.innerHTML = `<div class="p-4 text-neutral-500 italic">Simulador em desenvolvimento...</div>`;
             }
+
             document.getElementById('simulador-modal').classList.remove('hidden');
             document.getElementById('simulador-modal').classList.add('flex');
             lucide.createIcons();
@@ -178,21 +216,13 @@
 
         function fecharSimulador() {
             document.getElementById('simulador-modal').classList.add('hidden');
-            document.getElementById('simulador-content').innerHTML = '';
+            document.getElementById('simulador-inputs').innerHTML = '';
         }
 
-        function selecionarCategoria(cat, btn) {
-            categoriaAtiva = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.remove('active', 'bg-orange-600', 'text-white');
-                b.classList.add('text-neutral-400');
-            });
-            btn.classList.add('active', 'bg-orange-600', 'text-white');
-            renderizarCards();
-        }
-
-        function filtrarCalculadoras() {
-            renderizarCards(document.getElementById('searchInput').value);
+        window.executarSimulacao = function() {
+            document.getElementById('empty-result').classList.add('hidden');
+            document.getElementById('filled-result').classList.remove('hidden');
+            document.getElementById('filled-result').innerHTML = `<div class="p-4 bg-green-500/10 border border-green-500 rounded text-green-500 text-center font-bold">Simulação Concluída!</div>`;
         }
 
         window.onload = init;
